@@ -13,35 +13,34 @@ who just want to grab a quick part and print it.  No logins, no signups, no ads.
 
 ## How did I get here?
 
-Whoo...I went shoulder climbing for this one.  Many many thanks to Olivier Chafik, whose opencad-wasm project was the foundation of this effort:
+Whoo...I went shoulder climbing for this one.  Many thanks to Olivier Chafik, whose opencad-wasm project was the foundation of this effort:
 
 https://github.com/ochafik/openscad-wasm/tree/editor-ochafik.com
 
 
-Olivier's project is a fork of Dominick Schroer's openscad-wasm build, which I'm using in place of Olivier's since it was updated a little more recently.
+Olivier's project is a fork of Dominick Schroer's openscad-wasm build, which I'm using in place of Olivier's since it was updated a little more recently:
 
 https://github.com/DSchroer/openscad-wasm
 
-Because I wanted this site to be served from GitHub and hosted statically, I needed a way to keep the part library up to date without a server.  I landed on including a sqlite database in the distribution that I can update with a github push.  To use this in the site, I used the sqlite WASM build from sqlute itself 
+Because I wanted this site to be served from GitHub and hosted statically, I needed a way to keep the part library up to date without a server.  I landed on including a sqlite database in the distribution.  To use this in the site, I used the sqlite WASM build from sqlite itself:
 
 https://sqlite.org/wasm/doc/trunk/index.md
 
 
 Olivier kindly included the following OpenSCAD libraries in his distribution, which I have aldo carried forward:
 
-BOSL2
-BOSL
-closepoints
-fonts
-FunctionalOpenSCAD
-funcutils
-MCAD
-NopSCADlib
-openscad-tray
-plot-function
-smooth-prim
-Stemfie_OpenSCAD
-UB.scad
-YAPP_Box
-
+- BOSL2
+- BOSL
+- closepoints
+- fonts
+- FunctionalOpenSCAD
+- funcutils
+- MCAD
+- NopSCADlib
+- openscad-tray
+- plot-function
+- smooth-prim
+- Stemfie_OpenSCAD
+- UB.scad
+- YAPP_Box
 
