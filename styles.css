@@ -1,0 +1,380 @@
+body {
+  margin: 0;
+  /* overflow: hidden; */
+  min-height: 100vh;
+  /* mobile viewport bug fix */
+  min-height: -webkit-fill-available;
+}
+
+html {
+  height: -webkit-fill-available;
+}
+
+.root {
+  position: fixed;
+  left: 0;
+  top: 100;
+  width: 100vw;
+  height: 100vh;
+}
+
+#editor-panel,
+#controlArea {
+  min-width: 40vw;
+  padding: 10px;
+  background: #EEEEEE;
+  /* height: 100vh; */
+}
+
+#cheatsheet-link {
+  display: none;
+  position: fixed;
+  right: 120px;
+  top: 5px;
+  z-index: 10;
+  margin: 10px 20px;
+}
+
+#flip-mode {
+  display: none;
+  position: fixed;
+  left: 5px;
+  top: 5px;
+  z-index: 10;
+  font-size: large;
+  padding: 10px 20px;
+  margin: 5px 0;
+}
+
+.iPadShowKeyboard {
+  right: 130px !important;
+}
+
+#view-panel {
+  width: 70vw;
+}
+
+#editor-panel {
+  width: 30vw;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+}
+
+#run,
+#kill {
+  padding: 5px;
+  margin-top: 5px;
+}
+
+.button {
+  margin-right: 10px;
+}
+
+.text {
+  padding: 5px 0 5px 0;
+}
+
+.text-fragment {
+  padding: 0 10px 0 10px;
+  align-self: center;
+}
+
+.logs-container {
+  overflow-y: scroll;
+  height: calc(min(200px, 30vh));
+  position: relative;
+}
+
+.deep-link {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+
+#features {
+  position: fixed;
+  bottom: 0;
+}
+
+.spacer {
+  flex-grow: 1;
+}
+
+.title {
+  text-align: center;
+  width: 100%;
+  background: #DDDDDD;
+}
+
+#viewer {
+  min-height: 80vh;
+}
+
+#monacoEditor {
+  flex-grow: 1;
+}
+
+@media only screen and (max-height: 600px),
+only screen and (max-width: 600px),
+only screen and (max-width: 767px),
+only screen and (max-aspect-ratio: 1/2) {
+
+  .settings,
+  .desktop {
+    display: none;
+  }
+}
+
+/* 
+      @media only screen and ((max-width: 767px) or (max-height: 400px)) {
+        */
+@media only screen and (max-width: 767px),
+only screen and (max-aspect-ratio: 1/2) {
+
+  #cheatsheet-link {
+    display: block;
+  }
+
+  #flip-mode {
+    display: block;
+  }
+
+  /* .title {
+          position: absolute;
+          right: 0;
+          bottom: 0;
+        } */
+  /* .title h1 {
+          font-size: large;
+        } */
+
+  #monacoEditor,
+  #viewer {
+    padding: 10px 0;
+    position: absolute;
+    left: 0;
+    top: 50px;
+    right: 0;
+    bottom: 0;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  #viewer {
+    height: calc(100vh - 55px);
+  }
+
+
+  #link-container {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    z-index: 4;
+  }
+
+  .logs-container {
+    position: absolute;
+    bottom: 0;
+    height: 30vh;
+    width: 100vw;
+    left: 0;
+    z-index: 1;
+    background-color: rgba(255, 255, 255, 0.7) !important;
+  }
+
+  .logs-container pre {
+    color: rgba(50, 50, 50, 0.9);
+    font-family: Consolas, "Courier New", monospace;
+    font-weight: normal;
+    font-size: 12px;
+  }
+
+  .minimap.slider-mouseover {
+    height: 80vh !important;
+    bottom: 0;
+  }
+
+  .monaco-editor {
+    background-color: rgba(255, 255, 255, 1.0) !important;
+  }
+
+  .overflow-guard,
+  .monaco-scrollable-element,
+  .monaco-editor-background {
+    background-color: transparent !important;
+  }
+
+  #monacoEditor {
+    z-index: 0;
+  }
+
+  #viewer {
+    z-index: 0;
+  }
+
+  #viewer.focused {
+    z-index: 3;
+  }
+
+  /* .settings, */
+  .features
+
+  /* , .github-fork-ribbon */
+    {
+    display: none;
+  }
+}
+
+/**********************************************************/
+/* TAB BOX STUFF adapted from W3Schools */
+/**********************************************************/
+
+/* Style the tab */
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+/* Style the buttons that are used to open the tab content */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+  height: 100vh;
+}
+
+/**********************************************************/
+/* OVERLAY STUFF adapted from W3Schools */
+/**********************************************************/
+/* The Overlay (background) */
+.overlay {
+  height: 100vh;
+  width: 0vw;
+  position: fixed;
+  /* Stay in place */
+  z-index: 1;
+  /* Sit on top */
+  left: 0;
+  top: 0;
+  background-color:rgb(120,120,120);
+  background-color:rgba(120, 120, 120, 0.85);
+  overflow-x: hidden;
+  /* Disable horizontal scroll */
+  transition: 0.2s;
+}
+
+/* Position the content inside the overlay */
+.overlay-content {
+  position: relative;
+  top: 25%;
+  /* 25% from the top */
+  width: 100%;
+  /* 100% width */
+  text-align: center;
+  /* Centered text/links */
+  margin-top: 30px;
+}
+
+/* The navigation links inside the overlay */
+.overlay a {
+  padding: 8px;
+  text-decoration: none;
+  font-size: 36px;
+  color: #818181;
+  display: block;
+  /* Display block instead of inline */
+  transition: 0.3s;
+}
+
+/* When you mouse over the navigation links, change their color */
+.overlay a:hover,
+.overlay a:focus {
+  color: #f1f1f1;
+}
+
+/* Position the close button (top right corner) */
+.overlay .closebtn {
+  position: absolute;
+  top: 20px;
+  right: 45px;
+  font-size: 60px;
+}
+
+/* When the height of the screen is less than 450 pixels, change the font-size of the links and position the close button again, so they don't overlap */
+@media screen and (max-height: 450px) {
+  .overlay a {
+    font-size: 20px
+  }
+
+  .overlay .closebtn {
+    font-size: 40px;
+    top: 15px;
+    right: 35px;
+  }
+}
+
+/*********************************************************************/
+/* From https://www.imarketinx.de/artikel/responsive-image-gallery-with-css-grid.html */
+/*********************************************************************/
+/* First the Grid */
+.gallery-grid {
+  display: -ms-grid;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  grid-gap: 0.0rem;
+  justify-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+/* The Picture Frame */
+.gallery-frame {
+  padding: .5rem;
+  font-size: 1.0rem;
+  text-align: center;
+  background-color: #333;
+  color: #d9d9d9;
+}
+
+/* The Images */
+.gallery-img {
+  width:64px;
+  height:64px;
+  object-fit: cover;
+  transition: opacity 0.25s ease-in-out;
+}
+
+.gallery-img:hover {
+  opacity: .7;
+}

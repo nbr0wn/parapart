@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, user-scalable=no" />
+
+        <link rel="prefetch" href="openscad/openscad.wasm">
+        <link rel="prefetch" href="openscad-worker-inlined.js">
+        <link rel="prefetch" href="libraries/fonts.zip">
+        <link rel="prefetch" href="libraries/MCAD.zip">
+        <link rel="prefetch" href="libraries/BOSL2.zip">
+        <link rel="prefetch" href="libraries/BOSL.zip">
+        <link rel="prefetch" href="libraries/NopSCADlib.zip">
+        <link rel="prefetch" href="libraries/FunctionalOpenSCAD.zip">
+        <link rel="prefetch" href="libraries/funcutils.zip">
+        <link rel="prefetch" href="libraries/smooth-prim.zip">
+        <link rel="prefetch" href="libraries/closepoints.zip">
+        <link rel="prefetch" href="libraries/plot-function.zip">
+        <link rel="prefetch" href="libraries/YAPP_Box.zip">
+        <link rel="prefetch" href="libraries/Stemfie_OpenSCAD.zip">
+        <link rel="prefetch" href="libraries/UB.scad.zip">
+        <link rel="prefetch" href="libraries/openscad-tray.zip">
+
+        <script src="deps/three.min.js" defer></script>
+        <script src="deps/Projector.js" defer></script>
+        <script src="deps/stl_viewer.min.js" defer></script>
+        <script src="deps/webgl_detector.js" defer></script>
+        <script src="deps/OrbitControls.js" defer></script>
+        <script src="deps/parser.min.js" defer></script>
+        <script src="deps/TrackballControls.js" defer></script>
+        <script src="deps/CanvasRenderer.js" defer></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/BrowserFS/2.0.0/browserfs.min.js" defer></script>
+
+        <link rel="stylesheet" data-name="vs/editor/editor.main"
+                               href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/editor/editor.main.min.css">
+        <link rel="stylesheet" href="styles.css">
+        <script>
+            var require = { paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs' } }
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/loader.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/editor/editor.main.nls.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/editor/editor.main.js" defer></script>
+        <script>
+          (async () => {
+            if ('serviceWorker' in navigator) {
+              for (const reg of await navigator.serviceWorker.getRegistrations()) {
+                try {
+                  reg.unregister()
+                } catch (e) {
+                  console.error(e, e.stackTrace);
+                }
+              }
+            }
+          })();
+          // Handle Opening and closing tabs
+          function openTab(evt, tabName) {
+            // Declare all variables
+            var i, tabcontent, tablinks;
+
+            // Get all elements with class="tabcontent" and hide them
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+              tabcontent[i].style.display = "none";
+            }
+
+            // Get all elements with class="tablinks" and remove the class "active"
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+              tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+
+            // Show the current tab, and add an "active" class to the button that opened the tab
+            document.getElementById(tabName).style.display = "block";
+            document.getElementById(tabName).style.height = "100vh";
+            evt.currentTarget.className += " active";
+          }
+
+          /* Open when someone clicks on the span element */
+          function openNav() {
+            document.getElementById("navOverlay").style.width = "100vw";
+          }
+
+          /* Close when someone clicks on the "x" symbol inside the overlay */
+          function closeNav() {
+            console.log("ARGH");
+            document.getElementById("navOverlay").style.width = "0vw";
+          }
+        </script>
+        <script src="filesystem.js" defer></script>
+        <script type="module" src="main.js" defer></script>
+        <script src="controls.js" defer></script>
+        <script src="sqlite/sqlite3.js" defer></script>
+    </head>
+
+    <body>
+        <div id="navOverlay" class="overlay">
+          <span onclick="closeNav()">close</span>
+          <div id="gallery" class="gallery-grid">
+          </div>
+        </div>
+        <div class="text title desktop">
+            <h2>PARAPART</h2>
+                <div class="text desktop">
+                    <span class="text-fragment" onclick="openNav()">Part Finder</span> |
+                    <a target="_blank" class="text-fragment" style="padding-left: 0" href="http://openscad.org/documentation.html">Docs</a> |
+                    <a target="_blank" class="text-fragment" href="http://openscad.org/cheatsheet/">Cheatsheet</a> |
+                    <span class="text-fragment">
+                        <a target="_blank" href="https://github.com/DSchroer/openscad-wasm">WASM build</a>
+                        + <a target="_blank" href="https://github.com/microsoft/monaco-editor">Monaco</a>
+                        + <a target="_blank" href="https://github.com/omrips/viewstl">STL Viewer</a>
+                    </span> |
+                    <span class="text-fragment">
+                        <a target="_blank" href="https://github.com/ochafik/openscad-wasm/blob/editor-ochafik.com/LICENSE.md">LICENSES</a>
+                    </span> 
+                </div>
+        </div>
+        <div class="root row">
+            <div id="controlArea" class="col">
+                <div id="tabs" class="tab">
+                    <button id='head-editor' class="tablinks" onclick="openTab(event,'tab-editor')">Source</button>
+                    <button id='head-log' class="tablinks" onclick="openTab(event,'tab-log')">Logs</button>
+                </div>
+                <div id="tab-editor" class="tabcontent" style="background:#aaEEEE;">
+                    <!-- TODO - without this height, monaco is like 2px high.  Need it to take up the space like the
+                    other tabs.  FIX! -->
+                    <div id="monacoEditor" style="height:80vh"></div>
+                    <button id="flip-mode">Flip 🔀</button>
+                </div>
+                <div id="tab-log" class="tabcontent">
+                    <div class="logs-container">
+                        <pre><code id="logs"></code></pre>
+                    </div>
+                </div>
+            </div>
+            <div id="view-panel" class="col">
+                <div class="text desktop">
+                </div>
+                <div class="row text">
+                    <button class="button settings" id="run">Render (Ctrl+Enter)</button>
+                    <button class="button settings" id="kill" disabled>STOP</button>
+
+                    <div class="text-fragment" id="link-container"></div>
+                    <div class="text-fragment settings" id="meta"></div>
+
+                    <span class="spacer settings"></span>
+
+                    <span class="text-fragment settings"><input type="checkbox" id="autorender" checked>Render</span>
+                    <span class="text-fragment settings"><input type="checkbox" id="autoparse" checked>Check</span>
+                    <span class="text-fragment settings"><input type="checkbox" id="autorotate" checked>Rotate</span>
+                    <!-- <span class="text-fragment settings"><input type="checkbox" id="showedges" checked>Edges</span> -->
+                    <!-- <span class="text-fragment settings"><input type="number" min="16" max="2048" step="16" id="maximum-megabytes" value="512">MB</span> -->
+
+                    <span class="text-fragment settings"><input type="checkbox" id="show-experimental">Show experiments</span>
+
+                    <span class="spacer settings"></span>
+                </div>
+                <div id="viewer" tabindex="0"></div>
+                <span id="features" class="features"></span>
+            </div>
+        </div>
+    </body>
+</html>
