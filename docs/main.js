@@ -470,14 +470,13 @@ async function fetchFromGitHub(owner, repo, path) {
     });
 }
 
-async function fetchRawFromGitHub(owner, repo, path) {
+async function fetchRawFromGitHub(owner, repo, path, completedCallback) {
   return fetch(
-    `https://raw.githubusercontent.com/${owner}/${repo}/contents/${path}`)
-    .then(response => response.json())
-    .then(data => {
-      return atob(data.content);
-    }).catch(function () {
-      console.log("Fetch Error");
+    `https://raw.githubusercontent.com/${owner}/${repo}/main/${path}`
+    ).then(response => response.text()
+    ).then(function(response) {completedCallback(response);}
+    ).catch(function (error) {
+      console.log("Fetch Error" + error);
     });
 }
 
@@ -504,34 +503,12 @@ function base64ToBinary(data) {
 
 var db;
 
-async function fetchSqliteData(sqlite3, owner, repo, path) {
-  await fetch(
-    `https://nbr0wn.github.io/parapart_f_clip/parapart.sqlite3`)
-    //`https://api.github.com/repos/${owner}/${repo}/contents/${path}`)
-    .then(response => response.json())
-    .then(arrayBuffer => {
-      try {
-        const bytes = new Uint8Array(base64ToBinary(atob(arrayBuffer.content)));
-        const p = sqlite3.wasm.allocFromTypedArray(bytes);
-        db.onclose = { after: function () { sqlite3.wasm.dealloc(p) } };
-        const rc = sqlite3.capi.sqlite3_deserialize(
-          db.pointer, 'main', p, bytes.length, bytes.length,
-          0
-        );
-      } catch (e) { console.log(e); }
-    }).catch(function () {
-      console.log("Fetch Error");
-    });
-
-}
 function loadDatabase() {
   self.sqlite3InitModule({
     print: log,
     printErr: error
   }).then(function (sqlite3) {
     try {
-    //await fetchSqliteData(sqlite3, 'nbr0wn', 'parapart_f_clip', 'parapart.sqlite3');
-    //const data = await fetchFromGitHub('nbr0wn', 'parapart_f_clip', 'parapart.sqlite3');
       fetchLocal('parapart.sqlite3', function (data) {
         console.log(data);
         const dataArray = new Uint8Array(base64ToBinary(atob(data)));
@@ -595,7 +572,9 @@ function buildSection(id) {
 function editPart(url) {
   console.log("EDIT NEW PART:"+ url);
   ////const data = await fetchFromGitHub(user, repo, partFile);
-  fetchLocal(url, function (data) {
+  fetchRawFromGitHub('nbr0wn','parapart','docs/'+url,
+  //fetchLocal(url, 
+    function (data) {
     var localState  = defaultState
     localState.source.content = data;
     setState(localState);
