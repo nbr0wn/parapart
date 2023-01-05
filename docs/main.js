@@ -69,20 +69,25 @@ function buildStlViewer() {
   // const initialCameraState = stlViewer.get_camera_state();
   stlViewer.model_loaded_callback = id => {
     stlViewer.set_color(id, '#f9d72c');
-    stlViewer.set_auto_zoom(true);
+    stlViewer.set_color(id, '#3237D1');
+    stlViewer.set_bg_color('#dddddd');
+    //stlViewer.set_grid(true);
+    //stlViewer.set_auto_zoom(true);
     stlViewer.set_auto_resize(true);
     // stlViewer.set_auto_rotate(true);
     // stlViewer.set_edges(id, showedgesCheckbox.checked);
     // onStateChanged({allowRun: false});
+  console.log(stlViewer.get_camera_state());
   };
   return stlViewer;
 }
 
 function viewStlFile() {
+  //console.log(stlViewer.get_camera_state());
+  stlViewer.set_camera_state({position: {x:-100,y:0,z:100}, up:{x:0,y:1,z:0}, target:{x:0,y:0,z:0}})
   try { stlViewer.remove_model(1); } catch (e) { }
   stlViewer.add_model({ id: 1, local_file: stlFile });
 }
-// stlViewer.set_auto_zoom(true);
 
 function addDownloadLink(container, blob, fileName) {
   const link = document.createElement('a');
@@ -396,7 +401,7 @@ function setState(state) {
   editor.setValue(state.source.content);
   sourceFileName = state.source.name || 'input.scad';
   if (state.camera && persistCameraState) {
-    stlViewer.set_camera_state(state.camera);
+    //stlViewer.set_camera_state(state.camera);
   }
   let features = new Set();
   if (state.features) {
@@ -641,19 +646,11 @@ try {
   });
 
   stlViewer = buildStlViewer();
-  // stlViewerElement.onclick = () => stlViewerElement.focus();
   stlViewerElement.ondblclick = () => {
-    // stlViewerElement.onclick = () => {
     console.log("Tap detected!");
     setAutoRotate(!autorotateCheckbox.checked);
     onStateChanged({ allowRun: false });
   };
-  //   try { stlViewer.remove_model(1); } catch (e) {}
-  //   try { stlViewer.dispose(); } catch (e) {}
-
-  //   stlViewer = buildStlViewer();
-  //   viewStlFile();
-  // };
 
   stlViewerElement.onkeydown = e => {
     if (e.key === "Escape" || e.key === "Esc") editor.focus();

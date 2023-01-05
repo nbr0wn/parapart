@@ -74,6 +74,9 @@ https://www.viewstl.com
 https://github.com/omrips/viewstl
 
 
+...and the monaco editor:
+https://github.com/microsoft/monaco-editor
+
 Because I wanted this site to be served from GitHub and hosted statically, I needed a way 
 to manage the part library without a server.  I landed on including a sqlite 
 database in the distribution and using sqlite WASM to query it:
