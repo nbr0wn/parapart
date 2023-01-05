@@ -524,50 +524,51 @@ async function fetchSqliteData(sqlite3, owner, repo, path) {
     });
 
 }
-function dbtest(sqlite3, data) {
-    console.log(data);
-    const dataArray = new Uint8Array(base64ToBinary(atob(data)));
-    const p = sqlite3.wasm.allocFromTypedArray(dataArray);
-    db = new sqlite3.oo1.DB();
-    db.onclose = { after: function () { sqlite3.wasm.dealloc(p) } };
-    const rc = sqlite3.capi.sqlite3_deserialize(
-      db.pointer, 'main', p, dataArray.length, dataArray.length,
-      0
-    );
-
-    log("Query data with exec() using rowMode 'stmt'...");
-    db.exec({
-      sql: "select * from part",
-      rowMode: 'object',
-      callback: function (row) {
-        // Create image from data
-        log("Add Part", ++this.counter, "=", JSON.stringify(row));
-        addPartTile(row.name, row.id, row.file, row.image);
-      }.bind({ counter: 0 })
-    });
-    log("DONE");
+function loadDatabase() {
+  self.sqlite3InitModule({
+    print: log,
+    printErr: error
+  }).then(function (sqlite3) {
+    try {
+    //await fetchSqliteData(sqlite3, 'nbr0wn', 'parapart_f_clip', 'parapart.sqlite3');
+    //const data = await fetchFromGitHub('nbr0wn', 'parapart_f_clip', 'parapart.sqlite3');
+      fetchLocal('parapart.sqlite3', function (data) {
+        console.log(data);
+        const dataArray = new Uint8Array(base64ToBinary(atob(data)));
+        const p = sqlite3.wasm.allocFromTypedArray(dataArray);
+        db = new sqlite3.oo1.DB();
+        log("LOADED DB", db);
+        db.onclose = { after: function () { sqlite3.wasm.dealloc(p) } };
+        const rc = sqlite3.capi.sqlite3_deserialize(
+          db.pointer, 'main', p, dataArray.length, dataArray.length,
+          0
+        );
+        buildSection(0);
+      });
+    } catch (e) {
+      error("Exception:", e.message);
+    }
+  });
 }
 
-async function sqliteTest(sqlite3) {
-  //await fetchSqliteData(sqlite3, 'nbr0wn', 'parapart_f_clip', 'parapart.sqlite3');
-  //const data = await fetchFromGitHub('nbr0wn', 'parapart_f_clip', 'parapart.sqlite3');
-  if(typeof globalThis.parapartdb == "undefined" )
-  {
-    fetchLocal('parapart.sqlite3', function(data) {
-      globalThis.parapartdb = data;
-      dbtest(sqlite3, globalThis.parapartdb);
-    });
+function buildSection(id) {
+  // Nuke all the children
+  const gallery = document.getElementById("gallery");
+  while(gallery.firstChild) {
+    gallery.removeChild(gallery.firstChild);
   }
-  else{
-      dbtest(sqlite3, globalThis.parapartdb);
+  if(id > 0){
+    addSectionTile('back', 0, '/section_images/back.png');
   }
-}
-
-function editCallback(data) {
-  console.log(data);
-  var localState  = defaultState
-  localState.source.content = data;
-  setState(localState);
+  db.exec({
+    sql: `select * from section where parent_id = ${id}`,
+    rowMode: 'object',
+    callback: function (row) {
+      // Create image from data
+      log("Section: ", ++this.counter, "=", JSON.stringify(row));
+      addSectionTile(row.name, row.id, '/section_images/'+row.image);
+    }.bind({ counter: 0 })
+  });
 }
 
 // This function is called when a user clicks on a part in the gallery
@@ -604,7 +605,30 @@ function addPartTile(name, id, url, imgURI) {
   fig.appendChild(img);
   gallery.appendChild(fig);
 }
-  
+
+function addSectionTile(name, id, imgURI) {
+  console.log("ADDING SECTION:" + name)
+  let gallery = document.getElementById("gallery");
+  let img = document.createElement("img");
+  img.classList.add("gallery-img");
+  img.src = imgURI;
+  img.alt = "section image";
+  img.title = "name";
+
+  let cap = document.createElement("figcaption");
+  cap.innerHTML = name;
+
+  let fig = document.createElement("figure");
+  fig.classList.add("gallery-frame");
+  fig.onclick = () => { 
+    console.log(db);
+    buildSection(id); 
+  }
+  fig.appendChild(cap);
+  fig.appendChild(img);
+  gallery.appendChild(fig);
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 // End Parapart Stuff
@@ -656,7 +680,9 @@ try {
 
   const initialState = readStateFromFragment() || defaultState;
 
+  /////////////////////////////////////////////////////////
   ///////////////////////// PARAPART
+  /////////////////////////////////////////////////////////
 
   //const data = await fetchFromGitHub(user, repo, partFile);
 //fetchLocal('test3.scad', function (data) {
@@ -667,20 +693,14 @@ try {
   // Initialize the global customizations object
   globalThis.customizations = parseScad(initialState.source);
   globalThis.onchange = render;
-
-  log("SQLITE");
-  self.sqlite3InitModule({
-    print: log,
-    printErr: error
-  }).then(function (sqlite3) {
-    try {
-      sqliteTest(sqlite3);
-    } catch (e) {
-      error("Exception:", e.message);
-    }
-  });
   
+  // Build the top level gallery section
+  loadDatabase();
+  buildSection(0);
+  
+  /////////////////////////////////////////////////////////
   ///////////////////////// END PARAPART
+  /////////////////////////////////////////////////////////
 
   //setState(initialState);
   await buildFeatureCheckboxes(featuresContainer, featureCheckboxes, () => {
@@ -716,7 +736,9 @@ try {
   editor.focus();
 
   pollCameraChanges();
-  onStateChanged({ allowRun: true });
+
+  console.log("PREVENTED RUN");
+  //onStateChanged({ allowRun: true });
 
   editor.onDidChangeModelContent(() => {
     // Remove the customizer tabs
