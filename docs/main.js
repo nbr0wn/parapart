@@ -608,14 +608,37 @@ function editPart(url) {
   });
 }
 
-function addPartTile(name, id, url, imgURI) {
+function addTile(name, id, url, imgURI, clickFunc) {
   //console.log("ADDING PART:" + name)
   let gallery = document.getElementById("gallery");
   let img = document.createElement("img");
   img.classList.add("gallery-img");
   img.src = imgURI;
   img.alt = "part image";
-  img.title = "name";
+  img.title = name;
+  img.innerHTML="";
+
+  let cap = document.createElement("figcaption");
+  cap.innerHTML = name;
+
+  let fig = document.createElement("figure");
+  fig.classList.add("gallery-frame");
+  fig.onclick = clickFunc;
+  fig.appendChild(cap);
+  fig.appendChild(img);
+  gallery.appendChild(fig);
+}
+function addPartTile(name, id, url, imgURI) {
+  addTile(name,id,url,imgURI,function() { closeNav(); editPart(url);});
+  return;
+  //console.log("ADDING PART:" + name)
+  let gallery = document.getElementById("gallery");
+  let img = document.createElement("img");
+  img.classList.add("gallery-img");
+  img.src = imgURI;
+  img.alt = "part image";
+  img.title = name;
+  img.innerHTML="";
 
   let cap = document.createElement("figcaption");
   cap.innerHTML = name;
@@ -632,13 +655,16 @@ function addPartTile(name, id, url, imgURI) {
 }
 
 function addSectionTile(name, id, imgURI) {
+  addTile(name,id,'',imgURI,function() { buildSection(id);});
+  return;
   //console.log("ADDING SECTION:" + name)
   let gallery = document.getElementById("gallery");
   let img = document.createElement("img");
   img.classList.add("gallery-img");
   img.src = imgURI;
   img.alt = "section image";
-  img.title = "name";
+  img.title = name;
+  img.innerHTML="";
 
   let cap = document.createElement("figcaption");
   cap.innerHTML = name;
@@ -646,7 +672,6 @@ function addSectionTile(name, id, imgURI) {
   let fig = document.createElement("figure");
   fig.classList.add("gallery-frame");
   fig.onclick = () => { 
-    console.log(db);
     buildSection(id); 
   }
   fig.appendChild(cap);
