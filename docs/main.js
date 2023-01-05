@@ -565,27 +565,33 @@ function buildSection(id) {
       rowMode: 'object',
       callback: function (row) {
         // Create image from data
-        log("Section: ", ++this.counter, "=", JSON.stringify(row));
         addSectionTile('BACK', row.parent_id, '/section_images/back.png');
       }.bind({ counter: 0 })
     });
   }
+  // Add the section tiles ( if any )
   db.exec({
     sql: `select * from section where parent_id = ${id}`,
     rowMode: 'object',
     callback: function (row) {
       // Create image from data
-      log("Section: ", ++this.counter, "=", JSON.stringify(row));
+      //log("Section: ", ++this.counter, "=", JSON.stringify(row));
       addSectionTile(row.name, row.id, '/section_images/'+row.image);
     }.bind({ counter: 0 })
   });
+  // Add the part tiles ( if any )
   db.exec({
     sql: `select * from part p, hierarchy h where p.id = h.part_id AND h.section_id = ${id}`,
     rowMode: 'object',
     callback: function (row) {
       // Create image from data
-      log("Section: ", ++this.counter, "=", JSON.stringify(row));
-      //addPartTile(row.name, row.id, row.'/section_images/'+row.image);
+      //log("PART: ", ++this.counter, "=", JSON.stringify(row));
+
+      // Image directories are broken up into groups of 100
+      let dir = String(Math.floor(parseInt(row.id) / 100)).padStart(3,'0')
+      let file = String(parseInt(row.id) % 100).padStart(3,'0')
+      //log(`/part_images/${dir}/${file}.png`);
+      addPartTile(row.name, row.id, `/local_scad/part${row.id}.scad`, `/part_images/${dir}/${file}.png`);
     }.bind({ counter: 0 })
   });
 }
@@ -595,15 +601,15 @@ function editPart(url) {
   console.log("EDIT NEW PART:"+ url);
   ////const data = await fetchFromGitHub(user, repo, partFile);
   fetchLocal(url, function (data) {
-    console.log(data);
     var localState  = defaultState
     localState.source.content = data;
     setState(localState);
+    onStateChanged({ allowRun: true });
   });
 }
 
 function addPartTile(name, id, url, imgURI) {
-  console.log("ADDING PART:" + name)
+  //console.log("ADDING PART:" + name)
   let gallery = document.getElementById("gallery");
   let img = document.createElement("img");
   img.classList.add("gallery-img");
@@ -626,7 +632,7 @@ function addPartTile(name, id, url, imgURI) {
 }
 
 function addSectionTile(name, id, imgURI) {
-  console.log("ADDING SECTION:" + name)
+  //console.log("ADDING SECTION:" + name)
   let gallery = document.getElementById("gallery");
   let img = document.createElement("img");
   img.classList.add("gallery-img");
@@ -703,19 +709,12 @@ try {
   ///////////////////////// PARAPART
   /////////////////////////////////////////////////////////
 
-  //const data = await fetchFromGitHub(user, repo, partFile);
-//fetchLocal('test3.scad', function (data) {
-//  console.log(data);
-//  initialState.source.content = data;
-//});
-  
   // Initialize the global customizations object
   globalThis.customizations = parseScad(initialState.source);
   globalThis.onchange = render;
   
   // Build the top level gallery section
   loadDatabase();
-  buildSection(0);
   
   /////////////////////////////////////////////////////////
   ///////////////////////// END PARAPART
@@ -756,8 +755,7 @@ try {
 
   pollCameraChanges();
 
-  console.log("PREVENTED RUN");
-  //onStateChanged({ allowRun: true });
+  onStateChanged({ allowRun: true });
 
   editor.onDidChangeModelContent(() => {
     // Remove the customizer tabs
