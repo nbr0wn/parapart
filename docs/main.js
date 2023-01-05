@@ -557,8 +557,18 @@ function buildSection(id) {
   while(gallery.firstChild) {
     gallery.removeChild(gallery.firstChild);
   }
+  // Add Nav tiles if we're down in the tree
   if(id > 0){
-    addSectionTile('back', 0, '/section_images/back.png');
+    addSectionTile('TOP', 0, '/section_images/top.png');
+    db.exec({
+      sql: `select parent_id from section where id = ${id}`,
+      rowMode: 'object',
+      callback: function (row) {
+        // Create image from data
+        log("Section: ", ++this.counter, "=", JSON.stringify(row));
+        addSectionTile('BACK', row.parent_id, '/section_images/back.png');
+      }.bind({ counter: 0 })
+    });
   }
   db.exec({
     sql: `select * from section where parent_id = ${id}`,
@@ -567,6 +577,15 @@ function buildSection(id) {
       // Create image from data
       log("Section: ", ++this.counter, "=", JSON.stringify(row));
       addSectionTile(row.name, row.id, '/section_images/'+row.image);
+    }.bind({ counter: 0 })
+  });
+  db.exec({
+    sql: `select * from part p, hierarchy h where p.id = h.part_id AND h.section_id = ${id}`,
+    rowMode: 'object',
+    callback: function (row) {
+      // Create image from data
+      log("Section: ", ++this.counter, "=", JSON.stringify(row));
+      //addPartTile(row.name, row.id, row.'/section_images/'+row.image);
     }.bind({ counter: 0 })
   });
 }
