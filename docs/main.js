@@ -559,13 +559,13 @@ function buildSection(id) {
   }
   // Add Nav tiles if we're down in the tree
   if(id > 0){
-    addSectionTile('TOP', 0, '/section_images/top.png');
+    addSectionTile('TOP', 0, '/assets/section_images/top.png');
     db.exec({
       sql: `select parent_id from section where id = ${id}`,
       rowMode: 'object',
       callback: function (row) {
         // Create image from data
-        addSectionTile('BACK', row.parent_id, '/section_images/back.png');
+        addSectionTile('BACK', row.parent_id, '/assets/section_images/back.png');
       }.bind({ counter: 0 })
     });
   }
@@ -576,7 +576,7 @@ function buildSection(id) {
     callback: function (row) {
       // Create image from data
       //log("Section: ", ++this.counter, "=", JSON.stringify(row));
-      addSectionTile(row.name, row.id, '/section_images/'+row.image);
+      addSectionTile(row.name, row.id, '/assets/section_images/'+row.image);
     }.bind({ counter: 0 })
   });
   // Add the part tiles ( if any )
@@ -591,7 +591,7 @@ function buildSection(id) {
       let dir = String(Math.floor(parseInt(row.id) / 100)).padStart(3,'0')
       let file = String(parseInt(row.id) % 100).padStart(3,'0')
       //log(`/part_images/${dir}/${file}.png`);
-      addPartTile(row.name, row.id, `/local_scad/part${row.id}.scad`, `/part_images/${dir}/${file}.png`);
+      addPartTile(row.name, row.id, `/local_scad/part${row.id}.scad`, `/assets/part_images/${dir}/${file}.png`);
     }.bind({ counter: 0 })
   });
 }
