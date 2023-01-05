@@ -559,13 +559,13 @@ function buildSection(id) {
   }
   // Add Nav tiles if we're down in the tree
   if(id > 0){
-    addSectionTile('TOP', 0, '/assets/section_images/top.png');
+    addSectionTile('TOP', 0, 'assets/section_images/top.png');
     db.exec({
       sql: `select parent_id from section where id = ${id}`,
       rowMode: 'object',
       callback: function (row) {
         // Create image from data
-        addSectionTile('BACK', row.parent_id, '/assets/section_images/back.png');
+        addSectionTile('BACK', row.parent_id, 'assets/section_images/back.png');
       }.bind({ counter: 0 })
     });
   }
@@ -575,8 +575,7 @@ function buildSection(id) {
     rowMode: 'object',
     callback: function (row) {
       // Create image from data
-      //log("Section: ", ++this.counter, "=", JSON.stringify(row));
-      addSectionTile(row.name, row.id, '/assets/section_images/'+row.image);
+      addSectionTile(row.name, row.id, 'assets/section_images/'+row.image);
     }.bind({ counter: 0 })
   });
   // Add the part tiles ( if any )
@@ -584,14 +583,10 @@ function buildSection(id) {
     sql: `select * from part p, hierarchy h where p.id = h.part_id AND h.section_id = ${id}`,
     rowMode: 'object',
     callback: function (row) {
-      // Create image from data
-      //log("PART: ", ++this.counter, "=", JSON.stringify(row));
-
       // Image directories are broken up into groups of 100
       let dir = String(Math.floor(parseInt(row.id) / 100)).padStart(3,'0')
       let file = String(parseInt(row.id) % 100).padStart(3,'0')
-      //log(`/part_images/${dir}/${file}.png`);
-      addPartTile(row.name, row.id, `/local_scad/part${row.id}.scad`, `/assets/part_images/${dir}/${file}.png`);
+      addPartTile(row.name, row.id, `/local_scad/part${row.id}.scad`, `assets/part_images/${dir}/${file}.png`);
     }.bind({ counter: 0 })
   });
 }
@@ -608,7 +603,7 @@ function editPart(url) {
   });
 }
 
-function addTile(name, id, url, imgURI, clickFunc) {
+function addTile(name, imgURI, clickFunc) {
   //console.log("ADDING PART:" + name)
   let gallery = document.getElementById("gallery");
   let img = document.createElement("img");
@@ -629,54 +624,11 @@ function addTile(name, id, url, imgURI, clickFunc) {
   gallery.appendChild(fig);
 }
 function addPartTile(name, id, url, imgURI) {
-  addTile(name,id,url,imgURI,function() { closeNav(); editPart(url);});
-  return;
-  //console.log("ADDING PART:" + name)
-  let gallery = document.getElementById("gallery");
-  let img = document.createElement("img");
-  img.classList.add("gallery-img");
-  img.src = imgURI;
-  img.alt = "part image";
-  img.title = name;
-  img.innerHTML="";
-
-  let cap = document.createElement("figcaption");
-  cap.innerHTML = name;
-
-  let fig = document.createElement("figure");
-  fig.classList.add("gallery-frame");
-  fig.onclick = () => { 
-    closeNav();
-    editPart(url); 
-  }
-  fig.appendChild(cap);
-  fig.appendChild(img);
-  gallery.appendChild(fig);
+  addTile(name,imgURI,function() { closeNav(); editPart(url);});
 }
 
 function addSectionTile(name, id, imgURI) {
-  addTile(name,id,'',imgURI,function() { buildSection(id);});
-  return;
-  //console.log("ADDING SECTION:" + name)
-  let gallery = document.getElementById("gallery");
-  let img = document.createElement("img");
-  img.classList.add("gallery-img");
-  img.src = imgURI;
-  img.alt = "section image";
-  img.title = name;
-  img.innerHTML="";
-
-  let cap = document.createElement("figcaption");
-  cap.innerHTML = name;
-
-  let fig = document.createElement("figure");
-  fig.classList.add("gallery-frame");
-  fig.onclick = () => { 
-    buildSection(id); 
-  }
-  fig.appendChild(cap);
-  fig.appendChild(img);
-  gallery.appendChild(fig);
+  addTile(name,imgURI,function() { buildSection(id);});
 }
 
 
