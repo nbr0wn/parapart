@@ -715,7 +715,10 @@ try {
 
   // Initialize the global customizations object
   globalThis.customizations = parseScad(initialState.source);
+  // Not sure why this doesn't work
   globalThis.customizations.onchange = render;
+  // But this does
+  globalThis.onchange = render;
   
   // Build the top level gallery section
   loadDatabase();
