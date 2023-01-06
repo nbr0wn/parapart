@@ -18,17 +18,21 @@ export async function buildFeatureCheckboxes(container, checkboxes, onchange) {
   console.debug("Detected experimental features: ", features)
 
   for (const feature of features) {
-    const span = Object.assign(document.createElement('span'), {
+    const div = Object.assign(document.createElement('div'), {
       className: 'text-fragment',
     });
-    span.append(checkboxes[feature] = Object.assign(document.createElement('input'), {
+    div.append(checkboxes[feature] = Object.assign(document.createElement('input'), {
+      id:feature,
       checked: false,
       type: "checkbox",
       onchange
     }));
-    span.append(Object.assign(document.createElement('span'), {
-      innerText: feature,
-    }));
-    container.append(span);
+    const label = Object.assign(document.createElement('label'), {
+      htmlFor:feature,
+      innerHTML:feature
+    });
+    div.appendChild(label);
+    
+    container.append(div);
   }
 }

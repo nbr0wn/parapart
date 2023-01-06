@@ -109,48 +109,58 @@
                 </div>
         </div>
         <div class="root row">
-            <div id="controlArea" class="col">
-                <div id="tabs" class="tab">
-                    <button id='head-editor' class="tablinks" onclick="openTab(event,'tab-editor')">Source</button>
-                    <button id='head-log' class="tablinks" onclick="openTab(event,'tab-log')">Logs</button>
+          <div id="controlArea" class="col">
+            <div id="tabs" class="tabs">
+              <input type="radio" name="tabset" id="tabedit">
+              <label for="tabedit">Editor</label>
+              <div id="tab-editor" class="tabx">
+                <div id="monacoEditor" style="height:80vh"></div>
+                <button id="flip-mode">Flip 🔀</button>
+              </div>
+              <input type="radio" name="tabset" id="tablog">
+              <label for="tablog">Logs</label>
+              <div id="tab-log" class="tabx">
+                <div class="logs-container">
+                  <pre><code id="logs"></code></pre>
                 </div>
-                <div id="tab-editor" class="tabcontent" style="background:#aaEEEE;">
-                    <!-- TODO - without this height, monaco is like 2px high.  Need it to take up the space like the
-                    other tabs.  FIX! -->
-                    <div id="monacoEditor" style="height:80vh"></div>
-                    <button id="flip-mode">Flip 🔀</button>
+              </div>
+              <input type="radio" name="tabset" id="settings">
+              <label for="settings">Settings</label>
+              <div id="tab-settings" class="tabx">
+                <div><input type="checkbox" id="autorender" checked>
+                  <label for="autorender">Render</label>
                 </div>
-                <div id="tab-log" class="tabcontent">
-                    <div class="logs-container">
-                        <pre><code id="logs"></code></pre>
-                    </div>
+                <div><input type="checkbox" id="autoparse" checked>Check
+                  <label for="autoparse">Check Source</label>
                 </div>
+                <div><input type="checkbox" id="autorotate" checked>
+                  <label for="autorotate">Rotate</label>
+                </div>
+                <div><input type="checkbox" id="showedges" checked>
+                  <label for="showedges">Edges</label>
+                </div>
+                <div><input type="checkbox" id="show-experimental">
+                  <label for="show-experimental">Advanced Features</label>
+                </div>
+                <div id="features" class="features">
+                  <div><input type="number" min="16" max="2048" step="16" id="maximum-megabytes" value="512">Memory max(MB)
+                    <label for="maximum-megabytes">Max Memory(MB)</label>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div id="view-panel" class="col">
-                <div class="text desktop">
-                </div>
-                <div class="row text">
-                    <button class="button settings" id="run">Render (Ctrl+Enter)</button>
-                    <button class="button settings" id="kill" disabled>STOP</button>
-
-                    <div class="text-fragment" id="link-container"></div>
-                    <div class="text-fragment settings" id="meta"></div>
-
-                    <span class="spacer settings"></span>
-
-                    <span class="text-fragment settings"><input type="checkbox" id="autorender" checked>Render</span>
-                    <span class="text-fragment settings"><input type="checkbox" id="autoparse" checked>Check</span>
-                    <span class="text-fragment settings"><input type="checkbox" id="autorotate" checked>Rotate</span>
-                    <!-- <span class="text-fragment settings"><input type="checkbox" id="showedges" checked>Edges</span> -->
-                    <!-- <span class="text-fragment settings"><input type="number" min="16" max="2048" step="16" id="maximum-megabytes" value="512">MB</span> -->
-
-                    <span class="text-fragment settings"><input type="checkbox" id="show-experimental">Show experiments</span>
-
-                    <span class="spacer settings"></span>
-                </div>
-                <div id="viewer" tabindex="0"></div>
-                <span id="features" class="features"></span>
+          </div>
+          <div id="view-panel" class="col">
+            <div class="text desktop">
             </div>
+            <div class="row text">
+              <button class="button settings" id="run">Render (Ctrl+Enter)</button>
+              <button class="button settings" id="kill" disabled>STOP</button>
+              <div class="text-fragment" id="link-container"></div>
+              <div class="text-fragment settings" id="meta"></div>
+            </div>
+            <div id="viewer" tabindex="0"></div>
+          </div>
         </div>
     </body>
 </html>

@@ -1,9 +1,24 @@
+:root { 
+  --head-bg-color:red;
+  --body-bg-color:#aaffaa;
+  --nav-bg-color:green;
+  --work-bg-color:blue;
+  --log-bg-color:rgb(255,128,77);
+  --part-finder-bg: rgba(255, 255, 255, 0.7);
+  --part-finder-frame: rgb(0,0,0);
+  --editor-bg-color: rgba(255, 255, 255, 0.7);
+  --tab-bg-color:rgb(128,128,128);
+  --tab-label-bg:rgb(99,99,150);
+  --tab-checked-bg:rgb(77,120,155);
+}
+
 body {
   margin: 0;
   /* overflow: hidden; */
   min-height: 100vh;
   /* mobile viewport bug fix */
   min-height: -webkit-fill-available;
+  background:var(--body-bg-color);
 }
 
 html {
@@ -22,7 +37,7 @@ html {
 #controlArea {
   min-width: 40vw;
   padding: 10px;
-  background: #EEEEEE;
+  background: var(--nav-bg-color);
   /* height: 100vh; */
 }
 
@@ -100,7 +115,7 @@ html {
 }
 
 #features {
-  position: fixed;
+  /*position: fixed;*/
   bottom: 0;
 }
 
@@ -111,15 +126,11 @@ html {
 .title {
   text-align: center;
   width: 100%;
-  background: #DDDDDD;
+  background: var(--head-bg-color);
 }
 
 #viewer {
   min-height: 80vh;
-}
-
-#monacoEditor {
-  flex-grow: 1;
 }
 
 @media only screen and (max-height: 600px),
@@ -146,15 +157,10 @@ only screen and (max-aspect-ratio: 1/2) {
   #flip-mode {
     display: block;
   }
+#monacoEditor {
+  flex-grow: 1;
+}
 
-  /* .title {
-          position: absolute;
-          right: 0;
-          bottom: 0;
-        } */
-  /* .title h1 {
-          font-size: large;
-        } */
 
   #monacoEditor,
   #viewer {
@@ -187,33 +193,14 @@ only screen and (max-aspect-ratio: 1/2) {
     width: 100vw;
     left: 0;
     z-index: 1;
-    background-color: rgba(255, 255, 255, 0.7) !important;
+    background-color: var(--editor-bg-color) !important;
   }
 
   .logs-container pre {
-    color: rgba(50, 50, 50, 0.9);
+    color: var(--log-bg-color);
     font-family: Consolas, "Courier New", monospace;
     font-weight: normal;
     font-size: 12px;
-  }
-
-  .minimap.slider-mouseover {
-    height: 80vh !important;
-    bottom: 0;
-  }
-
-  .monaco-editor {
-    background-color: rgba(255, 255, 255, 1.0) !important;
-  }
-
-  .overflow-guard,
-  .monaco-scrollable-element,
-  .monaco-editor-background {
-    background-color: transparent !important;
-  }
-
-  #monacoEditor {
-    z-index: 0;
   }
 
   #viewer {
@@ -226,56 +213,39 @@ only screen and (max-aspect-ratio: 1/2) {
 
   /* .settings, */
   .features
+}
 
-  /* , .github-fork-ribbon */
-    {
-    display: none;
+/**********************************************************/
+/* MONACO EDITOR */
+/**********************************************************/
+
+#monacoEditor {
+  flex-grow: 1;
+}
+
+  .minimap.slider-mouseover {
+    height: 80vh !important;
+    bottom: 0;
   }
-}
+
+  .monaco-editor {
+    background-color: var(--editor-bg-color) !important;
+  }
+
+  .overflow-guard,
+  .monaco-scrollable-element,
+  .monaco-editor-background {
+    background-color: transparent !important;
+  }
+
+  #monacoEditor {
+    z-index: 0;
+  }
+
+
 
 /**********************************************************/
-/* TAB BOX STUFF adapted from W3Schools */
-/**********************************************************/
-
-/* Style the tab */
-.tab {
-  overflow: hidden;
-  border: 1px solid #ccc;
-  background-color: #f1f1f1;
-}
-
-/* Style the buttons that are used to open the tab content */
-.tab button {
-  background-color: inherit;
-  float: left;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  padding: 14px 16px;
-  transition: 0.3s;
-}
-
-/* Change background color of buttons on hover */
-.tab button:hover {
-  background-color: #ddd;
-}
-
-/* Create an active/current tablink class */
-.tab button.active {
-  background-color: #ccc;
-}
-
-/* Style the tab content */
-.tabcontent {
-  display: none;
-  padding: 6px 12px;
-  border: 1px solid #ccc;
-  border-top: none;
-  height: 100vh;
-}
-
-/**********************************************************/
-/* OVERLAY STUFF adapted from W3Schools */
+/* Part chooser overlay
 /**********************************************************/
 /* The Overlay (background) */
 .overlay {
@@ -287,8 +257,7 @@ only screen and (max-aspect-ratio: 1/2) {
   /* Sit on top */
   left: 0;
   top: 0;
-  background-color:rgb(120,120,120);
-  background-color:rgba(120, 120, 120, 1.0);
+  background-color: var(--part-finder-bg);
   overflow-x: hidden;
   /* Disable horizontal scroll */
   transition: 0.2s;
@@ -345,6 +314,7 @@ only screen and (max-aspect-ratio: 1/2) {
 }
 
 /*********************************************************************/
+/* Part gallery grid */
 /* From https://www.imarketinx.de/artikel/responsive-image-gallery-with-css-grid.html */
 /*********************************************************************/
 /* First the Grid */
@@ -363,7 +333,7 @@ only screen and (max-aspect-ratio: 1/2) {
   padding: .5rem;
   font-size: 1.0rem;
   text-align: center;
-  background-color: #333;
+  background-color: var(--part-finder-frame);
   color: #d9d9d9;
 }
 
@@ -377,4 +347,63 @@ only screen and (max-aspect-ratio: 1/2) {
 
 .gallery-img:hover {
   opacity: .7;
+}
+
+
+/*************************************************************************/
+/* MORE TAB STUFF */
+/*************************************************************************/
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  height: 100vh;
+  width: 500px;
+}
+ 
+.tabs label {
+  order: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem 2rem;
+  margin-right: 0.2rem;
+  cursor: pointer;
+  background-color: var(--tab-label-bg);
+  font-weight: bold;
+  transition: background ease 0.1s;
+}
+ 
+.tabs .tabx {
+  order: 9;
+  flex-grow: 1;
+  width: 100%;
+  height: 100%;
+  display: none;
+  padding: 1rem;
+  background: var(--tab-bg-color);
+  padding: 20px;
+}
+ 
+.tabs input[type="radio"] {
+  display: none;
+}
+ 
+.tabs input[type="radio"]:checked + label {
+  background: var(--tab-checked-bg);
+}
+ 
+.tabs input[type="radio"]:checked + label + .tabx {
+  display: block;
+}
+ 
+@media (max-width: 465px) {
+  .tabs .tabx,
+  .tabs label {
+   order: initial;
+  }
+ 
+  .tabs label {
+    width: 100%;
+    margin-left: 50px;
+  }
 }

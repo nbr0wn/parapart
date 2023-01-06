@@ -29,19 +29,19 @@ async function updateCustomizations(varname, value) {
 }
 
 // Add a control label
-function addLabel(controlTabId, description, varname) {
+function addLabel(controlDiv, description, varname) {
     if(description == "") {
         description = varname;
     }
     let label = document.createElement("h3");
     label.innerHTML = description;
-    document.getElementById(controlTabId).appendChild(label);
+    document.getElementById(controlDiv).appendChild(label);
 }
 
-function addSlider(controlTabId,description,varname,value,rangeList) {
+function addSlider(controlDiv,description,varname,value,rangeList) {
     var uniqueTag=randomString();
 
-    addLabel(controlTabId,description,varname);
+    addLabel(controlDiv,description,varname);
 
     // Create the range label
     let rangeTxt = document.createElement("h4");
@@ -87,27 +87,27 @@ function addSlider(controlTabId,description,varname,value,rangeList) {
     }
 
     // Add the range text label
-    document.getElementById(controlTabId).appendChild(rangeTxt);
+    document.getElementById(controlDiv).appendChild(rangeTxt);
 
     // Add the slider
     let form = document.createElement("form");
     form.setAttribute("onchange", `updateSliderTxt('${uniqueTag}', '${varname}');`);
     form.appendChild(slider);
-    document.getElementById(controlTabId).appendChild(form);
+    document.getElementById(controlDiv).appendChild(form);
 
     // Add the matching text input box
     form = document.createElement("form");
     form.setAttribute("onchange", `moveSliderThumb('${uniqueTag}', '${varname}',
         '${slider.min}', '${slider.max}');`);
     form.appendChild(sliderInput);
-    document.getElementById(controlTabId).appendChild(form);
+    document.getElementById(controlDiv).appendChild(form);
 
     updateCustomizations(varname,value);
 }
 
-function addCheckbox(controlTabId, description, varname, value ) {
+function addCheckbox(controlDiv, description, varname, value ) {
     const uniqueTag=randomString();
-    addLabel(controlTabId,description,varname);
+    addLabel(controlDiv,description,varname);
 
     let form = document.createElement("form");
     form.setAttribute("onchange", `updateCheckBox('${uniqueTag}', '${varname}');`);
@@ -119,14 +119,14 @@ function addCheckbox(controlTabId, description, varname, value ) {
         checkBox.checked = true;
     }
     form.appendChild(checkBox)
-    document.getElementById(controlTabId).appendChild(form);
+    document.getElementById(controlDiv).appendChild(form);
 
     updateCustomizations(varname,value);
 }
 
-function addTextBox(controlTabId, description, varname, value ) {
+function addTextBox(controlDiv, description, varname, value ) {
     const uniqueTag=randomString();
-    addLabel(controlTabId,description,varname);
+    addLabel(controlDiv,description,varname);
     
     let form = document.createElement("form");
     form.setAttribute("onchange", `updateTextBox('${uniqueTag}', '${varname}');`);
@@ -135,14 +135,14 @@ function addTextBox(controlTabId, description, varname, value ) {
     textBox.id = `text-${uniqueTag}`;
     textBox.value = value;
     form.appendChild(textBox)
-    document.getElementById(controlTabId).appendChild(form);
+    document.getElementById(controlDiv).appendChild(form);
 
     updateCustomizations(varname,value);
 }
 
-function addSpinBox(controlTabId, description, varname, value ) {
+function addSpinBox(controlDiv, description, varname, value ) {
     const uniqueTag=randomString();
-    addLabel(controlTabId,description,varname);
+    addLabel(controlDiv,description,varname);
     
     let form = document.createElement("form");
     form.setAttribute("onchange", `updateSpinBox('${uniqueTag}', '${varname}');`);
@@ -151,15 +151,15 @@ function addSpinBox(controlTabId, description, varname, value ) {
     spinBox.id = `spin-${uniqueTag}`;
     spinBox.value = value;
     form.appendChild(spinBox)
-    document.getElementById(controlTabId).appendChild(form);
+    document.getElementById(controlDiv).appendChild(form);
     
     updateCustomizations(varname,value);
 }
 
 
-function addVector(controlTabId, description, varname, elementList, rangeList) {
+function addVector(controlDiv, description, varname, elementList, rangeList) {
     const uniqueTag=randomString();
-    addLabel(controlTabId,description,varname);
+    addLabel(controlDiv,description,varname);
     
     let form = document.createElement("form");
     form.setAttribute("onchange", `updateVector('${uniqueTag}', '${varname}');`);
@@ -176,14 +176,14 @@ function addVector(controlTabId, description, varname, elementList, rangeList) {
         }
         form.appendChild(vec);
     });
-    document.getElementById(controlTabId).appendChild(form);
+    document.getElementById(controlDiv).appendChild(form);
 
     updateCustomizations(varname,"["+elementList.toString()+"]");
 }
 
-function addComboBox(controlTabId,description,varname,defaultValue,optionList) {
+function addComboBox(controlDiv,description,varname,defaultValue,optionList) {
     const uniqueTag=randomString();
-    addLabel(controlTabId,description,varname);
+    addLabel(controlDiv,description,varname);
 
     // Create the form
     let form = document.createElement("form");
@@ -218,32 +218,37 @@ function addComboBox(controlTabId,description,varname,defaultValue,optionList) {
     });
     
     // Add form to document
-    document.getElementById(controlTabId).appendChild(form);
+    document.getElementById(controlDiv).appendChild(form);
     updateCustomizations(varname,defaultValue);
 }
 
 
 function addTab(tabName) {
-    // Use the same random string for the button and div
     let randomStr = randomString();
     let tabId = "tab-" + randomStr;
 
-    let newButton = document.createElement("button");
-    newButton.id = "head-" + randomStr;
-    newButton.classList.add("tablinks");
-    newButton.classList.add("removable");
-    newButton.setAttribute("onclick", `openTab(event,'${tabId}');`);
-    newButton.innerHTML=tabName;
-    // Insert this tab before the editor in the nav button list
-    const editor = document.getElementById("head-editor");
-    document.getElementById("tabs").insertBefore(newButton,editor);
+    let radio = document.createElement("input");
+    radio.classList.add("removable");
+    radio.type = "radio";
+    radio.name = "tabset";
+    radio.id = tabId;
+
+    let label = document.createElement("label");
+    label.classList.add("removable");
+    label.id = 'tablabel-' + randomStr;
+    label.htmlFor = tabId;
+    label.innerHTML = tabName;
 
     let newDiv = document.createElement("div");
-    newDiv.id = tabId;
-    newDiv.classList.add("tabcontent");
+    newDiv.id = "tabdiv-" + randomStr;
+    newDiv.classList.add("tabx");
     newDiv.classList.add("removable");
+
     // Append this div to the control area
-    document.getElementById("controlArea").appendChild(newDiv);
+    let editor = document.getElementById("tabedit");
+    document.getElementById("tabs").insertBefore(radio,editor);
+    document.getElementById("tabs").insertBefore(label,editor);
+    document.getElementById("tabs").insertBefore(newDiv,editor);
     
     // Return the new control area ID
     return randomStr;
@@ -320,13 +325,11 @@ export function parseScad(data) {
 
     // Add the first tab
     let tabId = addTab('Controls')
-    var controlHeadId = 'head-' + tabId;
-    var controlTabId = 'tab-' + tabId;
+    var controlLabelId = 'tab-' + tabId;
+    var controlDiv = 'tabdiv-' + tabId;
 
     // Make the first tab active
-    document.getElementById(controlTabId).style.display = "block";
-    document.getElementById(controlTabId).style.height = "100vh";
-    document.getElementById(controlHeadId).classList.add("active");
+    document.getElementById('tab-'+tabId).checked="checked";
 
     data.toString().split("\n").every( function(line, index, arr) {
 
@@ -357,11 +360,11 @@ export function parseScad(data) {
             // rather than creating a new one
             if( haveTabs == false ){
                 // Relabel the default tab
-                document.getElementById(controlHeadId).innerHTML = tabName;
+                document.getElementById(controlLabelId).innerHTML = tabName;
                 haveTabs = true;
             } else {
                 // Create a new tab
-                controlTabId = 'tab-' + addTab(tabName);
+                controlDiv = 'tab-' + addTab(tabName);
             }
         }
 
@@ -376,10 +379,10 @@ export function parseScad(data) {
                     return element.trim();
                 });
                 console.log(`STRING OPTIONS: ${optionList}` );
-                addComboBox(controlTabId,description,varname,value,optionList);
+                addComboBox(controlDiv,description,varname,value,optionList);
             } else {
                 // Plain string text box
-                addTextBox(controlTabId,description,varname,value);
+                addTextBox(controlDiv,description,varname,value);
             }
         }
 
@@ -395,17 +398,17 @@ export function parseScad(data) {
                     return element.trim();
                 });
                 console.log(`NUMBER OPTIONS: ${optionList}` );
-                addComboBox(controlTabId,description,varname,value,optionList);
+                addComboBox(controlDiv,description,varname,value,optionList);
             } else if( matches = line.match(sliderRange)) {
                 // Slider with range (optional step)
                 let rangeList = matches.groups.options.split(':').map( element => {
                     return element.trim();
                 });
-                addSlider(controlTabId,description,varname,value,rangeList);
+                addSlider(controlDiv,description,varname,value,rangeList);
                 console.log(`NUMBER SLIDER RANGE: ${rangeList}` );
             } else {
                 // Plain number spinbox
-                addSpinBox(controlTabId, description, varname, value);
+                addSpinBox(controlDiv, description, varname, value);
             }
         }
 
@@ -415,7 +418,7 @@ export function parseScad(data) {
             let varname = matches.groups.varname;
             let value = matches.groups.value;
             console.log(`BOOL: ${varname} = ${value}` );
-            addCheckbox(controlTabId, description, varname, value);
+            addCheckbox(controlDiv, description, varname, value);
         }
 
         // VECTORS
@@ -437,10 +440,10 @@ export function parseScad(data) {
                     });
                     console.log(`VECTOR RANGE: ${rangeList}` );
                 }
-                addVector(controlTabId, description, varname, elementList, rangeList);
+                addVector(controlDiv, description, varname, elementList, rangeList);
             } else {
                 // Plain vector text box
-                addVector(controlTabId, description, varname, elementList, []);
+                addVector(controlDiv, description, varname, elementList, []);
             }
         }
 
