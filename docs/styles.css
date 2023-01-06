@@ -8,7 +8,7 @@
   --part-finder-frame: rgb(88, 110, 134);
   --part-finder-text: rgb(200,200,200);
   --editor-bg-color: rgba(255, 255, 255, 0.7);
-  --tab-bg-color:rgb(128,128,128);
+  --tab-bg-color:var(--part-finder-frame);
   --tab-label-bg:rgb(99,99,150);
   --tab-checked-bg:rgb(77,120,155);
 }
@@ -391,7 +391,7 @@ only screen and (max-aspect-ratio: 1/2) {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 1rem 2rem;
+  padding: 0.3rem 0.5rem;
   margin-right: 0.2rem;
   cursor: pointer;
   background-color: var(--tab-label-bg);

@@ -52,7 +52,7 @@ function buildStlViewer() {
   stlViewer.model_loaded_callback = id => {
     stlViewer.set_color(id, '#f9d72c');
     stlViewer.set_color(id, '#3237D1');
-    stlViewer.set_bg_color('#dddddd');
+    stlViewer.set_bg_color('#6d89a6');
     //stlViewer.set_grid(true);
     //stlViewer.set_auto_zoom(true);
     stlViewer.set_auto_resize(true);
@@ -703,9 +703,9 @@ try {
     onStateChanged({ allowRun: false });
   };
 
-  stlViewerElement.onkeydown = e => {
-    if (e.key === "Escape" || e.key === "Esc") editor.focus();
-  };
+  //stlViewerElement.onkeydown = e => {
+    //if (e.key === "Escape" || e.key === "Esc") editor.focus();
+  //};
 
   const initialState = readStateFromFragment() || defaultState;
 
@@ -715,7 +715,7 @@ try {
 
   // Initialize the global customizations object
   globalThis.customizations = parseScad(initialState.source);
-  globalThis.onchange = render;
+  globalThis.customizations.onchange = render;
   
   // Build the top level gallery section
   loadDatabase();
@@ -755,7 +755,7 @@ try {
   //   onStateChanged({allowRun: true});
   // };
 
-  editor.focus();
+  //editor.focus();
 
   pollCameraChanges();
 
