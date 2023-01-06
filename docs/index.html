@@ -92,21 +92,22 @@
     </head>
 
     <body>
-        <div id="navOverlay" class="overlay">
-          <span onclick="closeNav()">close</span>
-          <div id="gallery" class="gallery-grid">
-          </div>
-        </div>
-        <div class="text title desktop">
-            <h2>PARAPART</h2>
-                <div class="text desktop">
-                    <span class="text-fragment" onclick="openNav()">Part Finder</span> |
-                    <a target="_blank" class="text-fragment" style="padding-left: 0" href="http://openscad.org/documentation.html">OpenSCAD Docs</a> |
-                    <a target="_blank" class="text-fragment" href="http://openscad.org/cheatsheet/">OpenSCAD Cheatsheet</a> |
-                    <span class="text-fragment">
-                        <a target="_blank" href="https://github.com/nbr0wn/parapart">Project Info</a>
-                    </span> 
-                </div>
+      <div id="navOverlay" class="text title overlay">
+        <img class="hero-image" src="assets/logo.png">
+        <div id="breadcrumbs" class="breadcrumbs"></div>
+        <div id="categories" class="gallery-grid"></div>
+        <div id="gallery" class="gallery-grid"></div>
+      </div>
+      <div class="text title">
+        <img class="hero-image" src="assets/logo.png" onclick="openNav()">
+        <img src="/assets/part_finder.png">
+        <span class="text-fragment" onclick="openNav()">Search</span> |
+          <a target="_blank" class="text-fragment" style="padding-left: 0"
+            href="http://openscad.org/documentation.html">OpenSCAD Docs</a> |
+          <a target="_blank" class="text-fragment" href="http://openscad.org/cheatsheet/">OpenSCAD Cheatsheet</a> |
+          <span class="text-fragment">
+            <a target="_blank" href="https://github.com/nbr0wn/parapart">Project Info</a>
+          </span>
         </div>
         <div class="root row">
           <div id="controlArea" class="col">
@@ -130,7 +131,7 @@
                 <div><input type="checkbox" id="autorender" checked>
                   <label for="autorender">Render</label>
                 </div>
-                <div><input type="checkbox" id="autoparse" checked>Check
+                <div><input type="checkbox" id="autoparse" checked>
                   <label for="autoparse">Check Source</label>
                 </div>
                 <div><input type="checkbox" id="autorotate" checked>
@@ -143,7 +144,7 @@
                   <label for="show-experimental">Advanced Features</label>
                 </div>
                 <div id="features" class="features">
-                  <div><input type="number" min="16" max="2048" step="16" id="maximum-megabytes" value="512">Memory max(MB)
+                  <div><input type="number" min="16" max="2048" step="16" id="maximum-megabytes" value="512">
                     <label for="maximum-megabytes">Max Memory(MB)</label>
                   </div>
                 </div>
@@ -151,12 +152,10 @@
             </div>
           </div>
           <div id="view-panel" class="col">
-            <div class="text desktop">
-            </div>
             <div class="row text">
               <button class="button settings" id="run">Render (Ctrl+Enter)</button>
               <button class="button settings" id="kill" disabled>STOP</button>
-              <div class="text-fragment" id="link-container"></div>
+              <div class="text-fragment" id="link-container"><img src="assets/download.png"></div>
               <div class="text-fragment settings" id="meta"></div>
             </div>
             <div id="viewer" tabindex="0"></div>

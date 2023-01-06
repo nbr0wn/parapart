@@ -1,11 +1,12 @@
 :root { 
-  --head-bg-color:red;
-  --body-bg-color:#aaffaa;
-  --nav-bg-color:green;
+  --head-bg-color:rgb(109, 137, 166);
+  --body-bg-color:var(--head-bg-color);
+  --nav-bg-color:var(--head-bg-color);
   --work-bg-color:blue;
   --log-bg-color:rgb(255,128,77);
-  --part-finder-bg: rgba(255, 255, 255, 0.7);
-  --part-finder-frame: rgb(0,0,0);
+  --part-finder-bg: rgba(109,137,166, 1.0);
+  --part-finder-frame: rgb(88, 110, 134);
+  --part-finder-text: rgb(200,200,200);
   --editor-bg-color: rgba(255, 255, 255, 0.7);
   --tab-bg-color:rgb(128,128,128);
   --tab-label-bg:rgb(99,99,150);
@@ -243,7 +244,6 @@ only screen and (max-aspect-ratio: 1/2) {
   }
 
 
-
 /**********************************************************/
 /* Part chooser overlay
 /**********************************************************/
@@ -300,6 +300,19 @@ only screen and (max-aspect-ratio: 1/2) {
   font-size: 60px;
 }
 
+/* The hero image */
+.hero-image {
+  display:block;
+  background-image: rgb(100, 100, 150), url("assets/logo.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  height: 80px;
+
+  position: relative;
+}
+
+
 /* When the height of the screen is less than 450 pixels, change the font-size of the links and position the close button again, so they don't overlap */
 @media screen and (max-height: 450px) {
   .overlay a {
@@ -321,7 +334,7 @@ only screen and (max-aspect-ratio: 1/2) {
 .gallery-grid {
   display: -ms-grid;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   grid-gap: 0.0rem;
   justify-items: center;
   margin: 0;
@@ -330,17 +343,30 @@ only screen and (max-aspect-ratio: 1/2) {
 
 /* The Picture Frame */
 .gallery-frame {
+  width:134px;
+  height:146px;
   padding: .5rem;
   font-size: 1.0rem;
   text-align: center;
   background-color: var(--part-finder-frame);
-  color: #d9d9d9;
+  color: var(--part-finder-text);
+}
+
+/* The Picture Frame */
+.gallery-frame {
+  width:134px;
+  height:146px;
+  padding: .5rem;
+  font-size: 1.0rem;
+  text-align: center;
+  background-color: var(--part-finder-frame);
+  color: var(--part-finder-text);
 }
 
 /* The Images */
 .gallery-img {
-  width:64px;
-  height:64px;
+  width:128px;
+  height:128px;
   object-fit: cover;
   transition: opacity 0.25s ease-in-out;
 }

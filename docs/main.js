@@ -46,24 +46,6 @@ var persistCameraState = false; // If one gets too far, it's really hard to auto
 var stlViewer;
 var stlFile;
 
-// if (copyLinkButton) {
-//   copyLinkButton.onclick = async () => {
-//     const result = await navigator.permissions.query({name: "clipboard-write"});
-//     if (result.state == "granted" || result.state == "prompt") {
-//       try {
-//         // const serviceUrl = `https://is.gd/create.php?format=simple&url=${encodeURIComponent(location.href)}`;
-//         // const serviceUrl = 'https://is.gd/create.php?format=simple&url=https://www.example.com';
-//         const fetchUrl = '/shorten?url=' + encodeURIComponent(location.href);
-//         const url = await (await fetch(fetchUrl)).text();
-//         console.log('url', url)
-//         navigator.clipboard.writeText(url);
-//       } catch (e) {
-//         console.error("Failed to create the url", e);
-//       }
-//     }
-//   };
-// }
-
 function buildStlViewer() {
   const stlViewer = new StlViewer(stlViewerElement);
   // const initialCameraState = stlViewer.get_camera_state();
@@ -90,12 +72,22 @@ function viewStlFile() {
 }
 
 function addDownloadLink(container, blob, fileName) {
-  const link = document.createElement('a');
-  link.innerText = fileName;
-  link.href = URL.createObjectURL(blob);
-  link.download = fileName;
-  container.append(link);
-  return link;
+  const button = document.createElement('button');
+  button.id="download";
+  button.name="Foo";
+  button.value="Bar";
+  button.innerHTML = "Download " + fileName;
+  button.classList.add('button');
+  button.classList.add('settings');
+  button.onclick = function downloadFile() {
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    document.body.append(link);
+    link.click();
+    link.remove();
+  };
+  container.append(button);
 }
 
 function formatMillis(n) {
@@ -299,7 +291,7 @@ const render = turnIntoDelayableExecution(renderDelay, () => {
           throw result.error;
         }
 
-        metaElement.innerText = formatMillis(result.elapsedMillis);
+        metaElement.innerText = "Render time: " + formatMillis(result.elapsedMillis);
 
         const [output] = result.outputs;
         if (!output) throw 'No output from runner!'
@@ -318,7 +310,8 @@ const render = turnIntoDelayableExecution(renderDelay, () => {
         addDownloadLink(linkContainerElement, blob, fileName);
       } catch (e) {
         console.error(e, e.stack);
-        metaElement.innerText = '<failed>';
+        document.getElementById("download").disabled = true;
+        metaElement.innerText = '[Render Failed]';
         metaElement.title = e.toString();
       } finally {
         setExecuting(false);
@@ -534,22 +527,26 @@ function loadDatabase() {
 }
 
 function buildSection(id) {
-  // Nuke all the children
+  // Clear the categories
+  const categories = document.getElementById("categories");
+  while(categories.firstChild) {
+    categories.removeChild(categories.firstChild);
+  }
+  // Clear the gallery
   const gallery = document.getElementById("gallery");
   while(gallery.firstChild) {
     gallery.removeChild(gallery.firstChild);
   }
+  // Clear the breadcrumbs
+  const breadcrumbs = document.getElementById("breadcrumbs");
+  while(breadcrumbs.firstChild) {
+    breadcrumbs.removeChild(breadcrumbs.firstChild);
+  }
+
   // Add Nav tiles if we're down in the tree
   if(id > 0){
-    addSectionTile('TOP', 0, 'assets/section_images/top.png');
-    db.exec({
-      sql: `select parent_id from section where id = ${id}`,
-      rowMode: 'object',
-      callback: function (row) {
-        // Create image from data
-        addSectionTile('BACK', row.parent_id, 'assets/section_images/back.png');
-      }.bind({ counter: 0 })
-    });
+    // Show breadcrumbs
+    addBreadcrumbs(id);
   }
   // Add the section tiles ( if any )
   db.exec({
@@ -560,6 +557,7 @@ function buildSection(id) {
       addSectionTile(row.name, row.id, 'assets/section_images/'+row.image);
     }.bind({ counter: 0 })
   });
+
   // Add the part tiles ( if any )
   db.exec({
     sql: `select * from part p, hierarchy h where p.id = h.part_id AND h.section_id = ${id}`,
@@ -587,9 +585,9 @@ function editPart(url) {
   });
 }
 
-function addTile(name, imgURI, clickFunc) {
+function addTile(destination, name, imgURI, clickFunc) {
   //console.log("ADDING PART:" + name)
-  let gallery = document.getElementById("gallery");
+  let gallery = document.getElementById(destination);
   let img = document.createElement("img");
   img.classList.add("gallery-img");
   img.src = imgURI;
@@ -603,16 +601,69 @@ function addTile(name, imgURI, clickFunc) {
   let fig = document.createElement("figure");
   fig.classList.add("gallery-frame");
   fig.onclick = clickFunc;
-  fig.appendChild(cap);
   fig.appendChild(img);
+  fig.appendChild(cap);
   gallery.appendChild(fig);
 }
+
+function getParentId(id) {
+  let parent_id = 0;
+  db.exec({
+    sql: `select parent_id, name from section where id = ${id}`,
+    rowMode: 'object',
+    callback: function (row) {
+      parent_id = row.parent_id;
+    }.bind({ counter: 0 })
+  });
+  return parent_id;
+}
+
+function pushBreadcrumb(id) {
+  let name = "Top";
+  db.exec({
+    sql: `select name from section where id = ${id}`,
+    rowMode: 'object',
+    callback: function (row) {
+      name = row.name;
+    }.bind({ counter: 0 })
+  });
+  let span = document.createElement("span");
+  span.innerHTML=name;
+  span.onclick = function() { buildSection(id);};
+  // Stick it at the front of the list
+  let breadcrumbs = document.getElementById("breadcrumbs");
+  let firstChild = breadcrumbs.firstElementChild;
+  breadcrumbs.insertBefore(span, firstChild);
+}
+
+function pushSeparator() {
+  let span = document.createElement("span");
+  span.innerHTML=" -> ";
+  // Stick it at the front of the list
+  let breadcrumbs = document.getElementById("breadcrumbs");
+  let firstChild = breadcrumbs.firstElementChild;
+  breadcrumbs.insertBefore(span, firstChild);
+}
+
+function addBreadcrumbs(id){
+  pushBreadcrumb(id);
+  let parent_id = getParentId(id);
+  while (parent_id > 0) {
+    pushSeparator(id);
+    pushBreadcrumb(parent_id);
+
+    parent_id = getParentId(parent_id);
+  }
+  pushSeparator(id);
+  pushBreadcrumb(0);
+}
+
 function addPartTile(name, id, url, imgURI) {
-  addTile(name,imgURI,function() { closeNav(); editPart(url);});
+  addTile("gallery", name,imgURI,function() { closeNav(); editPart(url);});
 }
 
 function addSectionTile(name, id, imgURI) {
-  addTile(name,imgURI,function() { buildSection(id);});
+  addTile("categories", name,imgURI,function() { buildSection(id);});
 }
 
 
