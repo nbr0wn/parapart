@@ -52,38 +52,12 @@
               }
             }
           })();
-          // Handle Opening and closing tabs
-          function openTab(evt, tabName) {
-            // Declare all variables
-            var i, tabcontent, tablinks;
 
-            // Get all elements with class="tabcontent" and hide them
-            tabcontent = document.getElementsByClassName("tabcontent");
-            for (i = 0; i < tabcontent.length; i++) {
-              tabcontent[i].style.display = "none";
-            }
-
-            // Get all elements with class="tablinks" and remove the class "active"
-            tablinks = document.getElementsByClassName("tablinks");
-            for (i = 0; i < tablinks.length; i++) {
-              tablinks[i].className = tablinks[i].className.replace(" active", "");
-            }
-
-            // Show the current tab, and add an "active" class to the button that opened the tab
-            document.getElementById(tabName).style.display = "block";
-            document.getElementById(tabName).style.height = "100vh";
-            evt.currentTarget.className += " active";
-          }
-
-          /* Open when someone clicks on the span element */
+          // Slide open the nav panel
           function openNav() {
             document.getElementById("navOverlay").style.width = "100vw";
           }
 
-          /* Close when someone clicks on the "x" symbol inside the overlay */
-          function closeNav() {
-            document.getElementById("navOverlay").style.width = "0vw";
-          }
         </script>
         <script src="filesystem.js" defer></script>
         <script type="module" src="main.js" defer></script>
@@ -93,10 +67,11 @@
 
     <body>
       <div id="navOverlay" class="text title overlay">
-        <img class="hero-image" src="assets/logo.png">
+        <div id="mainlogo"></div>
         <div id="breadcrumbs" class="breadcrumbs"></div>
         <div id="categories" class="gallery-grid"></div>
         <div id="gallery" class="gallery-grid"></div>
+        <div id="miniviewer"></div>
       </div>
       <div class="text title">
         <img class="hero-image" src="assets/logo.png" onclick="openNav()">
@@ -111,7 +86,7 @@
       <div class="root row">
         <div id="controlArea" class="col">
           <div id="tabs" class="tabs">
-            <input type="radio" name="tabset" id="tabedit" onkeydown="return;">
+            <input type="radio" name="tabset" id="tabedit">
             <label for="tabedit">Editor</label>
             <div id="tab-editor" class="tabx">
                 <div id="monacoEditor" style="height:80vh"></div>

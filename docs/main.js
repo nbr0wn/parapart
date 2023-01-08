@@ -45,6 +45,7 @@ const featureCheckboxes = {};
 var persistCameraState = false; // If one gets too far, it's really hard to auto reset and can be confusing to users. Just restart.
 var stlViewer;
 var stlFile;
+var miniViewer;
 
 function buildStlViewer() {
   const stlViewer = new StlViewer(stlViewerElement);
@@ -53,13 +54,14 @@ function buildStlViewer() {
     stlViewer.set_color(id, '#f9d72c');
     stlViewer.set_color(id, '#3237D1');
     stlViewer.set_bg_color('#6d89a6');
+    //stlViewer.set_display(id,"smooth");
     //stlViewer.set_grid(true);
     //stlViewer.set_auto_zoom(true);
     stlViewer.set_auto_resize(true);
     // stlViewer.set_auto_rotate(true);
     // stlViewer.set_edges(id, showedgesCheckbox.checked);
     // onStateChanged({allowRun: false});
-  console.log(stlViewer.get_camera_state());
+    //console.log(stlViewer.get_camera_state());
   };
   return stlViewer;
 }
@@ -69,6 +71,7 @@ function viewStlFile() {
   stlViewer.set_camera_state({position: {x:-100,y:0,z:100}, up:{x:0,y:1,z:0}, target:{x:0,y:0,z:0}})
   try { stlViewer.remove_model(1); } catch (e) { }
   stlViewer.add_model({ id: 1, local_file: stlFile });
+  console.log(stlViewer);
 }
 
 function addDownloadLink(container, blob, fileName) {
@@ -585,15 +588,42 @@ function editPart(url) {
   });
 }
 
+function fetchSTL(part) {
+  let url = 'test.stl';
+  fetchLocal(url, function (data) {
+    const fileName = 'foo.stl';
+    const blob = new Blob([data], { type: "application/octet-stream" });
+    const stlFile = new File([blob], fileName);
+    try { miniViewer.remove_model(1); } catch (e) { console.log("STLVIEW ERROR: " + e); }
+    try { miniViewer.add_model({ id: 1, local_file: stlFile, color:'#3237D1' }) } catch (e) { console.log("STLVIEW ERROR: " + e); }
+    console.log(miniViewer);
+  });
+}
+
+function showViewer(event) {
+  const viewer = document.getElementById("miniviewer");
+  const canvas = viewer.getElementsByTagName("canvas")[0];
+
+  viewer.style.left = event.target.offsetLeft + "px";
+  viewer.style.top = event.target.offsetTop + "px";
+  viewer.style.display = "block";
+  viewer.onclick = function () { viewer.style.display = "none" ; event.target.onclick(); }
+  viewer.onmouseleave = function () { viewer.style.display = "none"; }
+  fetchSTL(event.target.partname);
+}
+
 function addTile(destination, name, imgURI, clickFunc) {
   //console.log("ADDING PART:" + name)
-  let gallery = document.getElementById(destination);
+  const gallery = document.getElementById(destination);
   let img = document.createElement("img");
   img.classList.add("gallery-img");
   img.src = imgURI;
   img.alt = "part image";
   img.title = name;
   img.innerHTML="";
+  img.onmousemove=showViewer;
+  img.onclick = clickFunc;
+  img.partname = name;
 
   let cap = document.createElement("figcaption");
   cap.innerHTML = name;
@@ -601,6 +631,8 @@ function addTile(destination, name, imgURI, clickFunc) {
   let fig = document.createElement("figure");
   fig.classList.add("gallery-frame");
   fig.onclick = clickFunc;
+  
+  
   fig.appendChild(img);
   fig.appendChild(cap);
   gallery.appendChild(fig);
@@ -659,11 +691,11 @@ function addBreadcrumbs(id){
 }
 
 function addPartTile(name, id, url, imgURI) {
-  addTile("gallery", name,imgURI,function() { closeNav(); editPart(url);});
+  addTile("gallery", name, imgURI, function() { document.getElementById("navOverlay").style.width = "0vw"; editPart(url);});
 }
 
 function addSectionTile(name, id, imgURI) {
-  addTile("categories", name,imgURI,function() { buildSection(id);});
+  addTile("categories", name, imgURI, function() { buildSection(id);});
 }
 
 
@@ -719,8 +751,27 @@ try {
   globalThis.customizations.onchange = render;
   // But this does
   globalThis.onchange = render;
-  
+
+  // Setup our mini STL viewer
+  miniViewer = new StlViewer(document.getElementById("miniviewer"));
+  miniViewer.set_bg_color('#6d89f6');
+  miniViewer.set_center_models(true);
+  //miniViewer.set_auto_zoom(true);
+  //miniViewer.set_auto_resize(false);
+  miniViewer.set_auto_rotate(true);
+  miniViewer.model_loaded_callback = id => {
+    console.log("Model Loaded:" + id)
+  };
+
   // Build the top level gallery section
+  // Create the clickable logo
+  let logo = document.createElement("img");
+  logo.src = "assets/logo.png";
+  logo.classList.add('hero-image');
+  logo.onclick = function() { buildSection(0); }
+  document.getElementById("mainlogo").appendChild(logo);
+  // Load the database and then build the top level nav elements
+  // on completion
   loadDatabase();
   
   /////////////////////////////////////////////////////////

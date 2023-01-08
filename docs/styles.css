@@ -243,7 +243,6 @@ only screen and (max-aspect-ratio: 1/2) {
     z-index: 0;
   }
 
-
 /**********************************************************/
 /* Part chooser overlay
 /**********************************************************/
@@ -253,7 +252,7 @@ only screen and (max-aspect-ratio: 1/2) {
   width: 100vw;
   position: fixed;
   /* Stay in place */
-  z-index: 1;
+  z-index: 2;
   /* Sit on top */
   left: 0;
   top: 0;
@@ -289,7 +288,7 @@ only screen and (max-aspect-ratio: 1/2) {
 /* When you mouse over the navigation links, change their color */
 .overlay a:hover,
 .overlay a:focus {
-  color: #f1f1f1;
+  color: #ffa1a1;
 }
 
 /* Position the close button (top right corner) */
@@ -432,4 +431,13 @@ only screen and (max-aspect-ratio: 1/2) {
     width: 100%;
     margin-left: 50px;
   }
+}
+
+#miniviewer {
+  top:-500px;
+  left:-500px;
+  position:absolute;
+  display:block;
+  width:128px;
+  height:128px;
 }

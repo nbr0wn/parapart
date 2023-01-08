@@ -1,5 +1,5 @@
 # parapart
-Parametric OpenSCAD part designer
+Parametric OpenSCAD part repository
 
 
 ## What is this thing?
@@ -8,11 +8,7 @@ part, but I couldn't find it, or if I did, it was not quite right and needed to 
 modified.  I had not to date seen a 3D model site that does this adequately, and I've
 never seen the Thingiverse customizer actually work, so...here we are.
 
-This site is not meant for complex multi-part models, or for selling designs.  It is for people
-who just want to grab a quick part, customize it, and print it.  No logins, no signups, no ads.  
-OpenSCAD was a good fit for this.
-
-https://openscad.org
+This site is intended to be a free repository of customizable OpenSCAD models with STL export. No logins, no signups, no ads.  Everything is statically hosted on GitHub, and is available for free to anyone.
 
 Parapart uses OpenSCAD's built-in customization handling as described in the wiki:
 
@@ -35,28 +31,47 @@ The format is:
 [Required]
 NAME:<name of part> - 32 char limit
 URL:<url of part file> - Currently only GitHub-hostted SCAD files are supported here
+SECTION: <Pick one number from the list below>
+
+[Containers]         [Hinges]               [Components]
+1100 Four Sides      5100 Barrel            10100 Fans
+1100 More Sides                             10200 Motors
+                     6000 Gears             10300 Displays
+2000 Brackets        7000 Wheels            10400 Power Supplies
+2100 Hooks                                  10500 Switches
+                     [Mechanical]           10600 Potentiometers
+3000 Fasteners       8100 Motion            10700 Connectors
+3100 Nuts            8110 Linear Slides     
+3200 Bolts           8120 Bushings          [Structural]
+3300 Washers         8130 Couplers          9100 8020
+                                            9200 Bar Stock
+11000 Miscellaneous
+12000 Tools
+
 
 [Optional]
 HELPURL:<help file name> - Name of markdown file that resides at the same path as the part file
-'''
 
+Anything after HELPURL may be read, but will not be processed as part of the part, and will not 
+wind up on the parapart interactive site
+
+'''
 Examples:
 '''
 NAME:Hexagonal Box
 URL:https://github.com/nbr0wn/mypartlib/blob/main/path/to/hexbox.scad
+SECTION: 1100
 HELP:hexbox.md
 
 NAME:Octagonal Box
 URL:https://github.com/nbr0wn/mypartlib/blob/main/path/to/octbox.scad
+SECTION: 1100
 '''
 
 Include as many parts as you like per issue.  Empty lines will be ignored
 
 ### Raw SCAD files
 If you just have a SCAD file that you don't have hosted on GitHub and you would like to include it, create an issue with the title 'SCAD' and then just include the file.  This will be added as a local file to the parapart repository.
-
-https://github.com/nbr0wn/parapart/issues/new
-
 
 ## How did I get here?
 
@@ -73,7 +88,6 @@ Olivier's project also made use of the most excellent viewstl:
 https://www.viewstl.com
 https://github.com/omrips/viewstl
 
-
 ...and the monaco editor:
 https://github.com/microsoft/monaco-editor
 
@@ -82,6 +96,9 @@ to manage the part library without a server.  I landed on including a sqlite
 database in the distribution and using sqlite WASM to query it:
 
 https://sqlite.org/wasm/doc/trunk/index.md
+
+...and of course the OpenSCAD project itself
+https://openscad.org
 
 
 Olivier kindly included the following OpenSCAD libraries in his distribution, which I have aldo carried forward:
