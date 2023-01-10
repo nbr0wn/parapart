@@ -733,14 +733,14 @@ function setDarkMode(dark) {
   if(dark) {
     darkButton.style.display="none";
     lightButton.style.display="block";
-    document.documentElement.classList.add('dark');
+    document.documentElement.setAttribute("data-theme", "business");
     modelColor = darkFg;
     miniViewer.set_bg_color(darkBg);
     render({ now: true });
   } else {
     darkButton.style.display="block";
     lightButton.style.display="none";
-    document.documentElement.classList.remove('dark');
+    document.documentElement.setAttribute("data-theme", "garden");
     modelColor = lightFg;;
     miniViewer.set_bg_color(lightBg);
     render({ now: true });

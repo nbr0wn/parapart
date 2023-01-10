@@ -1,89 +1,5 @@
 @tailwind base;
 
-:root {
-  --color-bg-primary: #EFF5F5;
-  --color-bg-secondary: #D6E4E5;
-  --color-bg-default: #497174;
-  --color-bg-hover: #497174;
-  --color-bg-inverse: #EB6440;
-
-  --color-text-primary: #fff;
-  --color-text-secondary: #755f17;
-  --color-text-default: #444;
-  --color-text-default-soft: #999;
-  --color-text-inverse: #444;
-  --color-text-inverse-soft: #767676;
-
-  --font-display: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --font-body: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-
-  --font-weight-normal: 400;
-  --font-weight-display: 400;
-  --font-weight-btn: 600;
-
-  --rounded-btn: 0.25rem;
-
-  /* Light Mode */
-  --head-bg-color:rgb(109, 137, 166);
-  /* --body-bg-color:var(--head-bg-color); */
-  --nav-bg-color:var(--head-bg-color);
-  --work-bg-color:blue;
-  --log-bg-color:rgb(255,128,77);
-  --part-finder-bg: rgba(109,137,166, 1.0);
-  --part-finder-frame: rgb(88, 110, 134);
-  --part-finder-text: rgb(200,200,200);
-  --editor-bg-color: rgba(255, 255, 255, 0.7);
-  --tab-bg-color:var(--part-finder-frame);
-  --tab-label-bg:rgb(99,99,150);
-  --tab-checked-bg:rgb(77,120,155);
-  --color-bg-button:rgb(120,120,120);
-  --button-text-color:rgb(0,0,0);
-  --button-hover-color:rgb(200,200,200);
-}
-
-/** purgecss start ignore */
-.dark {
-  --color-bg-primary: #1D3E53;
-  --color-bg-secondary: #254B62;
-  --color-bg-default: #476D7C;
-  --color-bg-hover: #77ABB7;
-  --color-bg-inverse: #77ABB7;
-
-  --color-text-primary: #fff;
-  --color-text-secondary: #927e7e;
-  --color-text-default: #373737;
-  --color-text-default-soft: #6a6a6a;
-  --color-text-inverse: #fff;
-  --color-text-inverse-soft: #bbb;
-
-  --font-display: Georgia, Times, 'Times New Roman', serif;
-  --font-body: Corbel, 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans',
-    'DejaVu Sans', 'Bitstream Vera Sans', 'Liberation Sans', Verdana,
-    'Verdana Ref', sans-serif;
-
-  --font-weight-normal: 400;
-  --font-weight-display: 400;
-  --font-weight-btn: 600;
-
-  --rounded-btn: 0;
-
-  --d-head-bg-color:rgb(109, 137, 166);
-  --d-body-bg-color:var(--head-bg-color);
-  --d-text-color:rgb(120,120,120);
-  --d-nav-bg-color:var(--head-bg-color);
-  --d-work-bg-color:blue;
-  --d-log-bg-color:rgb(255,128,77);
-  --d-part-finder-bg: rgba(109,137,166, 1.0);
-  --d-part-finder-frame: rgb(88, 110, 134);
-  --d-part-finder-text: rgb(200,200,200);
-  --d-editor-bg-color: rgba(255, 255, 255, 0.7);
-  --d-tab-bg-color:var(--part-finder-frame);
-  --d-tab-label-bg:rgb(99,99,150);
-  --d-tab-checked-bg:rgb(77,120,155);
-  --d-button-bg-color:rgb(50,50,80);
-  --d-button-text-color:var(--d-text-color);
-  --d-button-hover-color:rgb(100,100,160);
-}
 
 
 @tailwind components;
@@ -91,13 +7,11 @@
 
 
 body {
-  background:var(--color-bg-primary);
 }
 
 #controlArea {
   width: 30vw;
   min-width: 20vw;
-  background:var(--color-bg-primary);
   /* height: 100vh; */
 }
 
@@ -145,9 +59,6 @@ body {
   margin-top: 5px;
 }
 
-.button {
-  margin-right: 10px;
-}
 
 .text {
   padding: 5px 0 5px 0;
@@ -182,7 +93,6 @@ body {
 .title {
   text-align: center;
   width: 100%;
-  background: var(--head-bg-color);
 }
 
 #viewer {
@@ -236,11 +146,9 @@ body {
     width: 100vw;
     left: 0;
     z-index: 1;
-    background-color: var(--editor-bg-color) !important;
   }
 
   .logs-container pre {
-    color: var(--log-bg-color);
     font-family: Consolas, "Courier New", monospace;
     font-weight: normal;
     font-size: 12px;
@@ -271,7 +179,6 @@ body {
 }
 
 .monaco-editor {
-  background-color: var(--editor-bg-color) !important;
 }
 
 .overflow-guard,
@@ -297,7 +204,6 @@ body {
   top: 0;
   /* Sit on top */
   z-index: 2;
-  background:var(--color-bg-primary);
   /* Disable horizontal scroll */
   overflow-x: hidden;
   transition: 0.2s;
@@ -307,7 +213,7 @@ body {
 
 .hero-image {
   display:block;
-  background-image: rgb(100, 100, 150), url("assets/logo.png");
+  background-image: url("assets/logo.png");
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;
@@ -356,7 +262,7 @@ body {
   padding: .5rem;
   font-size: 1.0rem;
   text-align: center;
-  background:var(--color-bg-primary);
+  background:var(--color-bg);
   color: var(--color-text-primary);
 }
 
@@ -368,7 +274,7 @@ body {
   padding: .5rem;
   font-size: 1.0rem;
   text-align: center;
-  background:var(--color-bg-primary);
+  background:var(--color-bg);
   color: var(--color-text-primary);
 }
 
