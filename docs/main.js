@@ -9,7 +9,7 @@ const editorElement = document.getElementById('monacoEditor');
 const runButton = document.getElementById('run');
 const killButton = document.getElementById('kill');
 const metaElement = document.getElementById('meta');
-const linkContainerElement = document.getElementById('link-container');
+const linkContainerElement = document.getElementById('download');
 const autorenderCheckbox = document.getElementById('autorender');
 const autoparseCheckbox = document.getElementById('autoparse');
 const autorotateCheckbox = document.getElementById('autorotate');
@@ -36,6 +36,21 @@ let logHtml = function (cssClass, ...args) {
 const log = (...args) => logHtml('', ...args);
 const warn = (...args) => logHtml('warning', ...args);
 const error = (...args) => logHtml('error', ...args);
+
+var miniViewer;
+
+const darkButton = document.getElementById('darkmode');
+const lightButton = document.getElementById('lightmode');
+
+// Theme and dark mode stuff
+var lightBg = "#EFF5F5";
+var lightFg = "#D6E4E5";
+
+var darkBg = "#1D3E53";
+var darkFg = "#476D7C";
+
+var modelColor = darkFg;
+
 /////////////////////////////////////////////////////////////////
 // END
 /////////////////////////////////////////////////////////////////
@@ -45,19 +60,16 @@ const featureCheckboxes = {};
 var persistCameraState = false; // If one gets too far, it's really hard to auto reset and can be confusing to users. Just restart.
 var stlViewer;
 var stlFile;
-var miniViewer;
 
 function buildStlViewer() {
   const stlViewer = new StlViewer(stlViewerElement);
+  stlViewer.set_bg_color('transparent');
   // const initialCameraState = stlViewer.get_camera_state();
   stlViewer.model_loaded_callback = id => {
-    stlViewer.set_color(id, '#f9d72c');
-    stlViewer.set_color(id, '#3237D1');
-    stlViewer.set_bg_color('#6d89a6');
+    //stlViewer.set_color(id, modelColor);
     //stlViewer.set_display(id,"smooth");
     //stlViewer.set_grid(true);
     //stlViewer.set_auto_zoom(true);
-    stlViewer.set_auto_resize(true);
     // stlViewer.set_auto_rotate(true);
     // stlViewer.set_edges(id, showedgesCheckbox.checked);
     // onStateChanged({allowRun: false});
@@ -70,19 +82,19 @@ function viewStlFile() {
   //console.log(stlViewer.get_camera_state());
   stlViewer.set_camera_state({position: {x:-100,y:0,z:100}, up:{x:0,y:1,z:0}, target:{x:0,y:0,z:0}})
   try { stlViewer.remove_model(1); } catch (e) { }
-  stlViewer.add_model({ id: 1, local_file: stlFile });
-  console.log(stlViewer);
+  stlViewer.add_model({ id: 1, local_file: stlFile, color:modelColor });
+  //console.log(stlViewer);
 }
 
 function addDownloadLink(container, blob, fileName) {
-  const button = document.createElement('button');
-  button.id="download";
-  button.name="Foo";
-  button.value="Bar";
-  button.innerHTML = "Download " + fileName;
-  button.classList.add('button');
-  button.classList.add('settings');
-  button.onclick = function downloadFile() {
+  //const button = document.createElement('button');
+  //button.id="download";
+  //button.name="Foo";
+  //button.value="Bar";
+  //button.innerHTML = "Download " + fileName;
+  //button.classList.add('button');
+  //button.classList.add('settings');
+  container.onclick = function downloadFile() {
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = fileName;
@@ -90,7 +102,7 @@ function addDownloadLink(container, blob, fileName) {
     link.click();
     link.remove();
   };
-  container.append(button);
+  //container.append(button);
 }
 
 function formatMillis(n) {
@@ -309,7 +321,7 @@ const render = turnIntoDelayableExecution(renderDelay, () => {
 
         viewStlFile(stlFile);
 
-        linkContainerElement.innerHTML = '';
+        //linkContainerElement.innerHTML = '';
         addDownloadLink(linkContainerElement, blob, fileName);
       } catch (e) {
         console.error(e, e.stack);
@@ -511,7 +523,6 @@ function loadDatabase() {
   }).then(function (sqlite3) {
     try {
       fetchLocal('parapart.sqlite3', function (data) {
-        console.log(data);
         const dataArray = new Uint8Array(base64ToBinary(atob(data)));
         const p = sqlite3.wasm.allocFromTypedArray(dataArray);
         db = new sqlite3.oo1.DB();
@@ -546,11 +557,9 @@ function buildSection(id) {
     breadcrumbs.removeChild(breadcrumbs.firstChild);
   }
 
-  // Add Nav tiles if we're down in the tree
-  if(id > 0){
-    // Show breadcrumbs
-    addBreadcrumbs(id);
-  }
+  // Show breadcrumbs
+  addBreadcrumbs(id);
+
   // Add the section tiles ( if any )
   db.exec({
     sql: `select * from section where parent_id = ${id}`,
@@ -595,7 +604,7 @@ function fetchSTL(part) {
     const blob = new Blob([data], { type: "application/octet-stream" });
     const stlFile = new File([blob], fileName);
     try { miniViewer.remove_model(1); } catch (e) { console.log("STLVIEW ERROR: " + e); }
-    try { miniViewer.add_model({ id: 1, local_file: stlFile, color:'#3237D1' }) } catch (e) { console.log("STLVIEW ERROR: " + e); }
+    try { miniViewer.add_model({ id: 1, local_file: stlFile, color:modelColor }) } catch (e) { console.log("STLVIEW ERROR: " + e); }
     console.log(miniViewer);
   });
 }
@@ -612,32 +621,6 @@ function showViewer(event) {
   fetchSTL(event.target.partname);
 }
 
-function addTile(destination, name, imgURI, clickFunc) {
-  //console.log("ADDING PART:" + name)
-  const gallery = document.getElementById(destination);
-  let img = document.createElement("img");
-  img.classList.add("gallery-img");
-  img.src = imgURI;
-  img.alt = "part image";
-  img.title = name;
-  img.innerHTML="";
-  img.onmousemove=showViewer;
-  img.onclick = clickFunc;
-  img.partname = name;
-
-  let cap = document.createElement("figcaption");
-  cap.innerHTML = name;
-
-  let fig = document.createElement("figure");
-  fig.classList.add("gallery-frame");
-  fig.onclick = clickFunc;
-  
-  
-  fig.appendChild(img);
-  fig.appendChild(cap);
-  gallery.appendChild(fig);
-}
-
 function getParentId(id) {
   let parent_id = 0;
   db.exec({
@@ -651,30 +634,49 @@ function getParentId(id) {
 }
 
 function pushBreadcrumb(id) {
-  let name = "Top";
+  let name = "Home";
+  let imgURI = "home.png";
   db.exec({
-    sql: `select name from section where id = ${id}`,
+    sql: `select * from section where id = ${id}`,
     rowMode: 'object',
     callback: function (row) {
       name = row.name;
+      imgURI = row.image;
     }.bind({ counter: 0 })
   });
-  let span = document.createElement("span");
-  span.innerHTML=name;
-  span.onclick = function() { buildSection(id);};
+
+  let li = document.createElement("li");
+  li.onclick = function() { buildSection(id);};
+  li.classList.add("flex");
+  li.classList.add("items-center");
+  li.classList.add("space-x-2");
+
+  let img = document.createElement("img");
+  img.src = "assets/section_images/" + imgURI;
+  img.alt = name;
+  img.classList.add("w-8");
+  img.classList.add("h-8");
+  img.innerHTML="";
+
+  let span = document.createElement('span');
+  span.innerHTML = name;
+
+  li.appendChild(span);
+  li.appendChild(img);
+
   // Stick it at the front of the list
   let breadcrumbs = document.getElementById("breadcrumbs");
   let firstChild = breadcrumbs.firstElementChild;
-  breadcrumbs.insertBefore(span, firstChild);
+  breadcrumbs.insertBefore(li, firstChild);
 }
 
 function pushSeparator() {
-  let span = document.createElement("span");
-  span.innerHTML=" -> ";
+  let li = document.createElement("li");
+  li.innerHTML = "/";
   // Stick it at the front of the list
   let breadcrumbs = document.getElementById("breadcrumbs");
   let firstChild = breadcrumbs.firstElementChild;
-  breadcrumbs.insertBefore(span, firstChild);
+  breadcrumbs.insertBefore(li, firstChild);
 }
 
 function addBreadcrumbs(id){
@@ -686,9 +688,38 @@ function addBreadcrumbs(id){
 
     parent_id = getParentId(parent_id);
   }
-  pushSeparator(id);
-  pushBreadcrumb(0);
+  if( id > 0) {
+    pushSeparator(id);
+    pushBreadcrumb(0);
+  }
 }
+
+function addTile(destination, name, imgURI, clickFunc) {
+  //console.log("ADDING PART:" + name)
+  const gallery = document.getElementById(destination);
+  let img = document.createElement("img");
+  img.classList.add("col");
+  img.src = imgURI;
+  img.alt = "part image";
+  img.title = name;
+  img.innerHTML="";
+  img.onmousemove=showViewer;
+  img.onclick = clickFunc;
+  img.partname = name;
+
+  let cap = document.createElement("figcaption");
+  cap.innerHTML = name;
+
+  let fig = document.createElement("div");
+  fig.classList.add("gallery-frame");
+  fig.onclick = clickFunc;
+  
+  
+  fig.appendChild(img);
+  fig.appendChild(cap);
+  gallery.appendChild(fig);
+}
+
 
 function addPartTile(name, id, url, imgURI) {
   addTile("gallery", name, imgURI, function() { document.getElementById("navOverlay").style.width = "0vw"; editPart(url);});
@@ -698,6 +729,23 @@ function addSectionTile(name, id, imgURI) {
   addTile("categories", name, imgURI, function() { buildSection(id);});
 }
 
+function setDarkMode(dark) {
+  if(dark) {
+    darkButton.style.display="none";
+    lightButton.style.display="block";
+    document.documentElement.classList.add('dark');
+    modelColor = darkFg;
+    miniViewer.set_bg_color(darkBg);
+    render({ now: true });
+  } else {
+    darkButton.style.display="block";
+    lightButton.style.display="none";
+    document.documentElement.classList.remove('dark');
+    modelColor = lightFg;;
+    miniViewer.set_bg_color(lightBg);
+    render({ now: true });
+  }
+}
 
 //////////////////////////////////////////////////////////////////////////
 // End Parapart Stuff
@@ -750,11 +798,11 @@ try {
   // Not sure why this doesn't work
   globalThis.customizations.onchange = render;
   // But this does
-  globalThis.onchange = render;
+  //globalThis.onchange = render;
 
   // Setup our mini STL viewer
   miniViewer = new StlViewer(document.getElementById("miniviewer"));
-  miniViewer.set_bg_color('#6d89f6');
+  miniViewer.set_bg_color(darkBg);
   miniViewer.set_center_models(true);
   //miniViewer.set_auto_zoom(true);
   //miniViewer.set_auto_resize(false);
@@ -774,6 +822,9 @@ try {
   // on completion
   loadDatabase();
   
+  darkButton.onclick = () => { setDarkMode(true); }
+  lightButton.onclick = () => { setDarkMode(false); }
+
   /////////////////////////////////////////////////////////
   ///////////////////////// END PARAPART
   /////////////////////////////////////////////////////////

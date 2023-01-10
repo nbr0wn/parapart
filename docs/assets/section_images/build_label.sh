@@ -1,5 +1,5 @@
 #!/bin/bash
-for t in containers brackets fasteners standoffs tools components gears wheels structural hooks nuts bolts
+for t in home containers brackets fasteners standoffs tools components gears wheels structural hooks nuts bolts
 do
     label=`echo $t | tr 'a-z' 'A-Z'`
     echo $label

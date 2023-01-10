@@ -1,6 +1,31 @@
-:root { 
+@tailwind base;
+
+:root {
+  --color-bg-primary: #EFF5F5;
+  --color-bg-secondary: #D6E4E5;
+  --color-bg-default: #497174;
+  --color-bg-hover: #497174;
+  --color-bg-inverse: #EB6440;
+
+  --color-text-primary: #fff;
+  --color-text-secondary: #755f17;
+  --color-text-default: #444;
+  --color-text-default-soft: #999;
+  --color-text-inverse: #444;
+  --color-text-inverse-soft: #767676;
+
+  --font-display: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-body: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+  --font-weight-normal: 400;
+  --font-weight-display: 400;
+  --font-weight-btn: 600;
+
+  --rounded-btn: 0.25rem;
+
+  /* Light Mode */
   --head-bg-color:rgb(109, 137, 166);
-  --body-bg-color:var(--head-bg-color);
+  /* --body-bg-color:var(--head-bg-color); */
   --nav-bg-color:var(--head-bg-color);
   --work-bg-color:blue;
   --log-bg-color:rgb(255,128,77);
@@ -11,34 +36,68 @@
   --tab-bg-color:var(--part-finder-frame);
   --tab-label-bg:rgb(99,99,150);
   --tab-checked-bg:rgb(77,120,155);
+  --color-bg-button:rgb(120,120,120);
+  --button-text-color:rgb(0,0,0);
+  --button-hover-color:rgb(200,200,200);
 }
+
+/** purgecss start ignore */
+.dark {
+  --color-bg-primary: #1D3E53;
+  --color-bg-secondary: #254B62;
+  --color-bg-default: #476D7C;
+  --color-bg-hover: #77ABB7;
+  --color-bg-inverse: #77ABB7;
+
+  --color-text-primary: #fff;
+  --color-text-secondary: #927e7e;
+  --color-text-default: #373737;
+  --color-text-default-soft: #6a6a6a;
+  --color-text-inverse: #fff;
+  --color-text-inverse-soft: #bbb;
+
+  --font-display: Georgia, Times, 'Times New Roman', serif;
+  --font-body: Corbel, 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans',
+    'DejaVu Sans', 'Bitstream Vera Sans', 'Liberation Sans', Verdana,
+    'Verdana Ref', sans-serif;
+
+  --font-weight-normal: 400;
+  --font-weight-display: 400;
+  --font-weight-btn: 600;
+
+  --rounded-btn: 0;
+
+  --d-head-bg-color:rgb(109, 137, 166);
+  --d-body-bg-color:var(--head-bg-color);
+  --d-text-color:rgb(120,120,120);
+  --d-nav-bg-color:var(--head-bg-color);
+  --d-work-bg-color:blue;
+  --d-log-bg-color:rgb(255,128,77);
+  --d-part-finder-bg: rgba(109,137,166, 1.0);
+  --d-part-finder-frame: rgb(88, 110, 134);
+  --d-part-finder-text: rgb(200,200,200);
+  --d-editor-bg-color: rgba(255, 255, 255, 0.7);
+  --d-tab-bg-color:var(--part-finder-frame);
+  --d-tab-label-bg:rgb(99,99,150);
+  --d-tab-checked-bg:rgb(77,120,155);
+  --d-button-bg-color:rgb(50,50,80);
+  --d-button-text-color:var(--d-text-color);
+  --d-button-hover-color:rgb(100,100,160);
+}
+
+
+@tailwind components;
+@tailwind utilities;
+
 
 body {
-  margin: 0;
-  /* overflow: hidden; */
-  min-height: 100vh;
-  /* mobile viewport bug fix */
-  min-height: -webkit-fill-available;
-  background:var(--body-bg-color);
+  background:var(--color-bg-primary);
 }
 
-html {
-  height: -webkit-fill-available;
-}
-
-.root {
-  position: fixed;
-  left: 0;
-  top: 100;
-  width: 100vw;
-  height: 100vh;
-}
-
-#editor-panel,
 #controlArea {
-  min-width: 40vw;
-  padding: 10px;
-  background: var(--nav-bg-color);
+  width: 30vw;
+  min-width: 20vw;
+  background:var(--color-bg-primary);
   /* height: 100vh; */
 }
 
@@ -68,10 +127,6 @@ html {
 
 #view-panel {
   width: 70vw;
-}
-
-#editor-panel {
-  width: 30vw;
 }
 
 .row {
@@ -134,11 +189,7 @@ html {
   min-height: 80vh;
 }
 
-@media only screen and (max-height: 600px),
-only screen and (max-width: 600px),
-only screen and (max-width: 767px),
-only screen and (max-aspect-ratio: 1/2) {
-
+@media only screen and (max-height: 600px), only screen and (max-width: 600px), only screen and (max-width: 767px), only screen and (max-aspect-ratio: 1/2) {
   .settings,
   .desktop {
     display: none;
@@ -148,9 +199,8 @@ only screen and (max-aspect-ratio: 1/2) {
 /* 
       @media only screen and ((max-width: 767px) or (max-height: 400px)) {
         */
-@media only screen and (max-width: 767px),
-only screen and (max-aspect-ratio: 1/2) {
 
+@media only screen and (max-width: 767px), only screen and (max-aspect-ratio: 1/2) {
   #cheatsheet-link {
     display: block;
   }
@@ -158,10 +208,10 @@ only screen and (max-aspect-ratio: 1/2) {
   #flip-mode {
     display: block;
   }
-#monacoEditor {
-  flex-grow: 1;
-}
 
+  #monacoEditor {
+    flex-grow: 1;
+  }
 
   #monacoEditor,
   #viewer {
@@ -177,14 +227,6 @@ only screen and (max-aspect-ratio: 1/2) {
 
   #viewer {
     height: calc(100vh - 55px);
-  }
-
-
-  #link-container {
-    position: absolute;
-    bottom: 15px;
-    right: 15px;
-    z-index: 4;
   }
 
   .logs-container {
@@ -211,95 +253,58 @@ only screen and (max-aspect-ratio: 1/2) {
   #viewer.focused {
     z-index: 3;
   }
-
-  /* .settings, */
-  .features
 }
 
 /**********************************************************/
+
 /* MONACO EDITOR */
+
 /**********************************************************/
 
 #monacoEditor {
   flex-grow: 1;
 }
 
-  .minimap.slider-mouseover {
-    height: 80vh !important;
-    bottom: 0;
-  }
+.minimap.slider-mouseover {
+  height: 80vh !important;
+  bottom: 0;
+}
 
-  .monaco-editor {
-    background-color: var(--editor-bg-color) !important;
-  }
+.monaco-editor {
+  background-color: var(--editor-bg-color) !important;
+}
 
-  .overflow-guard,
+.overflow-guard,
   .monaco-scrollable-element,
   .monaco-editor-background {
-    background-color: transparent !important;
-  }
+  background-color: transparent !important;
+}
 
-  #monacoEditor {
-    z-index: 0;
-  }
+#monacoEditor {
+  z-index: 0;
+}
 
 /**********************************************************/
 /* Part chooser overlay
 /**********************************************************/
-/* The Overlay (background) */
+
 .overlay {
   height: 100vh;
   width: 100vw;
-  position: fixed;
   /* Stay in place */
-  z-index: 2;
-  /* Sit on top */
+  position: fixed;
   left: 0;
   top: 0;
-  background-color: var(--part-finder-bg);
-  overflow-x: hidden;
+  /* Sit on top */
+  z-index: 2;
+  background:var(--color-bg-primary);
   /* Disable horizontal scroll */
+  overflow-x: hidden;
   transition: 0.2s;
 }
 
-/* Position the content inside the overlay */
-.overlay-content {
-  position: relative;
-  top: 25%;
-  /* 25% from the top */
-  width: 100%;
-  /* 100% width */
-  text-align: center;
-  /* Centered text/links */
-  margin-top: 30px;
-}
-
-/* The navigation links inside the overlay */
-.overlay a {
-  padding: 8px;
-  text-decoration: none;
-  font-size: 36px;
-  color: #818181;
-  display: block;
-  /* Display block instead of inline */
-  transition: 0.3s;
-}
-
-/* When you mouse over the navigation links, change their color */
-.overlay a:hover,
-.overlay a:focus {
-  color: #ffa1a1;
-}
-
-/* Position the close button (top right corner) */
-.overlay .closebtn {
-  position: absolute;
-  top: 20px;
-  right: 45px;
-  font-size: 60px;
-}
-
 /* The hero image */
+
 .hero-image {
   display:block;
   background-image: rgb(100, 100, 150), url("assets/logo.png");
@@ -307,12 +312,11 @@ only screen and (max-aspect-ratio: 1/2) {
   background-size: contain;
   background-position: center;
   height: 80px;
-
   position: relative;
 }
 
-
 /* When the height of the screen is less than 450 pixels, change the font-size of the links and position the close button again, so they don't overlap */
+
 @media screen and (max-height: 450px) {
   .overlay a {
     font-size: 20px
@@ -326,12 +330,16 @@ only screen and (max-aspect-ratio: 1/2) {
 }
 
 /*********************************************************************/
+
 /* Part gallery grid */
+
 /* From https://www.imarketinx.de/artikel/responsive-image-gallery-with-css-grid.html */
+
 /*********************************************************************/
+
 /* First the Grid */
+
 .gallery-grid {
-  display: -ms-grid;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   grid-gap: 0.0rem;
@@ -341,50 +349,52 @@ only screen and (max-aspect-ratio: 1/2) {
 }
 
 /* The Picture Frame */
+
 .gallery-frame {
   width:134px;
   height:146px;
   padding: .5rem;
   font-size: 1.0rem;
   text-align: center;
-  background-color: var(--part-finder-frame);
-  color: var(--part-finder-text);
+  background:var(--color-bg-primary);
+  color: var(--color-text-primary);
 }
 
 /* The Picture Frame */
+
 .gallery-frame {
   width:134px;
   height:146px;
   padding: .5rem;
   font-size: 1.0rem;
   text-align: center;
-  background-color: var(--part-finder-frame);
-  color: var(--part-finder-text);
+  background:var(--color-bg-primary);
+  color: var(--color-text-primary);
 }
 
 /* The Images */
+
 .gallery-img {
   width:128px;
   height:128px;
-  object-fit: cover;
+  -o-object-fit: cover;
+     object-fit: cover;
   transition: opacity 0.25s ease-in-out;
 }
 
-.gallery-img:hover {
-  opacity: .7;
-}
-
-
 /*************************************************************************/
+
 /* MORE TAB STUFF */
+
 /*************************************************************************/
+
 .tabs {
   display: flex;
   flex-wrap: wrap;
   height: 100vh;
   width: 500px;
 }
- 
+
 .tabs label {
   order: 1;
   display: flex;
@@ -393,11 +403,12 @@ only screen and (max-aspect-ratio: 1/2) {
   padding: 0.3rem 0.5rem;
   margin-right: 0.2rem;
   cursor: pointer;
-  background-color: var(--tab-label-bg);
+  background-color: var(--color-bg-secondary);
   font-weight: bold;
   transition: background ease 0.1s;
+  border-radius: 8px 8px 0px 0px;
 }
- 
+
 .tabs .tabx {
   order: 9;
   flex-grow: 1;
@@ -408,25 +419,25 @@ only screen and (max-aspect-ratio: 1/2) {
   background: var(--tab-bg-color);
   padding: 20px;
 }
- 
+
 .tabs input[type="radio"] {
   display: none;
 }
- 
+
 .tabs input[type="radio"]:checked + label {
   background: var(--tab-checked-bg);
 }
- 
+
 .tabs input[type="radio"]:checked + label + .tabx {
   display: block;
 }
- 
+
 @media (max-width: 465px) {
   .tabs .tabx,
   .tabs label {
-   order: initial;
+    order: initial;
   }
- 
+
   .tabs label {
     width: 100%;
     margin-left: 50px;

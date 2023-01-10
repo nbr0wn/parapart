@@ -1,139 +1,220 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta name="viewport" content="width=device-width, user-scalable=no" />
+<html class="dark">
 
-        <link rel="prefetch" href="openscad/openscad.wasm">
-        <link rel="prefetch" href="openscad-worker-inlined.js">
-        <link rel="prefetch" href="libraries/fonts.zip">
-        <link rel="prefetch" href="libraries/MCAD.zip">
-        <link rel="prefetch" href="libraries/BOSL2.zip">
-        <link rel="prefetch" href="libraries/BOSL.zip">
-        <link rel="prefetch" href="libraries/NopSCADlib.zip">
-        <link rel="prefetch" href="libraries/FunctionalOpenSCAD.zip">
-        <link rel="prefetch" href="libraries/funcutils.zip">
-        <link rel="prefetch" href="libraries/smooth-prim.zip">
-        <link rel="prefetch" href="libraries/closepoints.zip">
-        <link rel="prefetch" href="libraries/plot-function.zip">
-        <link rel="prefetch" href="libraries/YAPP_Box.zip">
-        <link rel="prefetch" href="libraries/Stemfie_OpenSCAD.zip">
-        <link rel="prefetch" href="libraries/UB.scad.zip">
-        <link rel="prefetch" href="libraries/openscad-tray.zip">
+<head>
+  <meta name="viewport" content="width=device-width, user-scalable=no" />
 
-        <script src="deps/three.min.js" defer></script>
-        <script src="deps/Projector.js" defer></script>
-        <script src="deps/stl_viewer.min.js" defer></script>
-        <script src="deps/webgl_detector.js" defer></script>
-        <script src="deps/OrbitControls.js" defer></script>
-        <script src="deps/parser.min.js" defer></script>
-        <script src="deps/TrackballControls.js" defer></script>
-        <script src="deps/CanvasRenderer.js" defer></script>
+  <link rel="prefetch" href="openscad/openscad.wasm">
+  <link rel="prefetch" href="openscad-worker-inlined.js">
+  <link rel="prefetch" href="libraries/fonts.zip">
+  <link rel="prefetch" href="libraries/MCAD.zip">
+  <link rel="prefetch" href="libraries/BOSL2.zip">
+  <link rel="prefetch" href="libraries/BOSL.zip">
+  <link rel="prefetch" href="libraries/NopSCADlib.zip">
+  <link rel="prefetch" href="libraries/FunctionalOpenSCAD.zip">
+  <link rel="prefetch" href="libraries/funcutils.zip">
+  <link rel="prefetch" href="libraries/smooth-prim.zip">
+  <link rel="prefetch" href="libraries/closepoints.zip">
+  <link rel="prefetch" href="libraries/plot-function.zip">
+  <link rel="prefetch" href="libraries/YAPP_Box.zip">
+  <link rel="prefetch" href="libraries/Stemfie_OpenSCAD.zip">
+  <link rel="prefetch" href="libraries/UB.scad.zip">
+  <link rel="prefetch" href="libraries/openscad-tray.zip">
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/BrowserFS/2.0.0/browserfs.min.js" defer></script>
+  <script src="deps/three.min.js" defer></script>
+  <script src="deps/Projector.js" defer></script>
+  <script src="deps/stl_viewer.min.js" defer></script>
+  <script src="deps/webgl_detector.js" defer></script>
+  <script src="deps/OrbitControls.js" defer></script>
+  <script src="deps/parser.min.js" defer></script>
+  <script src="deps/TrackballControls.js" defer></script>
+  <script src="deps/CanvasRenderer.js" defer></script>
 
-        <link rel="stylesheet" data-name="vs/editor/editor.main"
-                               href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/editor/editor.main.min.css">
-        <link rel="stylesheet" href="styles.css">
-        <script>
-            var require = { paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs' } }
-        </script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/loader.min.js" defer></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/editor/editor.main.nls.js" defer></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/editor/editor.main.js" defer></script>
-        <script>
-          (async () => {
-            if ('serviceWorker' in navigator) {
-              for (const reg of await navigator.serviceWorker.getRegistrations()) {
-                try {
-                  reg.unregister()
-                } catch (e) {
-                  console.error(e, e.stackTrace);
-                }
-              }
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/BrowserFS/2.0.0/browserfs.min.js" defer></script>
+
+  <link rel="stylesheet" href="output.css">
+  <link rel="stylesheet" data-name="vs/editor/editor.main"
+    href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/editor/editor.main.min.css">
+  <script>
+    var require = { paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs' } }
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/loader.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/editor/editor.main.nls.js"
+    defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/editor/editor.main.js" defer></script>
+  <script>
+      (async () => {
+        if ('serviceWorker' in navigator) {
+          for (const reg of await navigator.serviceWorker.getRegistrations()) {
+            try {
+              reg.unregister()
+            } catch (e) {
+              console.error(e, e.stackTrace);
             }
-          })();
-
-          // Slide open the nav panel
-          function openNav() {
-            document.getElementById("navOverlay").style.width = "100vw";
           }
+        }
+      })();
 
-        </script>
-        <script src="filesystem.js" defer></script>
-        <script type="module" src="main.js" defer></script>
-        <script src="controls.js" defer></script>
-        <script src="sqlite/sqlite3.js" defer></script>
-    </head>
+    // Slide open the nav panel
+    function openNav() {
+      document.getElementById("navOverlay").style.width = "100vw";
+    }
 
-    <body>
-      <div id="navOverlay" class="text title overlay">
-        <div id="mainlogo"></div>
-        <div id="breadcrumbs" class="breadcrumbs"></div>
-        <div id="categories" class="gallery-grid"></div>
-        <div id="gallery" class="gallery-grid"></div>
-        <div id="miniviewer"></div>
+  </script>
+  <script src="filesystem.js" defer></script>
+  <script type="module" src="main.js" defer></script>
+  <script src="controls.js" defer></script>
+  <script src="sqlite/sqlite3.js" defer></script>
+</head>
+
+<body>
+
+  <div id="navOverlay" class="overlay">
+    <div id="headArea" class="grid grid-cols-7 gap-1">
+      <div id="mainlogo" class="col-span-2"> </div>
+      <div class="py-8">
+        <a target=" _blank" href="http://openscad.org/documentation.html">OpenSCAD Docs</a>
       </div>
-      <div class="text title">
+      <div class="py-8">
+        <a target="_blank" href="http://openscad.org/cheatsheet/">OpenSCAD Cheatsheet</a>
+      </div>
+      <div class="py-8">
+        <a target="_blank" href="https://github.com/nbr0wn/parapart">About Parapart</a>
+      </div>
+      <div class="py-8">
+        <a target="_blank" href="https://github.com/nbr0wn/parapart/issues/add">Add New Part</a>
+      </div>
+    </div>
+    <div>
+      <ul id="breadcrumbs" class="breadcrumbs flex flex-wrap space-x-3 pb-4"></ul>
+    </div>
+    <div id="categories" class="container m-auto grid grid-cols-3 md:grid-cols-5 lg:grid-cols-8 gap-4 pb-4"></div>
+    <div id="gallery" class="container m-auto grid grid-cols-3 md:grid-cols-5 lg:grid-cols-8 gap-4"></div>
+    <div id="miniviewer"></div>
+  </div>
+
+  <div id="mainPage" class="">
+    <div id="headArea" class="grid grid-cols-7 gap-1">
+      <div class="col-span-2">
         <img class="hero-image" src="assets/logo.png" onclick="openNav()">
-        <img src="/assets/search.png" alt="search" onclick="openNav()"> |
-        <a target=" _blank" class="text-fragment" style="padding-left: 0"
-          href="http://openscad.org/documentation.html">OpenSCAD Docs</a> |
-        <a target="_blank" class="text-fragment" href="http://openscad.org/cheatsheet/">OpenSCAD Cheatsheet</a> |
-        <span class="text-fragment">
-          <a target="_blank" href="https://github.com/nbr0wn/parapart">Project Info</a>
-        </span>
       </div>
-      <div class="root row">
-        <div id="controlArea" class="col">
-          <div id="tabs" class="tabs">
-            <input type="radio" name="tabset" id="tabedit">
-            <label for="tabedit">Editor</label>
-            <div id="tab-editor" class="tabx">
-                <div id="monacoEditor" style="height:80vh"></div>
-                <button id="flip-mode">Flip 🔀</button>
-              </div>
-              <input type="radio" name="tabset" id="tablog">
-              <label for="tablog">Logs</label>
-              <div id="tab-log" class="tabx">
-                <div class="logs-container">
-                  <pre><code id="logs"></code></pre>
-                </div>
-              </div>
-              <input type="radio" name="tabset" id="settings">
-              <label for="settings">Settings</label>
-              <div id="tab-settings" class="tabx">
-                <div><input type="checkbox" id="autorender" checked>
-                  <label for="autorender">Render</label>
-                </div>
-                <div><input type="checkbox" id="autoparse" checked>
-                  <label for="autoparse">Check Source</label>
-                </div>
-                <div><input type="checkbox" id="autorotate" checked>
-                  <label for="autorotate">Rotate</label>
-                </div>
-                <div><input type="checkbox" id="showedges" checked>
-                  <label for="showedges">Edges</label>
-                </div>
-                <div><input type="checkbox" id="show-experimental">
-                  <label for="show-experimental">Advanced Features</label>
-                </div>
-                <div id="features" class="features">
-                  <div><input type="number" min="16" max="2048" step="16" id="maximum-megabytes" value="512">
-                    <label for="maximum-megabytes">Max Memory(MB)</label>
-                  </div>
-                </div>
-              </div>
+      <div class="py-8">
+        <a target=" _blank" href="http://openscad.org/documentation.html">OpenSCAD Docs</a>
+      </div>
+      <div class="py-8">
+        <a target="_blank" href="http://openscad.org/cheatsheet/">OpenSCAD Cheatsheet</a>
+      </div>
+      <div class="py-8">
+        <a target="_blank" href="https://github.com/nbr0wn/parapart">Project Info</a>
+      </div>
+      <div class="py-8">
+        <a target="_blank" href="https://github.com/nbr0wn/parapart/issues/add">Add New Part</a>
+      </div>
+      <div class="py-8">
+        <button id="part-finder"
+          class="btn gap-2">
+            <svg class="w-4 h-4" width="24px" height="24px" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-width="36"
+              d="M280 278a153 153 0 1 0-2 2l170 170m-91-117 110 110-26 26-110-110" />
+          </svg>
+          <span>Part Finder</span>
+        </button>
+      </div>
+      </div>
+      
+      <div class="grid grid-cols-5 gap-1">
+      <div id="controlArea" class="col-span-2">
+        <div id="tabs" class="tabs">
+          <input type="radio" name="tabset" id="tabedit" onkeydown="">
+          <label for="tabedit">Editor</label>
+          <div id="tab-editor" class="tabx">
+            <div id="monacoEditor" style="height:80vh"></div>
+            <button id="flip-mode">Flip 🔀</button>
+          </div>
+          <input type="radio" name="tabset" id="tablog">
+          <label for="tablog">Logs</label>
+          <div id="tab-log" class="tabx">
+            <div class="logs-container">
+              <pre><code id="logs"></code></pre>
             </div>
           </div>
-          <div id="view-panel" class="col">
-            <div class="row text">
-              <button class="button settings" id="run">Render (Ctrl+Enter)</button>
-              <button class="button settings" id="kill" disabled>STOP</button>
-              <div class="text-fragment" id="link-container"><img src="assets/download.png"></div>
-              <div class="text-fragment settings" id="meta"></div>
+          <input type="radio" name="tabset" id="settings">
+          <label for="settings">Settings</label>
+          <div id="tab-settings" class="tabx">
+            <div>
+              <input type="checkbox" id="autorender" checked>
+              <label for="autorender">Automatically Re-Render</label>
             </div>
-            <div id="viewer" tabindex="0"></div>
+            <div>
+              <input type="checkbox" id="autoparse" checked>
+              <label for="autoparse">Check Source</label>
+            </div>
+            <div>
+              <input type="checkbox" id="autorotate" checked>
+              <label for="autorotate">Automatically Rotate</label>
+            </div>
+            <div>
+              <input type="checkbox" id="showedges" checked>
+              <label for="showedges">Show Edges</label>
+            </div>
+            <div>
+              <input type="checkbox" id="show-experimental">
+              <label for="show-experimental">Advanced Features</label>
+            </div>
+            <div id="features" class="features">
+              <div>
+                <input type="number" min="16" max="2048" step="16" id="maximum-megabytes" value="512">
+                <label for="maximum-megabytes">Max Memory(MB)</label>
+              </div>
+            </div>
           </div>
         </div>
-    </body>
+      </div>
+      </svg>
+
+      <div id="view-panel" class="col-span-3">
+        <div class="grid grid-flow-col auto-cols-max gap-3">
+          <button id="darkmode"
+            class="theme-btn rounded-btn bg-secondary hover:bg-hover font-bold py-1 px-2 inline-flex items-center"
+            style="display:none;">
+            <svg width="20px" height="20px" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47.539 47.539"
+              xml:space="preserve">
+              <path
+                d="M25 47.5A25 25 0 0 1 13.9.1a1 1 0 0 1 1.3 1.4 23 23 0 0 0 30.9 30.7 1 1 0 0 1 1.3 1.3 24.9 24.9 0 0 1-22.4 14zM12.2 3.4a23 23 0 1 0 32 31.8 25 25 0 0 1-32-31.8z" />
+            </svg>
+          </button>
+          <button id="lightmode"
+            class="theme-btn bg-primary hover:bg-secondary font-bold py-1 px-2 rounded-btn inline-flex items-center">
+            <svg class="fill-black dark:fill-white" width="23px" height="23px" xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 32 32">
+              <path
+                d="M15 3v5h2V3ZM7.5 6 6.1 7.6l3.5 3.6 1.5-1.5Zm17 0-3.6 3.6 1.5 1.5 3.5-3.6ZM16 9a7 7 0 0 0 0 14 7 7 0 0 0 0-14Zm0 2a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5ZM3 15v2h5v-2Zm21 0v2h5v-2ZM9.6 21l-3.5 3.5 1.4 1.4 3.6-3.5Zm12.8 0-1.5 1.4 3.6 3.5 1.4-1.4ZM15 24v5h2v-5Z" />
+            </svg>
+          </button>
+          <button id="run"
+            class="theme-btn bg-primary hover:bg-secondary text-gray-800 font-bold py-1 px-4 rounded inline-flex items-center">
+            <svg class="fill-black dark:fill-white w-5 h-5 mr-2" width="24px" height="24px"
+              xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path
+                d="M 7.1601562 3 L 8.7617188 5 L 18 5 C 18.551 5 19 5.448 19 6 L 19 15 L 16 15 L 20 20 L 24 15 L 21 15 L 21 6 C 21 4.346 19.654 3 18 3 L 7.1601562 3 z M 4 4 L 0 9 L 3 9 L 3 18 C 3 19.654 4.346 21 6 21 L 16.839844 21 L 15.238281 19 L 6 19 C 5.449 19 5 18.552 5 18 L 5 9 L 8 9 L 4 4 z" />
+            </svg>
+            <span> Re-Render</span>
+          </button>
+          <button id="kill"
+            class="theme-btn bg-primary hover:bg-secondary text-white font-bold py-1 px-4 rounded opacity-50 cursor-not-allowed">STOP</button>
+          <button id="download"
+            class="theme-btn bg-primary hover:bg-secondary text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center">
+            <svg class="fill-black dark:fill-white w-4 h-4 mr-2" width="24px" height="24px"
+              xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+              <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
+            </svg>
+            <span>Download STL</span>
+          </button>
+          <div id="meta" class="py-4 inline-block align-bottom"></div>
+        </div>
+        <div id="viewer"></div>
+      </div>
+    </div>
+</body>
+
 </html>
