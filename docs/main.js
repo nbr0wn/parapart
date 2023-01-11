@@ -591,8 +591,10 @@ function editPart(url) {
   });
 }
 
-function fetchSTL(part) {
-  let url = 'test.stl';
+function fetchSTL(partId) {
+  let dir = String(Math.floor(parseInt(partId) / 100)).padStart(3, '0');
+  let file = String(parseInt(partId) % 100).padStart(3, '0');
+  let url = `local_stl/${dir}/${file}.stl`;
   fetchLocal(url, function (data) {
     const fileName = 'foo.stl';
     const blob = new Blob([data], { type: "application/octet-stream" });
@@ -603,20 +605,20 @@ function fetchSTL(part) {
     modelColor = getStyle(lightButton, "backgroundColor");
     try { miniViewer.remove_model(1); } catch (e) { console.log("STLVIEW ERROR: " + e); }
     try { miniViewer.add_model({ id: 1, local_file: stlFile, color:modelColor }) } catch (e) { console.log("STLVIEW ERROR: " + e); }
-    //console.log(miniViewer);
+    console.log(miniViewer);
   });
 }
 
 function showViewer(event) {
   const viewer = document.getElementById("miniviewer");
-  const canvas = viewer.getElementsByTagName("canvas")[0];
 
+  // Move the miniViewer to the current target 
   viewer.style.left = event.target.offsetLeft + "px";
   viewer.style.top = event.target.offsetTop + "px";
   viewer.style.display = "block";
   viewer.onclick = function () { viewer.style.display = "none" ; event.target.onclick(); }
   viewer.onmouseleave = function () { viewer.style.display = "none"; }
-  fetchSTL(event.target.partname);
+  fetchSTL(event.target.partId);
 }
 
 function getParentId(id) {
@@ -705,7 +707,7 @@ function addTile(destination, name, imgURI, clickFunc, showMiniViewer) {
     img.onmousemove = showViewer;
   }
   img.onclick = clickFunc;
-  img.partname = name;
+  img.partId = name.replace('part','');
 
   let cap = document.createElement("figcaption");
   cap.innerHTML = name;
@@ -814,9 +816,9 @@ try {
   //miniViewer.set_auto_zoom(true);
   //miniViewer.set_auto_resize(false);
   miniViewer.set_auto_rotate(true);
-  miniViewer.model_loaded_callback = id => {
-    console.log("Model Loaded:" + id)
-  };
+  //miniViewer.model_loaded_callback = id => {
+    //console.log("Model Loaded:" + id)
+  //};
 
   // Build the top level gallery section
   // Create the clickable logo
