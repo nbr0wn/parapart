@@ -1,86 +1,86 @@
 solid OpenSCAD_Model
   facet normal 1 -0 0
     outer loop
-      vertex 16 0 16
-      vertex 16 16 0
-      vertex 16 16 16
+      vertex 7 0 6
+      vertex 7 19 0
+      vertex 7 19 6
     endloop
   endfacet
   facet normal 1 0 0
     outer loop
-      vertex 16 16 0
-      vertex 16 0 16
-      vertex 16 0 0
+      vertex 7 19 0
+      vertex 7 0 6
+      vertex 7 0 0
     endloop
   endfacet
   facet normal -0 0 1
     outer loop
-      vertex 0 16 16
-      vertex 16 0 16
-      vertex 16 16 16
+      vertex 0 19 6
+      vertex 7 0 6
+      vertex 7 19 6
     endloop
   endfacet
   facet normal 0 0 1
     outer loop
-      vertex 16 0 16
-      vertex 0 16 16
-      vertex 0 0 16
+      vertex 7 0 6
+      vertex 0 19 6
+      vertex 0 0 6
     endloop
   endfacet
   facet normal 0 0 -1
     outer loop
       vertex 0 0 0
-      vertex 16 16 0
-      vertex 16 0 0
+      vertex 7 19 0
+      vertex 7 0 0
     endloop
   endfacet
   facet normal -0 0 -1
     outer loop
-      vertex 16 16 0
+      vertex 7 19 0
       vertex 0 0 0
-      vertex 0 16 0
+      vertex 0 19 0
     endloop
   endfacet
   facet normal -1 0 0
     outer loop
       vertex 0 0 0
-      vertex 0 16 16
-      vertex 0 16 0
+      vertex 0 19 6
+      vertex 0 19 0
     endloop
   endfacet
   facet normal -1 -0 0
     outer loop
-      vertex 0 16 16
+      vertex 0 19 6
       vertex 0 0 0
-      vertex 0 0 16
+      vertex 0 0 6
     endloop
   endfacet
   facet normal 0 1 -0
     outer loop
-      vertex 16 16 0
-      vertex 0 16 16
-      vertex 16 16 16
+      vertex 7 19 0
+      vertex 0 19 6
+      vertex 7 19 6
     endloop
   endfacet
   facet normal 0 1 0
     outer loop
-      vertex 0 16 16
-      vertex 16 16 0
-      vertex 0 16 0
+      vertex 0 19 6
+      vertex 7 19 0
+      vertex 0 19 0
     endloop
   endfacet
   facet normal 0 -1 0
     outer loop
       vertex 0 0 0
-      vertex 16 0 16
-      vertex 0 0 16
+      vertex 7 0 6
+      vertex 0 0 6
     endloop
   endfacet
   facet normal 0 -1 -0
     outer loop
-      vertex 16 0 16
+      vertex 7 0 6
       vertex 0 0 0
-      vertex 16 0 0
+      vertex 7 0 0
     endloop
   endfacet
   facet normal 0 0 -1

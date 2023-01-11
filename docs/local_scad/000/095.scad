@@ -1,8 +1,8 @@
 //[CUSTOMIZATION]
 // Height
-h=16;
+h=5;
 // Radius
-r1=14;
+r1=17;
 // Message
 txt="part95";
 module __END_CUSTOMIZATIONS () { }

@@ -56,18 +56,9 @@ var stlViewer;
 var stlFile;
 
 function buildStlViewer() {
-  const stlViewer = new StlViewer(stlViewerElement);
+  const stlViewer = new StlViewer(stlViewerElement, {});
   stlViewer.set_bg_color('transparent');
-  // const initialCameraState = stlViewer.get_camera_state();
   stlViewer.model_loaded_callback = id => {
-    //stlViewer.set_color(id, modelColor);
-    //stlViewer.set_display(id,"smooth");
-    //stlViewer.set_grid(true);
-    //stlViewer.set_auto_zoom(true);
-    // stlViewer.set_auto_rotate(true);
-    // stlViewer.set_edges(id, showedgesCheckbox.checked);
-    // onStateChanged({allowRun: false});
-    //console.log(stlViewer.get_camera_state());
   };
   return stlViewer;
 }
@@ -81,13 +72,6 @@ function viewStlFile() {
 }
 
 function addDownloadLink(container, blob, fileName) {
-  //const button = document.createElement('button');
-  //button.id="download";
-  //button.name="Foo";
-  //button.value="Bar";
-  //button.innerHTML = "Download " + fileName;
-  //button.classList.add('button');
-  //button.classList.add('settings');
   container.onclick = function downloadFile() {
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
@@ -572,7 +556,7 @@ function buildSection(id) {
       // Image directories are broken up into groups of 100
       let dir = String(Math.floor(parseInt(row.id) / 100)).padStart(3,'0')
       let file = String(parseInt(row.id) % 100).padStart(3,'0')
-      addPartTile(row.name, row.id, `/local_scad/part${row.id}.scad`, `assets/part_images/${dir}/${file}.png`);
+      addPartTile(row.name, `/local_scad/${dir}/${file}.scad`, `assets/part_images/${dir}/${file}.png`);
     }.bind({ counter: 0 })
   });
 }
@@ -581,8 +565,8 @@ function buildSection(id) {
 function editPart(url) {
   console.log("EDIT NEW PART:"+ url);
   ////const data = await fetchFromGitHub(user, repo, partFile);
-  fetchRawFromGitHub('nbr0wn','parapart','docs/'+url,
-  //fetchLocal(url, 
+  //fetchRawFromGitHub('nbr0wn','parapart','docs/'+url,
+  fetchLocal(url, 
     function (data) {
     var localState  = defaultState
     localState.source.content = data;
@@ -603,9 +587,9 @@ function fetchSTL(partId) {
     const style = getComputedStyle(document.getElementById("navOverlay"));
     miniViewer.set_bg_color(style.backgroundColor);
     modelColor = getStyle(lightButton, "backgroundColor");
-    try { miniViewer.remove_model(1); } catch (e) { console.log("STLVIEW ERROR: " + e); }
+    try { miniViewer.clean(1); } catch (e) { console.log("STLVIEW ERROR: " + e + e.stack); }
     try { miniViewer.add_model({ id: 1, local_file: stlFile, color:modelColor }) } catch (e) { console.log("STLVIEW ERROR: " + e); }
-    console.log(miniViewer);
+    //console.log(miniViewer);
   });
 }
 
@@ -723,7 +707,7 @@ function addTile(destination, name, imgURI, clickFunc, showMiniViewer) {
 }
 
 
-function addPartTile(name, id, url, imgURI) {
+function addPartTile(name, url, imgURI) {
   addTile("gallery", name, imgURI, 
     function() { 
       document.getElementById("navOverlay").style.width = "0vw"; 
@@ -810,7 +794,7 @@ try {
   globalThis.onchange = render;
 
   // Setup our mini STL viewer
-  miniViewer = new StlViewer(document.getElementById("miniviewer"));
+  miniViewer = new StlViewer(document.getElementById("miniviewer"), {});
   miniViewer.set_bg_color('transparent');
   miniViewer.set_center_models(true);
   //miniViewer.set_auto_zoom(true);

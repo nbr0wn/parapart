@@ -1,12 +1,10 @@
 //[CUSTOMIZATION]
-// X Dimension
-xdim=16;
-// Y Dimension
-ydim=8;
-// Z Dimension
-zdim=18;
+// Radius
+rad=17;
 // Message
 txt="part70";
-module __END_CUSTOMIZATIONS () {}
-cube(xdim,ydim,zdim);
+// I love it
+boolvar=true;
+module __END_CUSTOMIZATIONS () { }
+sphere(rad);
 translate([20,20,20]) { linear_extrude(5) text(txt, font="Liberation Sans"); }

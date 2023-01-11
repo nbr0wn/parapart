@@ -1,10 +1,10 @@
 //[CUSTOMIZATION]
-// Height
-h=12;
 // Radius
-r1=19;
+rad=15;
 // Message
 txt="part4";
+// I love it
+boolvar=true;
 module __END_CUSTOMIZATIONS () { }
-cylinder(h,r1,r1);
+sphere(rad);
 translate([20,20,20]) { linear_extrude(5) text(txt, font="Liberation Sans"); }

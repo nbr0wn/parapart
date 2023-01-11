@@ -1,10 +1,14 @@
 //[CUSTOMIZATION]
-// Height
-h=13;
-// Radius
-r1=15;
+// X Dimension
+xdim=11;
+// Y Dimension
+ydim=17;
+// Z Dimension
+zdim=7;
 // Message
 txt="part78";
-module __END_CUSTOMIZATIONS () { }
-cylinder(h,r1,r1);
+// I love it
+boolvar=true;
+module __END_CUSTOMIZATIONS () {}
+cube([xdim,ydim,zdim]);
 translate([20,20,20]) { linear_extrude(5) text(txt, font="Liberation Sans"); }
