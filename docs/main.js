@@ -16,6 +16,7 @@ const autorotateCheckbox = document.getElementById('autorotate');
 // const showedgesCheckbox = document.getElementById('showedges');
 const showExperimentalFeaturesCheckbox = document.getElementById('show-experimental');
 const stlViewerElement = document.getElementById("viewer");
+const showLogsElement = document.getElementById("show-logs");
 const logsElement = document.getElementById("logs");
 const featuresContainer = document.getElementById("features");
 const flipModeButton = document.getElementById("flip-mode");
@@ -31,7 +32,7 @@ let logHtml = function (cssClass, ...args) {
   const ln = document.createElement('div');
   if (cssClass) ln.classList.add(cssClass);
   ln.append(document.createTextNode(args.join(' ')));
-  document.getElementById('tab-log').append(ln);
+  document.getElementById('logs').append(ln);
 };
 const log = (...args) => logHtml('', ...args);
 const warn = (...args) => logHtml('warning', ...args);
@@ -42,14 +43,7 @@ var miniViewer;
 const darkButton = document.getElementById('darkmode');
 const lightButton = document.getElementById('lightmode');
 
-// Theme and dark mode stuff
-var lightBg = "#EFF5F5";
-var lightFg = "#D6E4E5";
-
-var darkBg = "#1D3E53";
-var darkFg = "#476D7C";
-
-var modelColor = darkFg;
+var modelColor;
 
 /////////////////////////////////////////////////////////////////
 // END
@@ -494,7 +488,7 @@ async function fetchRawFromGitHub(owner, repo, path, completedCallback) {
 }
 
 async function fetchLocal(fileName, completedCallback) {
-  console.log("FETCHING LOCAL " + fileName);
+  //console.log("FETCHING LOCAL " + fileName);
   return fetch(fileName
   ).then(response => response.text()
   ).then(function(response) { completedCallback(response); }
@@ -603,9 +597,13 @@ function fetchSTL(part) {
     const fileName = 'foo.stl';
     const blob = new Blob([data], { type: "application/octet-stream" });
     const stlFile = new File([blob], fileName);
+    // Set the miniViewer color to match the current style
+    const style = getComputedStyle(document.getElementById("navOverlay"));
+    miniViewer.set_bg_color(style.backgroundColor);
+    modelColor = getStyle(lightButton, "backgroundColor");
     try { miniViewer.remove_model(1); } catch (e) { console.log("STLVIEW ERROR: " + e); }
     try { miniViewer.add_model({ id: 1, local_file: stlFile, color:modelColor }) } catch (e) { console.log("STLVIEW ERROR: " + e); }
-    console.log(miniViewer);
+    //console.log(miniViewer);
   });
 }
 
@@ -694,7 +692,7 @@ function addBreadcrumbs(id){
   }
 }
 
-function addTile(destination, name, imgURI, clickFunc) {
+function addTile(destination, name, imgURI, clickFunc, showMiniViewer) {
   //console.log("ADDING PART:" + name)
   const gallery = document.getElementById(destination);
   let img = document.createElement("img");
@@ -703,7 +701,9 @@ function addTile(destination, name, imgURI, clickFunc) {
   img.alt = "part image";
   img.title = name;
   img.innerHTML="";
-  img.onmousemove=showViewer;
+  if( showMiniViewer ) {
+    img.onmousemove = showViewer;
+  }
   img.onclick = clickFunc;
   img.partname = name;
 
@@ -722,27 +722,34 @@ function addTile(destination, name, imgURI, clickFunc) {
 
 
 function addPartTile(name, id, url, imgURI) {
-  addTile("gallery", name, imgURI, function() { document.getElementById("navOverlay").style.width = "0vw"; editPart(url);});
+  addTile("gallery", name, imgURI, 
+    function() { 
+      document.getElementById("navOverlay").style.width = "0vw"; 
+      editPart(url);
+    }, 
+    true );
 }
 
 function addSectionTile(name, id, imgURI) {
-  addTile("categories", name, imgURI, function() { buildSection(id);});
+  addTile("categories", name, imgURI, function() { buildSection(id);}, false);
 }
 
+var getStyle = function(element, property) {
+  return window.getComputedStyle ? window.getComputedStyle(element, null).getPropertyValue(property) : element.style[property.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); })];
+};
+
 function setDarkMode(dark) {
+  // Set bg to transparent to avoid flicker of old color.  
+  miniViewer.set_bg_color('transparent');
   if(dark) {
     darkButton.style.display="none";
     lightButton.style.display="block";
     document.documentElement.setAttribute("data-theme", "business");
-    modelColor = darkFg;
-    miniViewer.set_bg_color(darkBg);
     render({ now: true });
   } else {
     darkButton.style.display="block";
     lightButton.style.display="none";
     document.documentElement.setAttribute("data-theme", "garden");
-    modelColor = lightFg;;
-    miniViewer.set_bg_color(lightBg);
     render({ now: true });
   }
 }
@@ -798,11 +805,11 @@ try {
   // Not sure why this doesn't work
   globalThis.customizations.onchange = render;
   // But this does
-  //globalThis.onchange = render;
+  globalThis.onchange = render;
 
   // Setup our mini STL viewer
   miniViewer = new StlViewer(document.getElementById("miniviewer"));
-  miniViewer.set_bg_color(darkBg);
+  miniViewer.set_bg_color('transparent');
   miniViewer.set_center_models(true);
   //miniViewer.set_auto_zoom(true);
   //miniViewer.set_auto_resize(false);
@@ -824,6 +831,18 @@ try {
   
   darkButton.onclick = () => { setDarkMode(true); }
   lightButton.onclick = () => { setDarkMode(false); }
+
+  // Handle logs visibility
+  showLogsElement.checked = false;
+  showLogsElement.onchange = () => {
+    if (showLogsElement.checked) {
+      document.getElementById('tablog-label').style.display = "block";
+      //document.getElementById('tab-log').style.display = "block";
+    } else {
+      document.getElementById('tablog-label').style.display = "none";
+      //document.getElementById('tab-log').style.display = "none";
+    }
+  }
 
   /////////////////////////////////////////////////////////
   ///////////////////////// END PARAPART

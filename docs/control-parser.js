@@ -91,6 +91,7 @@ function addSlider(controlDiv,description,varname,value,rangeList) {
 
     // Add the slider
     let form = document.createElement("form");
+    form.onsubmit=function() { }
     form.setAttribute("onchange", `updateSliderTxt('${uniqueTag}', '${varname}');`);
     form.appendChild(slider);
     document.getElementById(controlDiv).appendChild(form);
@@ -110,6 +111,7 @@ function addCheckbox(controlDiv, description, varname, value ) {
     addLabel(controlDiv,description,varname);
 
     let form = document.createElement("form");
+    form.onsubmit=function() { }
     form.setAttribute("onchange", `updateCheckBox('${uniqueTag}', '${varname}');`);
     let checkBox = document.createElement("input");
     checkBox.type = "checkbox";
@@ -129,7 +131,9 @@ function addTextBox(controlDiv, description, varname, value ) {
     addLabel(controlDiv,description,varname);
     
     let form = document.createElement("form");
+    form.onsubmit=function() { }
     form.setAttribute("onchange", `updateTextBox('${uniqueTag}', '${varname}');`);
+    form.onsubmit=function() { }
     let textBox = document.createElement("input");
     textBox.type = "text";
     textBox.id = `text-${uniqueTag}`;
@@ -145,6 +149,7 @@ function addSpinBox(controlDiv, description, varname, value ) {
     addLabel(controlDiv,description,varname);
     
     let form = document.createElement("form");
+    form.onsubmit=function() { }
     form.setAttribute("onchange", `updateSpinBox('${uniqueTag}', '${varname}');`);
     let spinBox = document.createElement("input");
     spinBox.type = "number";
@@ -162,6 +167,7 @@ function addVector(controlDiv, description, varname, elementList, rangeList) {
     addLabel(controlDiv,description,varname);
     
     let form = document.createElement("form");
+    form.onsubmit=function() { }
     form.setAttribute("onchange", `updateVector('${uniqueTag}', '${varname}');`);
 
     elementList.forEach((entry) => {
@@ -187,6 +193,7 @@ function addComboBox(controlDiv,description,varname,defaultValue,optionList) {
 
     // Create the form
     let form = document.createElement("form");
+    form.onsubmit=function() { }
     form.setAttribute("onchange", `updateComboBox('${uniqueTag}', '${varname}');`);
     // Create the select element
     let sel = document.createElement("select");
@@ -324,7 +331,7 @@ export function parseScad(data) {
     customizations = { "parameterSets" : { "first" : { } } };
 
     // Add the first tab
-    let tabId = addTab('Controls')
+    let tabId = addTab('Customization')
     var controlLabelId = 'tab-' + tabId;
     var controlDiv = 'tabdiv-' + tabId;
 

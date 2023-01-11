@@ -94,7 +94,7 @@
   </div>
 
   <div id="mainPage" class="">
-    <div id="headArea" class="grid grid-cols-7 gap-1">
+    <div id="headArea" class="grid grid-cols-8 gap-1">
       <div class="col-span-2">
         <img class="hero-image" src="assets/logo.png" onclick="openNav()">
       </div>
@@ -112,7 +112,7 @@
       </div>
       <div class="py-5">
         <button id="part-finder"
-          class="btn gap-2">
+          class="btn gap-2" onclick="openNav()">
           <svg class="fill-current stroke-current w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 490 490">
             <path 
               d="M280 278a153 153 0 1 0-2 2l170 170m-91-117 110 110-26 26-110-110" />
@@ -120,6 +120,23 @@
           Part Finder
         </button>
       </div>
+        <button id="darkmode"
+          class="btn"
+          style="display:none;">
+          <svg class="fill-current w-5 h-5" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47.539 47.539"
+            xml:space="preserve">
+            <path
+              d="M25 47.5A25 25 0 0 1 13.9.1a1 1 0 0 1 1.3 1.4 23 23 0 0 0 30.9 30.7 1 1 0 0 1 1.3 1.3 24.9 24.9 0 0 1-22.4 14zM12.2 3.4a23 23 0 1 0 32 31.8 25 25 0 0 1-32-31.8z" />
+          </svg>
+        </button>
+        <button id="lightmode"
+          class="btn">
+          <svg class="fill-current w-7 h-7"  xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 32 32">
+            <path
+              d="M15 3v5h2V3ZM7.5 6 6.1 7.6l3.5 3.6 1.5-1.5Zm17 0-3.6 3.6 1.5 1.5 3.5-3.6ZM16 9a7 7 0 0 0 0 14 7 7 0 0 0 0-14Zm0 2a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5ZM3 15v2h5v-2Zm21 0v2h5v-2ZM9.6 21l-3.5 3.5 1.4 1.4 3.6-3.5Zm12.8 0-1.5 1.4 3.6 3.5 1.4-1.4ZM15 24v5h2v-5Z" />
+          </svg>
+        </button>
       </div>
       
       <div class="grid grid-cols-5 gap-1">
@@ -131,14 +148,6 @@
           <div id="tab-editor" class="tabx">
             <div id="monacoEditor" style="height:80vh"></div>
             <button id="flip-mode">Flip 🔀</button>
-          </div>
-
-          <input type="radio" name="tabset" id="tablog">
-          <label for="tablog">Logs</label>
-          <div id="tab-log" class="tabx">
-            <div class="logs-container">
-              <pre><code id="logs"></code></pre>
-            </div>
           </div>
 
           <input type="radio" name="tabset" id="settings">
@@ -161,6 +170,10 @@
               <label for="showedges">Show Edges</label>
             </div>
             <div>
+              <input type="checkbox" id="show-logs">
+              <label for="show-logs">Show Logs</label>
+            </div>
+            <div>
               <input type="checkbox" id="show-experimental">
               <label for="show-experimental">Advanced Features</label>
             </div>
@@ -172,27 +185,20 @@
             </div>
           </div>
 
+          <input type="radio" name="tabset" id="tablog">
+          <label id="tablog-label" for="tablog" style="display:none;">Logs</label>
+          <div id="tab-log" class="tabx">
+            <div class="logs-container">
+              <pre><code id="logs"></code></pre>
+            </div>
+          </div>
 
         </div>
       </div>
       <div id="view-panel" class="col-span-3">
         <div class="grid grid-flow-col auto-cols-max gap-3">
-          <button id="darkmode"
-            class="btn"
-            style="display:none;">
-            <svg class="fill-current w-5 h-5" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47.539 47.539"
-              xml:space="preserve">
-              <path
-                d="M25 47.5A25 25 0 0 1 13.9.1a1 1 0 0 1 1.3 1.4 23 23 0 0 0 30.9 30.7 1 1 0 0 1 1.3 1.3 24.9 24.9 0 0 1-22.4 14zM12.2 3.4a23 23 0 1 0 32 31.8 25 25 0 0 1-32-31.8z" />
-            </svg>
-          </button>
-          <button id="lightmode"
-            class="btn">
-            <svg class="fill-current w-7 h-7"  xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 32 32">
-              <path
-                d="M15 3v5h2V3ZM7.5 6 6.1 7.6l3.5 3.6 1.5-1.5Zm17 0-3.6 3.6 1.5 1.5 3.5-3.6ZM16 9a7 7 0 0 0 0 14 7 7 0 0 0 0-14Zm0 2a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5ZM3 15v2h5v-2Zm21 0v2h5v-2ZM9.6 21l-3.5 3.5 1.4 1.4 3.6-3.5Zm12.8 0-1.5 1.4 3.6 3.5 1.4-1.4ZM15 24v5h2v-5Z" />
-            </svg>
+          <button id="kill" class="btn btn-disabled">
+            <span>STOP</span>
           </button>
           <button id="run" class="btn">
             <svg class="fill-current w-5 h-5 mr-2"
@@ -201,9 +207,6 @@
                 d="M 7.1601562 3 L 8.7617188 5 L 18 5 C 18.551 5 19 5.448 19 6 L 19 15 L 16 15 L 20 20 L 24 15 L 21 15 L 21 6 C 21 4.346 19.654 3 18 3 L 7.1601562 3 z M 4 4 L 0 9 L 3 9 L 3 18 C 3 19.654 4.346 21 6 21 L 16.839844 21 L 15.238281 19 L 6 19 C 5.449 19 5 18.552 5 18 L 5 9 L 8 9 L 4 4 z" />
             </svg>
             Re-Render
-          </button>
-          <button id="kill" class="btn btn-disabled">
-            <span>STOP</span>
           </button>
           <button id="download" class="btn btn-enabled">
             <svg class="fill-current w-4 h-4 mr-2" width="24px" height="24px"
