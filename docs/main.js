@@ -804,11 +804,9 @@ try {
   showLogsElement.checked = false;
   showLogsElement.onchange = () => {
     if (showLogsElement.checked) {
-      document.getElementById('tablog-label').style.display = "block";
-      //document.getElementById('tab-log').style.display = "block";
+      document.getElementById('tablogs').style.display = "block";
     } else {
-      document.getElementById('tablog-label').style.display = "none";
-      //document.getElementById('tab-log').style.display = "none";
+      document.getElementById('tablogs').style.display = "none";
     }
   }
 

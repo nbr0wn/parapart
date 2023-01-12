@@ -1977,22 +1977,6 @@ html {
   cursor: auto;
 }
 
-.radio {
-  flex-shrink: 0;
-  --chkbg: var(--bc);
-  height: 1.5rem;
-  width: 1.5rem;
-  cursor: pointer;
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
-  border-radius: 9999px;
-  border-width: 1px;
-  border-color: hsl(var(--bc) / var(--tw-border-opacity));
-  --tw-border-opacity: 0.2;
-  transition: background, box-shadow var(--animation-input, 0.2s) ease-in-out;
-}
-
 .range {
   height: 1.5rem;
   width: 100%;
@@ -2474,24 +2458,6 @@ html {
   }
 }
 
-.radio:focus-visible {
-  outline: 2px solid hsl(var(--bc));
-  outline-offset: 2px;
-}
-
-.radio:checked,
-  .radio[aria-checked=true] {
-  --tw-bg-opacity: 1;
-  background-color: hsl(var(--bc) / var(--tw-bg-opacity));
-  animation: radiomark var(--animation-input, 0.2s) ease-in-out;
-  box-shadow: 0 0 0 4px hsl(var(--b1)) inset, 0 0 0 4px hsl(var(--b1)) inset;
-}
-
-.radio:disabled {
-  cursor: not-allowed;
-  opacity: 0.2;
-}
-
 @keyframes radiomark {
   0% {
     box-shadow: 0 0 0 12px hsl(var(--b1)) inset, 0 0 0 12px hsl(var(--b1)) inset;
@@ -2673,6 +2639,87 @@ html {
   border-bottom-left-radius: var(--tab-radius, 0.5rem);
 }
 
+.tab-lifted {
+  border: var(--tab-border, 1px) solid transparent;
+  border-width: 0 0 var(--tab-border, 1px) 0;
+  border-top-left-radius: var(--tab-radius, 0.5rem);
+  border-top-right-radius: var(--tab-radius, 0.5rem);
+  border-bottom-color: var(--tab-border-color);
+  padding-left: var(--tab-padding, 1rem);
+  padding-right: var(--tab-padding, 1rem);
+  padding-top: var(--tab-border, 1px);
+}
+
+.tab-lifted.tab-active {
+  background-color: var(--tab-bg);
+  border-width: var(--tab-border, 1px) var(--tab-border, 1px) 0 var(--tab-border, 1px);
+  border-left-color: var(--tab-border-color);
+  border-right-color: var(--tab-border-color);
+  border-top-color: var(--tab-border-color);
+  padding-left: calc(var(--tab-padding, 1rem) - var(--tab-border, 1px));
+  padding-right: calc(var(--tab-padding, 1rem) - var(--tab-border, 1px));
+  padding-bottom: var(--tab-border, 1px);
+  padding-top: 0;
+}
+
+.tab-lifted.tab-active:before,
+    .tab-lifted.tab-active:after {
+  z-index: 1;
+  content: "";
+  display: block;
+  position: absolute;
+  width: var(--tab-radius, 0.5rem);
+  height: var(--tab-radius, 0.5rem);
+  bottom: 0;
+  --tab-grad: calc(68% - var(--tab-border, 1px));
+  --tab-corner-bg: radial-gradient(circle at var(--circle-pos), transparent var(--tab-grad), var(--tab-border-color) calc(var(--tab-grad) + 0.3px), var(--tab-border-color) calc(var(--tab-grad) + var(--tab-border, 1px)), var(--tab-bg) calc(var(--tab-grad) + var(--tab-border, 1px) + 0.3px));
+}
+
+.tab-lifted.tab-active:before {
+  left: calc(var(--tab-radius, 0.5rem) * -1);
+  --circle-pos: top left;
+  background-image: var(--tab-corner-bg);
+}
+
+[dir="rtl"] .tab-lifted.tab-active:before {
+  --circle-pos: top right;
+}
+
+.tab-lifted.tab-active:after {
+  right: calc(var(--tab-radius, 0.5rem) * -1);
+  --circle-pos: top right;
+  background-image: var(--tab-corner-bg);
+}
+
+[dir="rtl"] .tab-lifted.tab-active:after {
+  --circle-pos: top left;
+}
+
+.tab-lifted.tab-active:first-child:before {
+  background: none;
+}
+
+.tab-lifted.tab-active:last-child:after {
+  background: none;
+}
+
+.tab-lifted.tab-active + .tab-lifted.tab-active:before {
+  background: none;
+}
+
+.tabs-boxed .tab-active {
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--p) / var(--tw-bg-opacity));
+  --tw-text-opacity: 1;
+  color: hsl(var(--pc) / var(--tw-text-opacity));
+  border-radius: var(--rounded-btn, 0.5rem);
+}
+
+.tabs-boxed .tab-active:hover {
+  --tw-text-opacity: 1;
+  color: hsl(var(--pc) / var(--tw-text-opacity));
+}
+
 .table tr.active th,
     .table tr.active td,
     .table tr.active:nth-child(even) th,
@@ -2795,6 +2842,10 @@ html {
   margin-left: 50%;
 }
 
+.static {
+  position: static;
+}
+
 .relative {
   position: relative;
 }
@@ -2895,8 +2946,8 @@ html {
   gap: 1rem;
 }
 
-.gap-1 {
-  gap: 0.25rem;
+.gap-2 {
+  gap: 0.5rem;
 }
 
 .gap-3 {
@@ -2957,12 +3008,6 @@ html {
 }
 
 body {
-}
-
-#controlArea {
-  width: 30vw;
-  min-width: 20vw;
-  /* height: 100vh; */
 }
 
 #cheatsheet-link {
@@ -3106,7 +3151,7 @@ body {
 /**********************************************************/
 
 #nav-overlay {
-  height: 80vh;
+  height: 100vh;
   width: 100vw;
   /* Stay in place */
   position: fixed;
@@ -3214,28 +3259,7 @@ change the font-size of the links and position the close button again, so they d
 
 /*************************************************************************/
 
-.tabs {
-  display: flex;
-  flex-wrap: wrap;
-  height: 100vh;
-  width: 500px;
-}
-
-.tabs label {
-  order: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0.3rem 0.5rem;
-  margin-right: 0.2rem;
-  cursor: pointer;
-  background-color: var(--color-bg-secondary);
-  font-weight: bold;
-  transition: background ease 0.1s;
-  border-radius: 8px 8px 0px 0px;
-}
-
-.tabs .tabx {
+.tab-content {
   order: 9;
   flex-grow: 1;
   width: 100%;
@@ -3244,30 +3268,6 @@ change the font-size of the links and position the close button again, so they d
   padding: 1rem;
   background: var(--tab-bg-color);
   padding: 20px;
-}
-
-.tabs input[type="radio"] {
-  display: none;
-}
-
-.tabs input[type="radio"]:checked + label {
-  background: var(--tab-checked-bg);
-}
-
-.tabs input[type="radio"]:checked + label + .tabx {
-  display: block;
-}
-
-@media (max-width: 465px) {
-  .tabs .tabx,
-  .tabs label {
-    order: initial;
-  }
-
-  .tabs label {
-    width: 100%;
-    margin-left: 50px;
-  }
 }
 
 @media (min-width: 768px) {

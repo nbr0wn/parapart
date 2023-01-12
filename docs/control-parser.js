@@ -229,33 +229,41 @@ function addComboBox(controlDiv,description,varname,defaultValue,optionList) {
     updateCustomizations(varname,defaultValue);
 }
 
+function makeTabActive(tabId) {
+    // Remove tab-active from all tabs
+    const tabList = document.getElementsByClassName("tab");
+    for( let i = 0; i < tabList.length; i++) {
+        tabList[i].classList.remove("tab-active");
+        document.getElementById(tabList[i].id+'-div').style.display="none";
+    }
+    // Add tab-active to this tab
+    document.getElementById(tabId).classList.add("tab-active");
+    document.getElementById(tabId + '-div').style.display = "block";
+}
+
 
 function addTab(tabName) {
     let randomStr = randomString();
     let tabId = "tab-" + randomStr;
 
-    let radio = document.createElement("input");
-    radio.classList.add("removable");
-    radio.type = "radio";
-    radio.name = "tabset";
-    radio.id = tabId;
-
-    let label = document.createElement("label");
-    label.classList.add("removable");
-    label.id = 'tablabel-' + randomStr;
-    label.htmlFor = tabId;
-    label.innerHTML = tabName;
+    let anchor = document.createElement("a");
+    anchor.classList.add("removable");
+    anchor.classList.add("tab");
+    anchor.classList.add("tab-lifted");
+    anchor.id = tabId;
+    anchor.text = tabName;
+    anchor.onclick = function () { makeTabActive(tabId); }
 
     let newDiv = document.createElement("div");
     newDiv.id = "tabdiv-" + randomStr;
-    newDiv.classList.add("tabx");
     newDiv.classList.add("removable");
+    newDiv.classList.add("tab-content");
+    newDiv.id = tabId + '-div';
 
     // Append this div to the control area
     let editor = document.getElementById("tabedit");
-    document.getElementById("tabs").insertBefore(radio,editor);
-    document.getElementById("tabs").insertBefore(label,editor);
-    document.getElementById("tabs").insertBefore(newDiv,editor);
+    document.getElementById("tab-head").insertBefore(anchor,editor);
+    document.getElementById("control-area").appendChild(newDiv);
     
     // Return the new control area ID
     return randomStr;
@@ -330,13 +338,20 @@ export function parseScad(data) {
     
     customizations = { "parameterSets" : { "first" : { } } };
 
+    // Activate the static tabs
+    document.getElementById('tabedit').onclick = function () { makeTabActive('tabedit'); }
+    document.getElementById('tabsettings').onclick = function () { makeTabActive('tabsettings'); }
+    document.getElementById('tablogs').onclick = function () { makeTabActive('tablogs'); }
+
     // Add the first tab
     let tabId = addTab('Customization')
     var controlLabelId = 'tab-' + tabId;
-    var controlDiv = 'tabdiv-' + tabId;
+    var controlDiv = 'tab-' + tabId + '-div';
 
     // Make the first tab active
-    document.getElementById('tab-'+tabId).checked="checked";
+    document.getElementById('tab-'+tabId).classList.add("tab-active");
+    document.getElementById(controlDiv).style.display = "block";
+
 
     data.toString().split("\n").every( function(line, index, arr) {
 

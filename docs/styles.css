@@ -9,12 +9,6 @@
 body {
 }
 
-#controlArea {
-  width: 30vw;
-  min-width: 20vw;
-  /* height: 100vh; */
-}
-
 #cheatsheet-link {
   display: none;
   position: fixed;
@@ -155,7 +149,7 @@ body {
 /**********************************************************/
 
 #nav-overlay {
-  height: 80vh;
+  height: 100vh;
   width: 100vw;
   /* Stay in place */
   position: fixed;
@@ -262,28 +256,7 @@ change the font-size of the links and position the close button again, so they d
 
 /*************************************************************************/
 
-.tabs {
-  display: flex;
-  flex-wrap: wrap;
-  height: 100vh;
-  width: 500px;
-}
-
-.tabs label {
-  order: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0.3rem 0.5rem;
-  margin-right: 0.2rem;
-  cursor: pointer;
-  background-color: var(--color-bg-secondary);
-  font-weight: bold;
-  transition: background ease 0.1s;
-  border-radius: 8px 8px 0px 0px;
-}
-
-.tabs .tabx {
+.tab-content {
   order: 9;
   flex-grow: 1;
   width: 100%;
@@ -292,28 +265,4 @@ change the font-size of the links and position the close button again, so they d
   padding: 1rem;
   background: var(--tab-bg-color);
   padding: 20px;
-}
-
-.tabs input[type="radio"] {
-  display: none;
-}
-
-.tabs input[type="radio"]:checked + label {
-  background: var(--tab-checked-bg);
-}
-
-.tabs input[type="radio"]:checked + label + .tabx {
-  display: block;
-}
-
-@media (max-width: 465px) {
-  .tabs .tabx,
-  .tabs label {
-    order: initial;
-  }
-
-  .tabs label {
-    width: 100%;
-    margin-left: 50px;
-  }
 }

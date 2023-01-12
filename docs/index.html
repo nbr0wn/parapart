@@ -127,20 +127,20 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-5 gap-1">
-      <div id="controlArea" class="col-span-2">
-        <div id="tabs" class="tabs">
+    <div class="grid grid-cols-5 gap-2">
+      <div id="control-area" class="col-span-2">
+        <div id="tab-head" class="tabs">
+          <a id="tabedit" class="tab tab-lifted">Editor</a>
+          <a id="tabsettings" class="tab tab-lifted">Settings</a>
+          <a id="tablogs" class="tab tab-lifted" style="display:none">Logs</a>
+        </div>
 
-          <input type="radio" name="tabset" id="tabedit" onkeydown="">
-          <label for="tabedit">Editor</label>
-          <div id="tab-editor" class="tabx">
+          <div id="tabedit-div" class="tab-content">
             <div id="monacoEditor" style="height:80vh"></div>
             <button id="flip-mode">Flip 🔀</button>
           </div>
 
-          <input type="radio" name="tabset" id="settings">
-          <label for="settings">Settings</label>
-          <div id="tab-settings" class="tabx">
+          <div id="tabsettings-div" class="tab-content">
             <div>
               <input type="checkbox" id="autorender" checked>
               <label for="autorender">Automatically Re-Render</label>
@@ -173,15 +173,12 @@
             </div>
           </div>
 
-          <input type="radio" name="tabset" id="tablog">
-          <label id="tablog-label" for="tablog" style="display:none;">Logs</label>
-          <div id="tab-log" class="tabx">
+          <div id="tablogs-div" class="tab-content">
             <div class="logs-container">
               <pre><code id="logs"></code></pre>
             </div>
           </div>
         </div>
-      </div>
       <div id="view-panel" class="col-span-3">
         <div class="flex flex-row gap-3">
           <button id="download" class="btn btn-disabled">
