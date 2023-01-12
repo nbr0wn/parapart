@@ -43,56 +43,15 @@ body {
   width: 70vw;
 }
 
-.row {
-  display: flex;
-  flex-direction: row;
-}
-
-.col {
-  display: flex;
-  flex-direction: column;
-}
-
-#run,
-#kill {
-  padding: 5px;
-  margin-top: 5px;
-}
-
-
-.text {
-  padding: 5px 0 5px 0;
-}
-
-.text-fragment {
-  padding: 0 10px 0 10px;
-  align-self: center;
-}
-
 .logs-container {
   overflow-y: scroll;
   height: calc(min(200px, 30vh));
   position: relative;
 }
 
-.deep-link {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-}
-
 #features {
   /*position: fixed;*/
   bottom: 0;
-}
-
-.spacer {
-  flex-grow: 1;
-}
-
-.title {
-  text-align: center;
-  width: 100%;
 }
 
 #viewer {
@@ -221,7 +180,8 @@ body {
   position: relative;
 }
 
-/* When the height of the screen is less than 450 pixels, change the font-size of the links and position the close button again, so they don't overlap */
+/* When the height of the screen is less than 450 pixels, 
+change the font-size of the links and position the close button again, so they don't overlap */
 
 @media screen and (max-height: 450px) {
   .overlay a {
@@ -288,55 +248,15 @@ body {
   transition: opacity 0.25s ease-in-out;
 }
 
-/*************************************************************************/
-
-/* MORE TAB STUFF */
-
-/*************************************************************************/
-
-.tabs {
-  display: flex;
-  flex-wrap: wrap;
-  height: 100vh;
-  width: 500px;
+#miniviewer {
+  top:-500px;
+  left:-500px;
+  position:absolute;
+  display:block;
+  width:128px;
+  height:128px;
 }
 
-.tabs label {
-  order: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0.3rem 0.5rem;
-  margin-right: 0.2rem;
-  cursor: pointer;
-  background-color: var(--color-bg-secondary);
-  font-weight: bold;
-  transition: background ease 0.1s;
-  border-radius: 8px 8px 0px 0px;
-}
-
-.tabs .tabx {
-  order: 9;
-  flex-grow: 1;
-  width: 100%;
-  height: 100%;
-  display: none;
-  padding: 1rem;
-  background: var(--tab-bg-color);
-  padding: 20px;
-}
-
-.tabs input[type="radio"] {
-  display: none;
-}
-
-.tabs input[type="radio"]:checked + label {
-  background: var(--tab-checked-bg);
-}
-
-.tabs input[type="radio"]:checked + label + .tabx {
-  display: block;
-}
 
 @media (max-width: 465px) {
   .tabs .tabx,
@@ -348,13 +268,4 @@ body {
     width: 100%;
     margin-left: 50px;
   }
-}
-
-#miniviewer {
-  top:-500px;
-  left:-500px;
-  position:absolute;
-  display:block;
-  width:128px;
-  height:128px;
 }

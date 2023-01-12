@@ -6,9 +6,9 @@ import { buildFeatureCheckboxes } from './features.js';
 import { parseScad, cleanupControls } from './control-parser.js';
 
 const editorElement = document.getElementById('monacoEditor');
-const runButton = document.getElementById('run');
-const killButton = document.getElementById('kill');
-const metaElement = document.getElementById('meta');
+const runButton = document.getElementById('re-render');
+const killButton = document.getElementById('stop-render');
+const renderStatusElement = document.getElementById('render-status');
 const linkContainerElement = document.getElementById('download');
 const autorenderCheckbox = document.getElementById('autorender');
 const autoparseCheckbox = document.getElementById('autoparse');
@@ -81,7 +81,6 @@ function addDownloadLink(container, blob, fileName) {
     link.click();
     link.remove();
   };
-  //container.append(button);
 }
 
 function formatMillis(n) {
@@ -263,8 +262,8 @@ var renderDelay = 1000;
 const render = turnIntoDelayableExecution(renderDelay, () => {
   const source = editor.getValue();
   const timestamp = Date.now();
-  metaElement.innerText = 'rendering...';
-  metaElement.title = null;
+  renderStatusElement.innerText = 'rendering...';
+  renderStatusElement.title = null;
   runButton.classList.add("btn-disabled");
   setExecuting(true);
   renderFailed = false;
@@ -297,7 +296,7 @@ const render = turnIntoDelayableExecution(renderDelay, () => {
           throw result.error;
         }
 
-        metaElement.innerText = "Render time: " + formatMillis(result.elapsedMillis);
+        renderStatusElement.innerText = "Render time: " + formatMillis(result.elapsedMillis);
 
         const [output] = result.outputs;
         if (!output) throw 'No output from runner!'
@@ -315,10 +314,10 @@ const render = turnIntoDelayableExecution(renderDelay, () => {
         addDownloadLink(linkContainerElement, blob, fileName);
       } catch (e) {
         console.error(e, e.stack);
-        metaElement.innerText = '[Render Failed]';
+        renderStatusElement.innerText = '[Render Failed]';
         renderFailed = true;
         linkContainerElement.classList.add("btn-disabled");
-        metaElement.title = e.toString();
+        renderStatusElement.title = e.toString();
       } finally {
         setExecuting(false);
       }

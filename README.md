@@ -1,5 +1,5 @@
 # parapart
-Parametric OpenSCAD part repository
+Parametric OpenSCAD part library
 
 
 ## What is this thing?
