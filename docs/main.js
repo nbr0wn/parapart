@@ -44,6 +44,7 @@ const darkButton = document.getElementById('darkmode');
 const lightButton = document.getElementById('lightmode');
 
 var modelColor;
+var renderFailed = true;
 
 /////////////////////////////////////////////////////////////////
 // END
@@ -117,8 +118,19 @@ function isViewerFocused() {
   return stlViewerElement.classList.contains('focused');
 }
 
-function setExecuting(v) {
-  killButton.disabled = !v;
+function setExecuting(isExecuting) {
+  if(isExecuting) {
+    linkContainerElement.classList.add("btn-disabled");
+    killButton.classList.remove("btn-disabled");
+    runButton.classList.add("btn-disabled");
+  } else {
+    if(renderFailed == false )
+    {
+      linkContainerElement.classList.remove("btn-disabled");
+    }
+    killButton.classList.add("btn-disabled");
+    runButton.classList.remove("btn-disabled");
+  }
 }
 
 var lastProcessedOutputsTimestamp;
@@ -253,8 +265,9 @@ const render = turnIntoDelayableExecution(renderDelay, () => {
   const timestamp = Date.now();
   metaElement.innerText = 'rendering...';
   metaElement.title = null;
-  runButton.disabled = true;
+  runButton.classList.add("btn-disabled");
   setExecuting(true);
+  renderFailed = false;
 
   const job = spawnOpenSCAD({
     // wasmMemory,
@@ -299,16 +312,15 @@ const render = turnIntoDelayableExecution(renderDelay, () => {
 
         viewStlFile(stlFile);
 
-        //linkContainerElement.innerHTML = '';
         addDownloadLink(linkContainerElement, blob, fileName);
       } catch (e) {
         console.error(e, e.stack);
-        document.getElementById("download").disabled = true;
         metaElement.innerText = '[Render Failed]';
+        renderFailed = true;
+        linkContainerElement.classList.add("btn-disabled");
         metaElement.title = e.toString();
       } finally {
         setExecuting(false);
-        runButton.disabled = false;
       }
     })()
   }
@@ -556,7 +568,7 @@ function buildSection(id) {
       // Image directories are broken up into groups of 100
       let dir = String(Math.floor(parseInt(row.id) / 100)).padStart(3,'0')
       let file = String(parseInt(row.id) % 100).padStart(3,'0')
-      addPartTile(row.name, `/local_scad/${dir}/${file}.scad`, `assets/part_images/${dir}/${file}.png`);
+      addPartTile(row.name, `assets/local_scad/${dir}/${file}.scad`, `assets/part_images/${dir}/${file}.png`);
     }.bind({ counter: 0 })
   });
 }
@@ -565,8 +577,8 @@ function buildSection(id) {
 function editPart(url) {
   console.log("EDIT NEW PART:"+ url);
   ////const data = await fetchFromGitHub(user, repo, partFile);
-  //fetchRawFromGitHub('nbr0wn','parapart','docs/'+url,
-  fetchLocal(url, 
+  fetchRawFromGitHub('nbr0wn','parapart','docs/'+url,
+  //fetchLocal(url, 
     function (data) {
     var localState  = defaultState
     localState.source.content = data;
@@ -578,7 +590,7 @@ function editPart(url) {
 function fetchSTL(partId) {
   let dir = String(Math.floor(parseInt(partId) / 100)).padStart(3, '0');
   let file = String(parseInt(partId) % 100).padStart(3, '0');
-  let url = `local_stl/${dir}/${file}.stl`;
+  let url = `assets/local_stl/${dir}/${file}.stl`;
   fetchLocal(url, function (data) {
     const fileName = 'foo.stl';
     const blob = new Blob([data], { type: "application/octet-stream" });
@@ -808,7 +820,6 @@ try {
   // Create the clickable logo
   let logo = document.createElement("img");
   logo.src = "assets/logo.png";
-  logo.classList.add('hero-image');
   logo.onclick = function() { buildSection(0); }
   document.getElementById("mainlogo").appendChild(logo);
   // Load the database and then build the top level nav elements

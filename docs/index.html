@@ -70,7 +70,7 @@
 <body>
 
   <div id="navOverlay" class="bg-base-100 overlay">
-    <div id="headArea" class="grid grid-cols-7 gap-1">
+    <div id="headArea" class="grid grid-cols-8 gap-1">
       <div id="mainlogo" class="col-span-2"> </div>
       <div class="py-8">
         <a target=" _blank" href="http://openscad.org/documentation.html">OpenSCAD Docs</a>
@@ -96,7 +96,7 @@
   <div id="mainPage" class="">
     <div id="headArea" class="grid grid-cols-8 gap-1">
       <div class="col-span-2">
-        <img class="hero-image" src="assets/logo.png" onclick="openNav()">
+        <img src="assets/logo.png" onclick="openNav()">
       </div>
       <div class="py-8">
         <a target=" _blank" href="http://openscad.org/documentation.html">OpenSCAD Docs</a>
@@ -120,6 +120,7 @@
           Part Finder
         </button>
       </div>
+      <div class="py-5">
         <button id="darkmode"
           class="btn"
           style="display:none;">
@@ -138,6 +139,7 @@
           </svg>
         </button>
       </div>
+    </div>
       
       <div class="grid grid-cols-5 gap-1">
       <div id="controlArea" class="col-span-2">
@@ -208,7 +210,7 @@
             </svg>
             Re-Render
           </button>
-          <button id="download" class="btn btn-enabled">
+          <button id="download" class="btn btn-disabled">
             <svg class="fill-current w-4 h-4 mr-2" width="24px" height="24px"
               xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
               <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
