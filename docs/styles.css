@@ -1,13 +1,7 @@
 @tailwind base;
-
-
-
 @tailwind components;
 @tailwind utilities;
 
-
-body {
-}
 
 #cheatsheet-link {
   display: none;
@@ -195,31 +189,6 @@ change the font-size of the links and position the close button again, so they d
 /* From https://www.imarketinx.de/artikel/responsive-image-gallery-with-css-grid.html */
 
 /*********************************************************************/
-
-/* First the Grid */
-
-.gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  grid-gap: 0.0rem;
-  justify-items: center;
-  margin: 0;
-  padding: 0;
-}
-
-/* The Picture Frame */
-
-.gallery-frame {
-  width:134px;
-  height:146px;
-  padding: .5rem;
-  font-size: 1.0rem;
-  text-align: center;
-  background:var(--color-bg);
-  color: var(--color-text-primary);
-}
-
-/* The Picture Frame */
 
 .gallery-frame {
   width:134px;

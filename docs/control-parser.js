@@ -352,7 +352,6 @@ export function parseScad(data) {
     document.getElementById('tab-'+tabId).classList.add("tab-active");
     document.getElementById(controlDiv).style.display = "block";
 
-
     data.toString().split("\n").every( function(line, index, arr) {
 
         //console.log(index + " " + line);

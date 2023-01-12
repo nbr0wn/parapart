@@ -1,5 +1,13 @@
 # parapart
+
 Parametric OpenSCAD part library
+- Free
+- Open source
+- No signups/logins/ads
+
+
+GitHub Pages site:
+https://parapart.com
 
 
 ## What is this thing?

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-theme="business">
+<html data-theme="winter">
 
 <head>
   <meta name="viewport" content="width=device-width, user-scalable=no" />
@@ -68,7 +68,7 @@
 </head>
 
 <body>
-  <div id="nav-overlay" class="bg-base-100">
+  <div id="nav-overlay" class="bg-base-100" style="z-index:2;">
     <div class="text-sm breadcrumbs">
       <ul id="pp-breadcrumbs"></ul>
     </div>
@@ -93,27 +93,27 @@
       </div>
       <div class="py-5">
         <button class="btn" onclick="openNav()">
-          <svg class="fill-current stroke-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 490 490">
+          <svg class="fill-current stroke-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 490 490">
             <path d="M280 278a153 153 0 1 0-2 2l170 170m-91-117 110 110-26 26-110-110" />
           </svg>
           Part Finder
         </button>
       </div>
       <div class="py-5">
-        <button class="btn" onclick="window.location.href='https://github.com/nbr0wn/parapart/issues/add'">
+        <label id="add-part-btn" for="add-part-modal" class="btn">
           <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
             viewBox="0 0 122.9 122.6">
             <path fill-rule="evenodd"
               d="M109 47c8 0 14 6 14 14s-6 14-14 14H75v34c0 7-6 14-14 14s-14-7-14-14V75l-33 1C6 76 0 69 0 62c0-8 6-14 14-14h34V14c0-8 6-14 14-14s14 6 14 14l-1 33h34z"
               clip-rule="evenodd" />
           </svg>
-          Add New Part
-        </button>
+          Add New Part</label>
       </div>
       <div class="py-5">
         <button id="darkmode" class="btn" style="display:none;">
-          <svg class="fill-current w-5 h-5 mr-2" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47.539 47.539"
-            xml:space="preserve">
+          <svg class="fill-current w-5 h-5 mr-2" version="1.1" xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 47.539 47.539" xml:space="preserve">
             <path
               d="M25 47.5A25 25 0 0 1 13.9.1a1 1 0 0 1 1.3 1.4 23 23 0 0 0 30.9 30.7 1 1 0 0 1 1.3 1.3 24.9 24.9 0 0 1-22.4 14zM12.2 3.4a23 23 0 1 0 32 31.8 25 25 0 0 1-32-31.8z" />
           </svg>
@@ -127,59 +127,60 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-5 gap-2">
-      <div id="control-area" class="col-span-2">
+    <div class="flex w-full">
+      <div id="control-area" class="w-100 card flex-grow">
         <div id="tab-head" class="tabs">
           <a id="tabedit" class="tab tab-lifted">Editor</a>
           <a id="tabsettings" class="tab tab-lifted">Settings</a>
           <a id="tablogs" class="tab tab-lifted" style="display:none">Logs</a>
         </div>
 
-          <div id="tabedit-div" class="tab-content">
-            <div id="monacoEditor" style="height:80vh"></div>
-            <button id="flip-mode">Flip 🔀</button>
-          </div>
+        <div id="tabedit-div" class="tab-content">
+          <div id="monacoEditor" style="height:80vh"></div>
+          <button id="flip-mode">Flip 🔀</button>
+        </div>
 
-          <div id="tabsettings-div" class="tab-content">
-            <div>
-              <input type="checkbox" id="autorender" checked>
-              <label for="autorender">Automatically Re-Render</label>
-            </div>
-            <div>
-              <input type="checkbox" id="autoparse" checked>
-              <label for="autoparse">Check Source</label>
-            </div>
-            <div>
-              <input type="checkbox" id="autorotate" checked>
-              <label for="autorotate">Automatically Rotate</label>
-            </div>
-            <div>
-              <input type="checkbox" id="showedges" checked>
-              <label for="showedges">Show Edges</label>
-            </div>
-            <div>
-              <input type="checkbox" id="show-logs">
-              <label for="show-logs">Show Logs</label>
-            </div>
-            <div>
-              <input type="checkbox" id="show-experimental">
-              <label for="show-experimental">Advanced Features</label>
-            </div>
-            <div id="features" class="features">
-              <div>
-                <input type="number" min="16" max="2048" step="16" id="maximum-megabytes" value="512">
-                <label for="maximum-megabytes">Max Memory(MB)</label>
-              </div>
-            </div>
+        <div id="tabsettings-div" class="tab-content">
+          <div>
+            <input type="checkbox" id="autorender" checked>
+            <label for="autorender">Automatically Re-Render</label>
           </div>
-
-          <div id="tablogs-div" class="tab-content">
-            <div class="logs-container">
-              <pre><code id="logs"></code></pre>
+          <div>
+            <input type="checkbox" id="autoparse" checked>
+            <label for="autoparse">Check Source</label>
+          </div>
+          <div>
+            <input type="checkbox" id="autorotate" checked>
+            <label for="autorotate">Automatically Rotate</label>
+          </div>
+          <div>
+            <input type="checkbox" id="showedges" checked>
+            <label for="showedges">Show Edges</label>
+          </div>
+          <div>
+            <input type="checkbox" id="show-logs">
+            <label for="show-logs">Show Logs</label>
+          </div>
+          <div>
+            <input type="checkbox" id="show-experimental">
+            <label for="show-experimental">Advanced Features</label>
+          </div>
+          <div id="features" class="features">
+            <div>
+              <input type="number" min="16" max="2048" step="16" id="maximum-megabytes" value="512">
+              <label for="maximum-megabytes">Max Memory(MB)</label>
             </div>
           </div>
         </div>
-      <div id="view-panel" class="col-span-3">
+
+        <div id="tablogs-div" class="tab-content">
+          <div class="logs-container">
+            <pre><code id="logs"></code></pre>
+          </div>
+        </div>
+      </div>
+      <div class="divider-horizontal"></div>
+      <div id="view-panel" class="card flex-grow">
         <div class="flex flex-row gap-3">
           <button id="download" class="btn btn-disabled">
             <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -202,6 +203,102 @@
         <div id="viewer"></div>
       </div>
     </div>
+
+    <input type="checkbox" id="add-part-modal" class="modal-toggle" />
+    <div class="modal">
+      <div class="modal-box">
+        <div id="add-part-form" class="form-control">
+          <label class="label">
+            <span class="label-text">Part Name</span>
+            <input id="part-name" type="text" placeholder="My Great Part"
+              class="input input-bordered w-full max-w-xs" />
+          </label>
+          <label class="label">
+            <span class="label-text">Category</span>
+            <select id="part-section" class="select select-bordered">
+              <option disabled selected>Choose Category for this model</option>
+              <option value="1110">Four Sided Containers</option>
+              <option value="1120">Containers with >4 Sides</option>
+              <option value="1200">Trays</option>
+              <option value="1300">Holders</option>
+              <option value="2100">Hooks</option>
+              <option value="3100">Nuts</option>
+              <option value="3200">Bolts</option>
+              <option value="3300">Washers</option>
+              <option value="3400">Screws</option>
+              <option value="4000">Standoffs</option>
+              <option value="5000">Hinges</option>
+              <option value="5100">Pin Barrel Hinges</option>
+              <option value="6000">Gears</option>
+              <option value="7000">Wheels</option>
+              <option value="8100">Motion</option>
+              <option value="8110">Linear Slides</option>
+              <option value="8120">Bushings</option>
+              <option value="8130">Couplers</option>
+              <option value="9100">8020 Extrusion Components</option>
+              <option value="9200">Bar Stock</option>
+              <option value="9300">Blocks</option>
+              <option value="9400">Wedges</option>
+              <option value="10100">Fans</option>
+              <option value="10200">Motors</option>
+              <option value="10300">Displays</option>
+              <option value="10400">Power Supplies</option>
+              <option value="10500">Switches</option>
+              <option value="10600">Potentiometers</option>
+              <option value="10700">Connectors</option>
+              <option value="12000">Tools</option>
+              <option value="11000">Miscellaneous</option>
+            </select>
+          </label>
+          <label class="label">
+            <span class="label-text">OpenSCAD file is in GitHub</span>
+            <input id="part-github" type="checkbox" checked="checked" class="checkbox" />
+          </label>
+          <div id="github-fields">
+            <label class="label">
+              <span class="label-text">GitHub username</span>
+              <input id="user-name" type="text" placeholder="somedeveloper"
+                class="input input-bordered w-full max-w-xs" />
+            </label>
+            <label class="label">
+              <span class="label-text">GitHub repository name</span>
+              <input id="repo-name" type="text" placeholder="mygithubrepo"
+                class="input input-bordered w-full max-w-xs" />
+            </label>
+            <label class="label">
+              <span class="label-text">Branch name</span>
+              <input id="branch-name" type="text" placeholder="main" class="input input-bordered w-full max-w-xs" />
+            </label>
+            <label class="label">
+              <span class="label-text">Path to file</span>
+              <input id="file-path" type="text" placeholder="a_dir/sub_dir/file.scad"
+                class="input input-bordered w-full max-w-xs" />
+            </label>
+          </div>
+          <div id="non-github-file" style="display:none;">
+            <label class="label">
+              <span class="label-text">OpenSCAD script</span>
+              <textarea id="scad-text" class="textarea textarea-bordered h-30"
+                placeholder="Paste OpenSCAD text here"></textarea>
+            </label>
+          </div>
+          <span>New parts are added using GitHub issues. When you click <b>Add Part</b> below, you will be redirected to
+            the
+            Parapart issue
+            page on GitHub. Don't forget to hit <b>submit</b>!
+          </span>
+          <div class="flex w-full justify-around">
+            <div id="add-part-confirm" class="modal-action">
+              <label for="add-part-modal" class="btn">Add Part</label>
+            </div>
+            <div class="modal-action">
+              <label for="add-part-modal" class="btn">Nah</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 
 </html>
