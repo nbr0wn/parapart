@@ -154,13 +154,12 @@ body {
 /* Part chooser overlay
 /**********************************************************/
 
-.overlay {
-  height: 100vh;
+#nav-overlay {
+  height: 80vh;
   width: 100vw;
   /* Stay in place */
   position: fixed;
-  left: 0;
-  top: 0;
+  top: 80px;
   /* Sit on top */
   z-index: 2;
   /* Disable horizontal scroll */
@@ -168,18 +167,18 @@ body {
   transition: 0.2s;
 }
 
-/* The hero image */
-
-.hero-image {
-  display:block;
-  background-image: url("assets/logo.png");
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: center;
-  height: 80px;
-  position: relative;
+#main-page {
+  height: 100vh;
+  width: 100vw;
+  /* Stay in place */
+  position: fixed;
+  left: 0;
+  top: 0;
+  /* Sit on top */
+  z-index: 1;
+  /* Disable horizontal scroll */
+  overflow: hidden;
 }
-
 /* When the height of the screen is less than 450 pixels, 
 change the font-size of the links and position the close button again, so they don't overlap */
 
@@ -257,6 +256,55 @@ change the font-size of the links and position the close button again, so they d
   height:128px;
 }
 
+/*************************************************************************/
+
+/* MORE TAB STUFF */
+
+/*************************************************************************/
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  height: 100vh;
+  width: 500px;
+}
+
+.tabs label {
+  order: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.3rem 0.5rem;
+  margin-right: 0.2rem;
+  cursor: pointer;
+  background-color: var(--color-bg-secondary);
+  font-weight: bold;
+  transition: background ease 0.1s;
+  border-radius: 8px 8px 0px 0px;
+}
+
+.tabs .tabx {
+  order: 9;
+  flex-grow: 1;
+  width: 100%;
+  height: 100%;
+  display: none;
+  padding: 1rem;
+  background: var(--tab-bg-color);
+  padding: 20px;
+}
+
+.tabs input[type="radio"] {
+  display: none;
+}
+
+.tabs input[type="radio"]:checked + label {
+  background: var(--tab-checked-bg);
+}
+
+.tabs input[type="radio"]:checked + label + .tabx {
+  display: block;
+}
 
 @media (max-width: 465px) {
   .tabs .tabx,

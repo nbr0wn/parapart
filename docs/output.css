@@ -2819,10 +2819,6 @@ html {
   display: block;
 }
 
-.inline-block {
-  display: inline-block;
-}
-
 .flex {
   display: flex;
 }
@@ -2875,58 +2871,36 @@ html {
   resize: both;
 }
 
-.auto-cols-max {
-  grid-auto-columns: max-content;
-}
-
-.grid-flow-col {
-  grid-auto-flow: column;
-}
-
-.grid-cols-7 {
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-}
-
 .grid-cols-3 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.grid-cols-8 {
-  grid-template-columns: repeat(8, minmax(0, 1fr));
 }
 
 .grid-cols-5 {
   grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
-.flex-wrap {
-  flex-wrap: wrap;
+.flex-row {
+  flex-direction: row;
 }
 
 .items-center {
   align-items: center;
 }
 
-.gap-1 {
-  gap: 0.25rem;
+.justify-between {
+  justify-content: space-between;
 }
 
 .gap-4 {
   gap: 1rem;
 }
 
-.gap-2 {
-  gap: 0.5rem;
+.gap-1 {
+  gap: 0.25rem;
 }
 
 .gap-3 {
   gap: 0.75rem;
-}
-
-.space-x-3 > :not([hidden]) ~ :not([hidden]) {
-  --tw-space-x-reverse: 0;
-  margin-right: calc(0.75rem * var(--tw-space-x-reverse));
-  margin-left: calc(0.75rem * calc(1 - var(--tw-space-x-reverse)));
 }
 
 .space-x-2 > :not([hidden]) ~ :not([hidden]) {
@@ -2973,8 +2947,9 @@ html {
   padding-bottom: 1rem;
 }
 
-.align-bottom {
-  vertical-align: bottom;
+.text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
 }
 
 .filter {
@@ -3018,55 +2993,15 @@ body {
   width: 70vw;
 }
 
-.row {
-  display: flex;
-  flex-direction: row;
-}
-
-.col {
-  display: flex;
-  flex-direction: column;
-}
-
-#run,
-#kill {
-  padding: 5px;
-  margin-top: 5px;
-}
-
-.text {
-  padding: 5px 0 5px 0;
-}
-
-.text-fragment {
-  padding: 0 10px 0 10px;
-  align-self: center;
-}
-
 .logs-container {
   overflow-y: scroll;
   height: calc(min(200px, 30vh));
   position: relative;
 }
 
-.deep-link {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-}
-
 #features {
   /*position: fixed;*/
   bottom: 0;
-}
-
-.spacer {
-  flex-grow: 1;
-}
-
-.title {
-  text-align: center;
-  width: 100%;
 }
 
 #viewer {
@@ -3170,13 +3105,12 @@ body {
 /* Part chooser overlay
 /**********************************************************/
 
-.overlay {
-  height: 100vh;
+#nav-overlay {
+  height: 80vh;
   width: 100vw;
   /* Stay in place */
   position: fixed;
-  left: 0;
-  top: 0;
+  top: 80px;
   /* Sit on top */
   z-index: 2;
   /* Disable horizontal scroll */
@@ -3184,19 +3118,21 @@ body {
   transition: 0.2s;
 }
 
-/* The hero image */
-
-.hero-image {
-  display:block;
-  background-image: url("assets/logo.png");
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: center;
-  height: 80px;
-  position: relative;
+#main-page {
+  height: 100vh;
+  width: 100vw;
+  /* Stay in place */
+  position: fixed;
+  left: 0;
+  top: 0;
+  /* Sit on top */
+  z-index: 1;
+  /* Disable horizontal scroll */
+  overflow: hidden;
 }
 
-/* When the height of the screen is less than 450 pixels, change the font-size of the links and position the close button again, so they don't overlap */
+/* When the height of the screen is less than 450 pixels, 
+change the font-size of the links and position the close button again, so they don't overlap */
 
 @media screen and (max-height: 450px) {
   .overlay a {
@@ -3263,6 +3199,15 @@ body {
   transition: opacity 0.25s ease-in-out;
 }
 
+#miniviewer {
+  top:-500px;
+  left:-500px;
+  position:absolute;
+  display:block;
+  width:128px;
+  height:128px;
+}
+
 /*************************************************************************/
 
 /* MORE TAB STUFF */
@@ -3323,15 +3268,6 @@ body {
     width: 100%;
     margin-left: 50px;
   }
-}
-
-#miniviewer {
-  top:-500px;
-  left:-500px;
-  position:absolute;
-  display:block;
-  width:128px;
-  height:128px;
 }
 
 @media (min-width: 768px) {

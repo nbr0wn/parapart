@@ -459,18 +459,6 @@ function pollCameraChanges() {
 // PARAPART STUFF
 ////////////////////////////////////////////////////////////////////////////
 
-async function fetchFromGitHub(owner, repo, path) {
-  //return fetch (
-  //`https://raw.githubusercontent.com/${owner}/${repo}/main/${path}`)
-  return fetch(
-    `https://api.github.com/repos/${owner}/${repo}/contents/${path}`)
-    .then(response => response.json())
-    .then(data => {
-      return atob(data.content);
-    }).catch(function () {
-      console.log("Fetch Error");
-    });
-}
 
 async function fetchRawFromGitHub(owner, repo, path, completedCallback) {
   return fetch(
@@ -541,7 +529,7 @@ function buildSection(id) {
     gallery.removeChild(gallery.firstChild);
   }
   // Clear the breadcrumbs
-  const breadcrumbs = document.getElementById("breadcrumbs");
+  const breadcrumbs = document.getElementById("pp-breadcrumbs");
   while(breadcrumbs.firstChild) {
     breadcrumbs.removeChild(breadcrumbs.firstChild);
   }
@@ -575,7 +563,6 @@ function buildSection(id) {
 // This function is called when a user clicks on a part in the gallery
 function editPart(url) {
   console.log("EDIT NEW PART:"+ url);
-  ////const data = await fetchFromGitHub(user, repo, partFile);
   fetchRawFromGitHub('nbr0wn','parapart','docs/'+url,
   //fetchLocal(url, 
     function (data) {
@@ -595,7 +582,7 @@ function fetchSTL(partId) {
     const blob = new Blob([data], { type: "application/octet-stream" });
     const stlFile = new File([blob], fileName);
     // Set the miniViewer color to match the current style
-    const style = getComputedStyle(document.getElementById("navOverlay"));
+    const style = getComputedStyle(document.getElementById("nav-overlay"));
     miniViewer.set_bg_color(style.backgroundColor);
     modelColor = getStyle(lightButton, "backgroundColor");
     try { miniViewer.clean(1); } catch (e) { console.log("STLVIEW ERROR: " + e + e.stack); }
@@ -656,20 +643,11 @@ function pushBreadcrumb(id) {
   let span = document.createElement('span');
   span.innerHTML = name;
 
-  li.appendChild(span);
   li.appendChild(img);
+  li.appendChild(span);
 
   // Stick it at the front of the list
-  let breadcrumbs = document.getElementById("breadcrumbs");
-  let firstChild = breadcrumbs.firstElementChild;
-  breadcrumbs.insertBefore(li, firstChild);
-}
-
-function pushSeparator() {
-  let li = document.createElement("li");
-  li.innerHTML = "/";
-  // Stick it at the front of the list
-  let breadcrumbs = document.getElementById("breadcrumbs");
+  let breadcrumbs = document.getElementById("pp-breadcrumbs");
   let firstChild = breadcrumbs.firstElementChild;
   breadcrumbs.insertBefore(li, firstChild);
 }
@@ -678,13 +656,10 @@ function addBreadcrumbs(id){
   pushBreadcrumb(id);
   let parent_id = getParentId(id);
   while (parent_id > 0) {
-    pushSeparator(id);
     pushBreadcrumb(parent_id);
-
     parent_id = getParentId(parent_id);
   }
   if( id > 0) {
-    pushSeparator(id);
     pushBreadcrumb(0);
   }
 }
@@ -721,7 +696,7 @@ function addTile(destination, name, imgURI, clickFunc, showMiniViewer) {
 function addPartTile(name, url, imgURI) {
   addTile("gallery", name, imgURI, 
     function() { 
-      document.getElementById("navOverlay").style.width = "0vw"; 
+      document.getElementById("nav-overlay").style.width = "0vw"; 
       editPart(url);
     }, 
     true );
@@ -816,11 +791,8 @@ try {
   //};
 
   // Build the top level gallery section
-  // Create the clickable logo
-  let logo = document.createElement("img");
-  logo.src = "assets/logo.png";
-  logo.onclick = function() { buildSection(0); }
-  document.getElementById("mainlogo").appendChild(logo);
+  // Add the logo onclick
+  document.getElementById("mainlogo").onclick = function() { buildSection(0); }
   // Load the database and then build the top level nav elements
   // on completion
   loadDatabase();

@@ -57,7 +57,7 @@
 
     // Slide open the nav panel
     function openNav() {
-      document.getElementById("navOverlay").style.width = "100vw";
+      document.getElementById("nav-overlay").style.width = "100vw";
     }
 
   </script>
@@ -68,35 +68,19 @@
 </head>
 
 <body>
-
-  <div id="navOverlay" class="bg-base-100 overlay">
-    <div id="headArea" class="grid grid-cols-8 gap-1">
-      <div id="mainlogo" class="col-span-2"> </div>
-      <div class="py-8">
-        <a target=" _blank" href="http://openscad.org/documentation.html">OpenSCAD Docs</a>
-      </div>
-      <div class="py-8">
-        <a target="_blank" href="http://openscad.org/cheatsheet/">OpenSCAD Cheatsheet</a>
-      </div>
-      <div class="py-8">
-        <a target="_blank" href="https://github.com/nbr0wn/parapart">About Parapart</a>
-      </div>
-      <div class="py-8">
-        <a target="_blank" href="https://github.com/nbr0wn/parapart/issues/add">Add New Part</a>
-      </div>
-    </div>
-    <div>
-      <ul id="breadcrumbs" class="breadcrumbs flex flex-wrap space-x-3 pb-4"></ul>
+  <div id="nav-overlay" class="bg-base-100">
+    <div class="text-sm breadcrumbs">
+      <ul id="pp-breadcrumbs"></ul>
     </div>
     <div id="categories" class="container m-auto grid grid-cols-3 md:grid-cols-5 lg:grid-cols-8 gap-4 pb-4"></div>
     <div id="gallery" class="container m-auto grid grid-cols-3 md:grid-cols-5 lg:grid-cols-8 gap-4"></div>
     <div id="miniviewer"></div>
   </div>
 
-  <div id="mainPage" class="">
-    <div id="headArea" class="grid grid-cols-8 gap-1">
-      <div class="col-span-2">
-        <img src="assets/logo.png" onclick="openNav()">
+  <div id="main-page" class="bg-base-100">
+    <div class="flex justify-between">
+      <div id="mainlogo" class="col-span-2">
+        <img src="assets/logo.png" width="400px" onclick="openNav()">
       </div>
       <div class="py-8">
         <a target=" _blank" href="http://openscad.org/documentation.html">OpenSCAD Docs</a>
@@ -107,20 +91,28 @@
       <div class="py-8">
         <a target="_blank" href="https://github.com/nbr0wn/parapart">Project Info</a>
       </div>
-      <div class="py-8">
-        <a target="_blank" href="https://github.com/nbr0wn/parapart/issues/add">Add New Part</a>
-      </div>
       <div class="py-5">
-        <button id="part-finder" class="btn gap-2" onclick="openNav()">
-          <svg class="fill-current stroke-current w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 490 490">
+        <button class="btn" onclick="openNav()">
+          <svg class="fill-current stroke-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 490 490">
             <path d="M280 278a153 153 0 1 0-2 2l170 170m-91-117 110 110-26 26-110-110" />
           </svg>
           Part Finder
         </button>
       </div>
       <div class="py-5">
+        <button class="btn" onclick="window.location.href='https://github.com/nbr0wn/parapart/issues/add'">
+          <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
+            viewBox="0 0 122.9 122.6">
+            <path fill-rule="evenodd"
+              d="M109 47c8 0 14 6 14 14s-6 14-14 14H75v34c0 7-6 14-14 14s-14-7-14-14V75l-33 1C6 76 0 69 0 62c0-8 6-14 14-14h34V14c0-8 6-14 14-14s14 6 14 14l-1 33h34z"
+              clip-rule="evenodd" />
+          </svg>
+          Add New Part
+        </button>
+      </div>
+      <div class="py-5">
         <button id="darkmode" class="btn" style="display:none;">
-          <svg class="fill-current w-5 h-5" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47.539 47.539"
+          <svg class="fill-current w-5 h-5 mr-2" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 47.539 47.539"
             xml:space="preserve">
             <path
               d="M25 47.5A25 25 0 0 1 13.9.1a1 1 0 0 1 1.3 1.4 23 23 0 0 0 30.9 30.7 1 1 0 0 1 1.3 1.3 24.9 24.9 0 0 1-22.4 14zM12.2 3.4a23 23 0 1 0 32 31.8 25 25 0 0 1-32-31.8z" />
@@ -192,23 +184,22 @@
       </div>
       <div id="view-panel" class="col-span-3">
         <div class="flex flex-row gap-3">
-            <button id="download" class="btn btn-disabled pt-2">
-              <svg class="fill-current w-4 h-4 mr-2"  xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20">
-                <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
-              </svg>
-              Download STL
-            </button>
-            <button id="re-render" class="btn">
-              <svg class="fill-current w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path
-                  d="M 7.1601562 3 L 8.7617188 5 L 18 5 C 18.551 5 19 5.448 19 6 L 19 15 L 16 15 L 20 20 L 24 15 L 21 15 L 21 6 C 21 4.346 19.654 3 18 3 L 7.1601562 3 z M 4 4 L 0 9 L 3 9 L 3 18 C 3 19.654 4.346 21 6 21 L 16.839844 21 L 15.238281 19 L 6 19 C 5.449 19 5 18.552 5 18 L 5 9 L 8 9 L 4 4 z" />
-              </svg>
-              Re-Render
-            </button>
-            <button id="stop-render" class="btn btn-disabled">
-              STOP
-            </button>
+          <button id="download" class="btn btn-disabled">
+            <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+              <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
+            </svg>
+            Download STL
+          </button>
+          <button id="re-render" class="btn">
+            <svg class="fill-current w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path
+                d="M 7.1601562 3 L 8.7617188 5 L 18 5 C 18.551 5 19 5.448 19 6 L 19 15 L 16 15 L 20 20 L 24 15 L 21 15 L 21 6 C 21 4.346 19.654 3 18 3 L 7.1601562 3 z M 4 4 L 0 9 L 3 9 L 3 18 C 3 19.654 4.346 21 6 21 L 16.839844 21 L 15.238281 19 L 6 19 C 5.449 19 5 18.552 5 18 L 5 9 L 8 9 L 4 4 z" />
+            </svg>
+            Re-Render
+          </button>
+          <button id="stop-render" class="btn btn-disabled">
+            STOP
+          </button>
           <div id="render-status" class="py-4"></div>
         </div>
         <div id="viewer"></div>
