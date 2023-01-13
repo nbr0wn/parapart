@@ -3173,6 +3173,10 @@ html {
   display: contents;
 }
 
+.h-8 {
+  height: 2rem;
+}
+
 .h-4 {
   height: 1rem;
 }
@@ -3185,8 +3189,8 @@ html {
   height: 1.75rem;
 }
 
-.h-8 {
-  height: 2rem;
+.w-8 {
+  width: 2rem;
 }
 
 .w-4 {
@@ -3203,10 +3207,6 @@ html {
 
 .w-full {
   width: 100%;
-}
-
-.w-8 {
-  width: 2rem;
 }
 
 .max-w-xs {
