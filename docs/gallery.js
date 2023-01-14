@@ -16,10 +16,9 @@ const warn = (...args) => logHtml('warning', ...args);
 const error = (...args) => logHtml('error', ...args);
 
 
-
-async function fetchRawFromGitHub(owner, repo, path, completedCallback) {
+async function fetchRawFromGitHub(owner, repo, branch, path, completedCallback) {
   return fetch(
-    `https://raw.githubusercontent.com/${owner}/${repo}/main/${path}`
+    `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`
     ).then(response => response.text()
     ).then(function(response) {completedCallback(response);}
     ).catch(function (error) {
@@ -52,7 +51,7 @@ function base64ToBinary(data) {
 // This function is called when a user clicks on a part in the gallery
 function editPart(url) {
   console.log("EDIT NEW PART:"+ url);
-  fetchRawFromGitHub('nbr0wn','parapart','docs/'+url,
+  fetchRawFromGitHub('nbr0wn','parapart','main', 'docs/'+url,
   //fetchLocal(url, 
     function (data) {
     var localState  = defaultState
@@ -67,7 +66,6 @@ var getStyle = function(elementId, property) {
   console.log(elementId);
   return window.getComputedStyle ? window.getComputedStyle(element, null).getPropertyValue(property) : element.style[property.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); })];
 };
-
 
 function fetchSTL(partId) {
   let dir = String(Math.floor(parseInt(partId) / 100)).padStart(3, '0');

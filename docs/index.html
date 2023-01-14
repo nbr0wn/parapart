@@ -216,7 +216,7 @@
           <label class="label">
             <span class="label-text">Category</span>
             <select id="part-section" class="select select-bordered">
-              <option disabled selected>Choose Category for this model</option>
+              <option disabled selected value="0">Choose Category for this model</option>
               <option value="1110">Four Sided Containers</option>
               <option value="1120">Containers with >4 Sides</option>
               <option value="1200">Trays</option>
@@ -251,27 +251,13 @@
             </select>
           </label>
           <label class="label">
-            <span class="label-text">OpenSCAD file is in GitHub</span>
-            <input id="part-github" type="checkbox" class="checkbox" checked/>
+            <span class="label-text">Submit raw SCAD file</span>
+            <input id="raw-scad" type="checkbox" class="checkbox" />
           </label>
           <div id="github-fields">
             <label class="label">
-              <span class="label-text">GitHub username</span>
-              <input id="user-name" type="text" placeholder="somedeveloper"
-                class="input input-bordered w-full max-w-xs" />
-            </label>
-            <label class="label">
-              <span class="label-text">GitHub repository name</span>
-              <input id="repo-name" type="text" placeholder="mygithubrepo"
-                class="input input-bordered w-full max-w-xs" />
-            </label>
-            <label class="label">
-              <span class="label-text">Branch name</span>
-              <input id="branch-name" type="text" placeholder="main" class="input input-bordered w-full max-w-xs" />
-            </label>
-            <label class="label">
-              <span class="label-text">Path to file</span>
-              <input id="file-path" type="text" placeholder="a_dir/sub_dir/file.scad"
+              <span class="label-text">GitHub URL</span>
+              <input id="github-url" type="text" placeholder="Link to GitHub .scad file"
                 class="input input-bordered w-full max-w-xs" />
             </label>
           </div>
@@ -282,14 +268,25 @@
                 placeholder="Paste OpenSCAD text here"></textarea>
             </label>
           </div>
-          <span>New parts are added using GitHub issues. When you click <b>Add Part</b> below, you will be redirected to
-            the
-            Parapart issue
-            page on GitHub. Don't forget to hit <b>submit</b>!
-          </span>
+          <div></div>
+          <div class="alert shadow-lg">
+            <div>
+              <svg xmlns=" http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                class="stroke-current flex-shrink-0 w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span>New parts are added using GitHub issues. When you click <b>Add Part</b> below, you will be
+                redirected
+                to the Parapart issue page on GitHub.
+                <br />
+                  <br />On the issue page, don't forget to click the <span class="text-green-500">Submit New Issue</span> button to add your part
+              </span>
+            </div>
+          </div>
           <div class="flex w-full justify-around">
             <div id="add-part-confirm" class="modal-action">
-              <label for="add-part-modal" class="btn">Add Part</label>
+              <label id="add-confirm-btn" for="add-part-modal" class="btn btn-disabled">Add Part</label>
             </div>
             <div class="modal-action">
               <label for="add-part-modal" class="btn">Nah</label>

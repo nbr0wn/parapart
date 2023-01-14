@@ -5,6 +5,7 @@ import { writeStateInFragment, readStateFromFragment } from './state.js'
 import { buildFeatureCheckboxes } from './features.js';
 import { parseScad, cleanupControls } from './control-parser.js';
 import { loadDatabase, buildSection } from './gallery.js';
+import { setupAddPart } from './add-part.js';
 
 const editorElement = document.getElementById('monacoEditor');
 const runButton = document.getElementById('re-render');
@@ -553,47 +554,8 @@ try {
     }
   }
 
-  document.getElementById("part-github").onchange = () => { 
-    if (document.getElementById("part-github").checked) {
-      document.getElementById('github-fields').style.display = "block";
-      document.getElementById('non-github-file').style.display = "none";
-    } else {
-      document.getElementById('github-fields').style.display = "none";
-      document.getElementById('non-github-file').style.display = "block";
-    }
-  }
-
-  document.getElementById("add-part-form").onchange = () => { 
-      console.log(document.getElementById('part-name').value);
-      console.log(document.getElementById('part-section').value);
-      console.log(document.getElementById('part-github').checked);
-      console.log(document.getElementById('user-name').value);
-      console.log(document.getElementById('repo-name').value);
-      console.log(document.getElementById('branch-name').value);
-      console.log(document.getElementById('file-path').value);
-      console.log(document.getElementById('scad-text').value);
-  }
-
-  document.getElementById("add-part-btn").onclick = function() { 
-    document.getElementById("nav-overlay").style.width = "0vw";
-  }
-  document.getElementById("add-part-modal").checked = false;
-
-  document.getElementById("add-part-confirm").onclick = function() { 
-    let TEXT="NAME:" + document.getElementById('part-name').value + "\n";
-    TEXT +="SECTION:" + document.getElementById('part-section').value + "\n";
-    if(document.getElementById('part-github').checked ) {
-      TEXT += "USER:" + document.getElementById('user-name').value + "\n";
-      TEXT += "REPO:" + document.getElementById('repo-name').value + "\n";
-      TEXT += "BRANCH:" + document.getElementById('branch-name').value + "\n";
-      TEXT += "PATH:" + document.getElementById('file-path').value + "\n";
-    }
-    else {
-      TEXT += "SCAD: " + document.getElementById('scad-text').value;
-    }
-    let uriTxt = encodeURIComponent(TEXT);
-    window.location.assign('https://github.com/nbr0wn/parapart/issues/new?title=SCAD&body='+uriTxt);
-  }
+  // Setup handler for the add part dialog
+  setupAddPart();
 
   /////////////////////////////////////////////////////////
   ///////////////////////// END PARAPART
