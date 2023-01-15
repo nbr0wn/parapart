@@ -557,6 +557,30 @@ try {
   // Setup handler for the add part dialog
   setupAddPart();
 
+  document.getElementById("get-part-link").onclick = function() {
+    console.log("Get part link clicked " + window.location.hash);
+
+    let toast = document.createElement("div");
+    toast.classList.add("toast-bottom");
+    let alert = document.createElement("div");
+    alert.classList.add("alert");
+    alert.classList.add("alert-info");
+
+    let msg = document.createElement("div");
+    let span = document.createElement("span");
+
+    navigator.clipboard.writeText(window.location.hash).then(() => {
+      span.innerText = "Copied!";
+    }, (err) => { span.innerText = "Clipboard Copy Failed"; });
+
+    msg.appendChild(span);
+    alert.appendChild(msg);
+    toast.appendChild(alert);
+    document.body.appendChild(toast);
+    //toast.style.display = "block";
+    //setTimeout(function() {console.log("TOAST TIMEOUT")} );
+   }
+
   /////////////////////////////////////////////////////////
   ///////////////////////// END PARAPART
   /////////////////////////////////////////////////////////

@@ -182,6 +182,20 @@
       <div class="divider-horizontal"></div>
       <div id="view-panel" class="card flex-grow">
         <div class="flex flex-row gap-3">
+          <button id="get-part-link" class="btn">
+
+            <svg class="stroke-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <g stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" clip-path="url(#a)">
+                <path d="m15 5-3-3m0 0L9 5m3-3v12M6 9H4v9l2 2h12l2-2V9h-2"/>
+              </g>
+              <defs>
+                <clipPath id="a">
+                  <path fill="#fff" d="M0 0h24v24H0z"/>
+                </clipPath>
+              </defs>
+            </svg>
+            Share Part
+          </button>
           <button id="download" class="btn btn-disabled">
             <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
               <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
@@ -207,7 +221,7 @@
     <input type="checkbox" id="add-part-modal" class="modal-toggle" />
     <div class="modal">
       <div class="modal-box">
-        <div id="add-part-form" class="form-control">
+        <div id="add-part-form" class="form-control space-y-1">
           <label class="label">
             <span class="label-text">Part Name</span>
             <input id="part-name" type="text" placeholder="My Great Part"
@@ -217,37 +231,6 @@
             <span class="label-text">Category</span>
             <select id="part-section" class="select select-bordered">
               <option disabled selected value="0">Choose Category for this model</option>
-              <option value="1110">Four Sided Containers</option>
-              <option value="1120">Containers with >4 Sides</option>
-              <option value="1200">Trays</option>
-              <option value="1300">Holders</option>
-              <option value="2100">Hooks</option>
-              <option value="3100">Nuts</option>
-              <option value="3200">Bolts</option>
-              <option value="3300">Washers</option>
-              <option value="3400">Screws</option>
-              <option value="4000">Standoffs</option>
-              <option value="5000">Hinges</option>
-              <option value="5100">Pin Barrel Hinges</option>
-              <option value="6000">Gears</option>
-              <option value="7000">Wheels</option>
-              <option value="8100">Motion</option>
-              <option value="8110">Linear Slides</option>
-              <option value="8120">Bushings</option>
-              <option value="8130">Couplers</option>
-              <option value="9100">8020 Extrusion Components</option>
-              <option value="9200">Bar Stock</option>
-              <option value="9300">Blocks</option>
-              <option value="9400">Wedges</option>
-              <option value="10100">Fans</option>
-              <option value="10200">Motors</option>
-              <option value="10300">Displays</option>
-              <option value="10400">Power Supplies</option>
-              <option value="10500">Switches</option>
-              <option value="10600">Potentiometers</option>
-              <option value="10700">Connectors</option>
-              <option value="12000">Tools</option>
-              <option value="11000">Miscellaneous</option>
             </select>
           </label>
           <label class="label">
@@ -262,13 +245,14 @@
             </label>
           </div>
           <div id="non-github-file" style="display:none;">
-            <label class="label">
+            <div>
               <span class="label-text">OpenSCAD script</span>
-              <textarea id="scad-text" class="textarea textarea-bordered h-30"
+            </div>
+            <div class="pb-4 pt-2">
+              <textarea id="scad-text" class="textarea textarea-bordered w-full h-50"
                 placeholder="Paste OpenSCAD text here"></textarea>
-            </label>
+                </div>
           </div>
-          <div></div>
           <div class="alert shadow-lg">
             <div>
               <svg xmlns=" http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
