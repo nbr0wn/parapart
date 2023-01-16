@@ -185,6 +185,7 @@ function processMergedOutputs(editor, mergedOutputs, timestamp) {
     unmatchedLines.push(stderr ?? stdout ?? `EXCEPTION: ${error}`);
   }
   if (errorCount || warningCount) unmatchedLines = [`${errorCount} errors, ${warningCount} warnings!`, '', ...unmatchedLines];
+  log("** OPENSCAD RENDER OUTPUT");
   log(allLines.join('\n'));
 
   //logsElement.innerText = allLines.join("\n")
@@ -269,6 +270,7 @@ const render = turnIntoDelayableExecution(renderDelay, () => {
     args: [
       "input.scad",
       "-o", "out.stl",
+      "--summary", "all",
       "-p", "customizations.json",
       "-P", "first",
       ...Object.keys(featureCheckboxes).filter(f => featureCheckboxes[f].checked).map(f => `--enable=${f}`),

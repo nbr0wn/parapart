@@ -246,7 +246,6 @@ export function buildSearchResults(searchString) {
     .join(' OR name like ');
   console.log(likeClause);
 
-  let c;
   // Add the section tiles ( if any )
   db.exec({
     sql: `select * from part where name like ${likeClause} limit 30`,
@@ -258,7 +257,6 @@ export function buildSearchResults(searchString) {
       addPartTile(row.name, `assets/local_scad/${dir}/${file}.scad`, `assets/part_images/${dir}/${file}.png`);
     }.bind({ counter: c })
   });
-  console.log(c);
 }
 
 export function buildGallery(_miniViewer, _renderPartFunc) {
