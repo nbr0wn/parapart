@@ -1,3 +1,5 @@
+import { log, warn, error } from './log.js';
+
 
 // Placeholder for our customizations object
 let customizations;
@@ -23,7 +25,7 @@ function randomString() {
 
 // Build up the customization array for the scad controls
 async function updateCustomizations(varname, value) {
-    //console.log(`Setting ${varname} to ${value}`);
+    //log(`Setting ${varname} to ${value}`);
     customizations["parameterSets"]
     customizations.parameterSets.first[varname] = value;
 }
@@ -336,6 +338,7 @@ export function parseScad(data) {
     var haveTabs = false;
     var description;
     
+    log("** Parsing Customizer Fields")
     customizations = { "parameterSets" : { "first" : { } } };
 
     // Activate the static tabs
@@ -354,11 +357,11 @@ export function parseScad(data) {
 
     data.toString().split("\n").every( function(line, index, arr) {
 
-        //console.log(index + " " + line);
+        //log(index + " " + line);
 
         // END OF CUSTOMIZATION MARKER
         if(line.match(customizationEndRegex)) {
-            //console.log("CUSTOMIZATION END: " + line );
+            //log("CUSTOMIZATION END: " + line );
             // All done
             return false;
         }
@@ -369,14 +372,14 @@ export function parseScad(data) {
         let matches;
         if( matches = line.match(descriptionRegex)) {
             description = matches.groups.description;
-            console.log("DESCRIPTION: " + description );
+            log("DESCRIPTION: " + description );
             return true;
         }
 
         // TABS
         if( matches = line.match(tabRegex)) {
             let tabName = matches.groups.tab.replaceAll("[","").replaceAll("]","");
-            console.log(`TAB: ${tabName}`);
+            log(`TAB: ${tabName}`);
             // If this is the first tab, rename our default placeholder 
             // rather than creating a new one
             if( haveTabs == false ){
@@ -393,13 +396,13 @@ export function parseScad(data) {
         if( matches = line.match(stringRegex)) {
             let varname = matches.groups.varname;
             let value = matches.groups.value;
-            console.log(`STRING: ${varname} = ${value}` );
+            log(`STRING: ${varname} = ${value}` );
             if( matches = line.match(comboList)) {
                 // String combo box (labeled and not)
                 let optionList = matches.groups.options.split(',').map( element => {
                     return element.trim();
                 });
-                console.log(`STRING OPTIONS: ${optionList}` );
+                log(`STRING OPTIONS: ${optionList}` );
                 addComboBox(controlDiv,description,varname,value,optionList);
             } else {
                 // Plain string text box
@@ -411,14 +414,14 @@ export function parseScad(data) {
         if( matches = line.match(numberRegex)) {
             let varname = matches.groups.varname;
             let value = matches.groups.value;
-            console.log(`NUMBER: ${varname} = ${value}` );
+            log(`NUMBER: ${varname} = ${value}` );
             if( line.includes(",")) {
                 // Combo Box for numbers (labeled and not)
                 let matches = line.match(comboList);
                 let optionList = matches.groups.options.split(',').map( element => {
                     return element.trim();
                 });
-                console.log(`NUMBER OPTIONS: ${optionList}` );
+                log(`NUMBER OPTIONS: ${optionList}` );
                 addComboBox(controlDiv,description,varname,value,optionList);
             } else if( matches = line.match(sliderRange)) {
                 // Slider with range (optional step)
@@ -426,7 +429,7 @@ export function parseScad(data) {
                     return element.trim();
                 });
                 addSlider(controlDiv,description,varname,value,rangeList);
-                console.log(`NUMBER SLIDER RANGE: ${rangeList}` );
+                log(`NUMBER SLIDER RANGE: ${rangeList}` );
             } else {
                 // Plain number spinbox
                 addSpinBox(controlDiv, description, varname, value);
@@ -438,7 +441,7 @@ export function parseScad(data) {
             // Checkbox
             let varname = matches.groups.varname;
             let value = matches.groups.value;
-            console.log(`BOOL: ${varname} = ${value}` );
+            log(`BOOL: ${varname} = ${value}` );
             addCheckbox(controlDiv, description, varname, value);
         }
 
@@ -446,11 +449,11 @@ export function parseScad(data) {
         if( matches = line.match(vectorRegex)) {
             let varname = matches.groups.varname;
             let elements = matches.groups.elements;
-            console.log(`VECTOR: ${varname} = ${elements}` );
+            log(`VECTOR: ${varname} = ${elements}` );
             let elementList = elements.split(',').map( element => {
                 return element.trim();
             });
-            console.log(`VECTOR ELEMENTS: ${elementList}` );
+            log(`VECTOR ELEMENTS: ${elementList}` );
             if(line.includes(":")) {
                 let rangeList;
                 // Vector with ranges
@@ -459,7 +462,7 @@ export function parseScad(data) {
                     rangeList = matches.groups.options.split(':').map( element => {
                         return element.trim();
                     });
-                    console.log(`VECTOR RANGE: ${rangeList}` );
+                    log(`VECTOR RANGE: ${rangeList}` );
                 }
                 addVector(controlDiv, description, varname, elementList, rangeList);
             } else {

@@ -4,8 +4,10 @@ import { registerOpenSCADLanguage } from './openscad-editor-config.js'
 import { writeStateInFragment, readStateFromFragment } from './state.js'
 import { buildFeatureCheckboxes } from './features.js';
 import { parseScad, cleanupControls } from './control-parser.js';
-import { loadDatabase, buildSection } from './gallery.js';
+import { buildGallery, buildSection } from './gallery.js';
 import { setupAddPart } from './add-part.js';
+import { log, warn, error } from './log.js';
+
 
 const editorElement = document.getElementById('monacoEditor');
 const runButton = document.getElementById('re-render');
@@ -25,20 +27,6 @@ const flipModeButton = document.getElementById("flip-mode");
 // const maximumMegabytesInput = document.getElementById("maximum-megabytes");
 // const copyLinkButton = document.getElementById("copy-link");
 
-
-/////////////////////////////////////////////////////////////////
-// PARAPART - Cribbed from sqlite3 wasm demo
-/////////////////////////////////////////////////////////////////
-// Create Log output area
-let logHtml = function (cssClass, ...args) {
-  const ln = document.createElement('div');
-  if (cssClass) ln.classList.add(cssClass);
-  ln.append(document.createTextNode(args.join(' ')));
-  document.getElementById('logs').append(ln);
-};
-const log = (...args) => logHtml('', ...args);
-const warn = (...args) => logHtml('warning', ...args);
-const error = (...args) => logHtml('error', ...args);
 
 var miniViewer;
 
@@ -196,8 +184,9 @@ function processMergedOutputs(editor, mergedOutputs, timestamp) {
     unmatchedLines.push(stderr ?? stdout ?? `EXCEPTION: ${error}`);
   }
   if (errorCount || warningCount) unmatchedLines = [`${errorCount} errors, ${warningCount} warnings!`, '', ...unmatchedLines];
+  log(allLines.join('\n'));
 
-  logsElement.innerText = allLines.join("\n")
+  //logsElement.innerText = allLines.join("\n")
   // logsElement.innerText = unmatchedLines.join("\n")
 
   monaco.editor.setModelMarkers(editor.getModel(), 'openscad', markers);
@@ -537,9 +526,17 @@ try {
   // Add the logo onclick
   document.getElementById("mainlogo").onclick = function() { buildSection(0); }
 
+  // Set up the part rendering function
+  let renderPartFunc = (scadText) => {
+    var localState = defaultState
+    localState.source.content = scadText;
+    setState(localState);
+    onStateChanged({ allowRun: true });
+  }
+
   // Load the database and then build the top level nav elements
   // on completion
-  loadDatabase(miniViewer);
+  buildGallery(miniViewer, renderPartFunc);
   
   darkButton.onclick = () => { setDarkMode(true); }
   lightButton.onclick = () => { setDarkMode(false); }
@@ -554,14 +551,23 @@ try {
     }
   }
 
+
   // Setup handler for the add part dialog
   setupAddPart();
 
   document.getElementById("get-part-link").onclick = function() {
     console.log("Get part link clicked " + window.location.hash);
 
-    let toast = document.createElement("div");
+    let toast = document.getElementById("toasty");
+    if (toast) {
+      document.getElementById("main-page").removeChild(toast);
+    }
+
+    toast = document.createElement("div");
+    toast.id = "toasty";
+    toast.classList.add("toast");
     toast.classList.add("toast-bottom");
+    toast.classList.add("transition-opacity");
     let alert = document.createElement("div");
     alert.classList.add("alert");
     alert.classList.add("alert-info");
@@ -576,9 +582,14 @@ try {
     msg.appendChild(span);
     alert.appendChild(msg);
     toast.appendChild(alert);
-    document.body.appendChild(toast);
-    //toast.style.display = "block";
-    //setTimeout(function() {console.log("TOAST TIMEOUT")} );
+    document.getElementById("main-page").appendChild(toast);
+
+    setTimeout(function() {
+      let toast = document.getElementById("toasty");
+      if (toast) {
+        document.getElementById("main-page").removeChild(toast);
+      }
+    }, 1000 );
    }
 
   /////////////////////////////////////////////////////////

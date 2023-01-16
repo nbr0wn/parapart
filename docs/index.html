@@ -108,7 +108,7 @@
               d="M109 47c8 0 14 6 14 14s-6 14-14 14H75v34c0 7-6 14-14 14s-14-7-14-14V75l-33 1C6 76 0 69 0 62c0-8 6-14 14-14h34V14c0-8 6-14 14-14s14 6 14 14l-1 33h34z"
               clip-rule="evenodd" />
           </svg>
-          Add New Part</label>
+          Add A Part</label>
       </div>
       <div class="py-5">
         <button id="darkmode" class="btn" style="display:none;">
@@ -154,10 +154,6 @@
             <label for="autorotate">Automatically Rotate</label>
           </div>
           <div>
-            <input type="checkbox" id="showedges" checked>
-            <label for="showedges">Show Edges</label>
-          </div>
-          <div>
             <input type="checkbox" id="show-logs">
             <label for="show-logs">Show Logs</label>
           </div>
@@ -166,17 +162,11 @@
             <label for="show-experimental">Advanced Features</label>
           </div>
           <div id="features" class="features">
-            <div>
-              <input type="number" min="16" max="2048" step="16" id="maximum-megabytes" value="512">
-              <label for="maximum-megabytes">Max Memory(MB)</label>
-            </div>
           </div>
         </div>
 
         <div id="tablogs-div" class="tab-content">
-          <div class="logs-container">
-            <pre><code id="logs"></code></pre>
-          </div>
+          <pre><code id="logs"></code></pre>
         </div>
       </div>
       <div class="divider-horizontal"></div>

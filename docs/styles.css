@@ -31,12 +31,6 @@
   width: 70vw;
 }
 
-.logs-container {
-  overflow-y: scroll;
-  height: calc(min(200px, 30vh));
-  position: relative;
-}
-
 #features {
   /*position: fixed;*/
   bottom: 0;

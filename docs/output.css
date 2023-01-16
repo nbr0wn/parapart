@@ -3449,6 +3449,12 @@ html {
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 
+.transition-opacity {
+  transition-property: opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
 #cheatsheet-link {
   display: none;
   position: fixed;
@@ -3475,12 +3481,6 @@ html {
 
 #view-panel {
   width: 70vw;
-}
-
-.logs-container {
-  overflow-y: scroll;
-  height: calc(min(200px, 30vh));
-  position: relative;
 }
 
 #features {

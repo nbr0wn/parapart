@@ -1,3 +1,5 @@
+import { log, warn, error } from './log.js';
+
 
 const submitButton = document.getElementById("add-confirm-btn");
 const partName = document.getElementById("part-name");

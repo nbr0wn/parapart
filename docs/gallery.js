@@ -1,20 +1,8 @@
+import { log, warn, error } from './log.js';
+
 var db;
 var miniViewer;
-
-/////////////////////////////////////////////////////////////////
-// PARAPART - Cribbed from sqlite3 wasm demo
-/////////////////////////////////////////////////////////////////
-// Create Log output area
-let logHtml = function (cssClass, ...args) {
-  const ln = document.createElement('div');
-  if (cssClass) ln.classList.add(cssClass);
-  ln.append(document.createTextNode(args.join(' ')));
-  document.getElementById('logs').append(ln);
-};
-const log = (...args) => logHtml('', ...args);
-const warn = (...args) => logHtml('warning', ...args);
-const error = (...args) => logHtml('error', ...args);
-
+var renderPartFunc;
 
 async function fetchRawFromGitHub(owner, repo, branch, path, completedCallback) {
   return fetch(
@@ -47,18 +35,15 @@ function base64ToBinary(data) {
   return array.buffer;
 }
 
-
 // This function is called when a user clicks on a part in the gallery
 function editPart(url) {
   console.log("EDIT NEW PART:"+ url);
-  fetchRawFromGitHub('nbr0wn','parapart','main', 'docs/'+url,
+  fetchRawFromGitHub('nbr0wn','parapart','main', 'docs/'+url, renderPartFunc);
+
   //fetchLocal(url, 
-    function (data) {
-    var localState  = defaultState
-    localState.source.content = data;
-    setState(localState);
-    onStateChanged({ allowRun: true });
-  });
+    //function (data) {
+      //renderPart(data);
+  //});
 }
 
 var getStyle = function(elementId, property) {
@@ -244,8 +229,11 @@ export function buildSection(id) {
   });
 }
 
-export function loadDatabase(_miniViewer) {
+export function buildGallery(_miniViewer, _renderPartFunc) {
+  // Stash these as they only exist in main.js
   miniViewer = _miniViewer;
+  renderPartFunc = _renderPartFunc;
+  log("** Initializing sqlite database")
   self.sqlite3InitModule({
     print: log,
     printErr: error
@@ -261,6 +249,7 @@ export function loadDatabase(_miniViewer) {
           db.pointer, 'main', p, dataArray.length, dataArray.length,
           0
         );
+        log("** Building Gallery")
         buildSection(0);
       });
     } catch (e) {
