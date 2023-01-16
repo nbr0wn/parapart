@@ -185,8 +185,7 @@ function addSectionTile(name, id, imgURI) {
   addTile("categories", name, imgURI, function() { buildSection(id);}, false);
 }
 
-
-export function buildSection(id) {
+export function clearGallery(id) {
   // Clear the categories
   const categories = document.getElementById("categories");
   while(categories.firstChild) {
@@ -202,6 +201,11 @@ export function buildSection(id) {
   while(breadcrumbs.firstChild) {
     breadcrumbs.removeChild(breadcrumbs.firstChild);
   }
+}
+
+
+export function buildSection(id) {
+  clearGallery();
 
   // Show breadcrumbs
   addBreadcrumbs(id);
@@ -227,6 +231,34 @@ export function buildSection(id) {
       addPartTile(row.name, `assets/local_scad/${dir}/${file}.scad`, `assets/part_images/${dir}/${file}.png`);
     }.bind({ counter: 0 })
   });
+}
+export function buildSearchResults(searchString) {
+  clearGallery();
+
+  // Show breadcrumbs
+  addBreadcrumbs(0);
+
+  let likeClause = searchString
+    .trim()
+    .replace(/[^a-zA-Z0-9 ]/g, '')
+    .split(' ')
+    .map(word => { return '\'%' + word + '%\'' })
+    .join(' OR name like ');
+  console.log(likeClause);
+
+  let c;
+  // Add the section tiles ( if any )
+  db.exec({
+    sql: `select * from part where name like ${likeClause} limit 30`,
+    rowMode: 'object',
+    callback: function (row) {
+      // Image directories are broken up into groups of 100
+      let dir = String(Math.floor(parseInt(row.id) / 100)).padStart(3,'0')
+      let file = String(parseInt(row.id) % 100).padStart(3,'0')
+      addPartTile(row.name, `assets/local_scad/${dir}/${file}.scad`, `assets/part_images/${dir}/${file}.png`);
+    }.bind({ counter: c })
+  });
+  console.log(c);
 }
 
 export function buildGallery(_miniViewer, _renderPartFunc) {
@@ -257,4 +289,3 @@ export function buildGallery(_miniViewer, _renderPartFunc) {
     }
   });
 }
-

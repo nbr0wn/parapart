@@ -3,7 +3,8 @@
 Parametric OpenSCAD part library
 - Free
 - Open source
-- No signups/logins/ads
+- No signups/logins/ads to download parts
+- 100% static - Hosted by GitHub and runs in the browser
 
 
 GitHub Pages site:

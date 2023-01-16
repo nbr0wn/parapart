@@ -4,7 +4,7 @@ import { registerOpenSCADLanguage } from './openscad-editor-config.js'
 import { writeStateInFragment, readStateFromFragment } from './state.js'
 import { buildFeatureCheckboxes } from './features.js';
 import { parseScad, cleanupControls } from './control-parser.js';
-import { buildGallery, buildSection } from './gallery.js';
+import { buildGallery, buildSearchResults, buildSection } from './gallery.js';
 import { setupAddPart } from './add-part.js';
 import { log, warn, error } from './log.js';
 
@@ -24,6 +24,7 @@ const showLogsElement = document.getElementById("show-logs");
 const logsElement = document.getElementById("logs");
 const featuresContainer = document.getElementById("features");
 const flipModeButton = document.getElementById("flip-mode");
+const searchBox = document.getElementById("part-search");
 // const maximumMegabytesInput = document.getElementById("maximum-megabytes");
 // const copyLinkButton = document.getElementById("copy-link");
 
@@ -461,7 +462,7 @@ function setDarkMode(dark) {
   } else {
     darkButton.style.display="block";
     lightButton.style.display="none";
-    document.documentElement.setAttribute("data-theme", "corporate");
+    document.documentElement.setAttribute("data-theme", "garden");
     render({ now: true });
   }
 }
@@ -551,10 +552,12 @@ try {
     }
   }
 
+  searchBox.onchange = () => { buildSearchResults(searchBox.value); }
 
   // Setup handler for the add part dialog
   setupAddPart();
 
+  // Clipboard handling
   document.getElementById("get-part-link").onclick = function() {
     console.log("Get part link clicked " + window.location.hash);
 
