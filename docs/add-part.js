@@ -122,7 +122,7 @@ function add_part_section_option(section_id,name) {
   document.getElementById("part-section").appendChild(opt);
 }
 
-export function setupAddPart() {
+export function setupAddPart(partList) {
     // Close the gallery view on add part.  Could NOT figure out how
     // to have the modal pop over the gallery overlay.  Grr.
     document.getElementById("add-part-btn").onclick = function() { 
@@ -140,7 +140,7 @@ export function setupAddPart() {
     }
 
     // TODO - Fill in options with a query from the database instead 
-    SECTIONS.map((section) => { add_part_section_option(section[0],section[1]); });
+    partList.map((section) => { add_part_section_option(section[0],section[1]); });
 
     // Handle the checkbox functionality
     document.getElementById("add-part-form").onchange = () => { 
@@ -166,13 +166,13 @@ export function setupAddPart() {
         if (submitButton.classList.contains("btn-disabled")) {
             return;
         }
-        let TEXT = "NAME~=~" + partName.value + "\n";
-        TEXT +="SECTION~=~" + partSection.value + "\n";
+        let TEXT = "NAME::" + partName.value + "\n";
+        TEXT +="SECTION::" + partSection.value + "\n";
         if(rawCheck.checked ) {
-            TEXT += "SCAD~=~\n```" + scadText.value + "\n```";
+            TEXT += "SCAD::\n```" + scadText.value + "\n```";
         }
         else {
-            TEXT += "URL~=~" + githubURL.value + "\n";
+            TEXT += "URL::" + githubURL.value + "\n";
         }
         let uriTxt = encodeURIComponent(TEXT);
         window.location.assign('https://github.com/nbr0wn/parapart/issues/new?title=SCAD&body='+uriTxt);

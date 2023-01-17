@@ -5,7 +5,6 @@ import { writeStateInFragment, readStateFromFragment } from './state.js'
 import { buildFeatureCheckboxes } from './features.js';
 import { parseScad, cleanupControls } from './control-parser.js';
 import { buildGallery, buildSearchResults, buildSection } from './gallery.js';
-import { setupAddPart } from './add-part.js';
 import { log, warn, error } from './log.js';
 
 
@@ -555,9 +554,6 @@ try {
   }
 
   searchBox.onchange = () => { buildSearchResults(searchBox.value); }
-
-  // Setup handler for the add part dialog
-  setupAddPart();
 
   // Clipboard handling
   document.getElementById("get-part-link").onclick = function() {

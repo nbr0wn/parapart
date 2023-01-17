@@ -1,4 +1,5 @@
 import { log, warn, error } from './log.js';
+import { setupAddPart } from './add-part.js';
 
 var db;
 var miniViewer;
@@ -80,6 +81,19 @@ function showViewer(event) {
   viewer.onclick = function () { viewer.style.display = "none" ; event.target.onclick(); }
   viewer.onmouseleave = function () { viewer.style.display = "none"; }
   fetchSTL(event.target.partId);
+}
+
+export function getSectionList() {
+  let section_list = [];
+  db.exec({
+    sql: "SELECT id, name FROM section WHERE id NOT IN (select distinct parent_id from section)",
+    rowMode: 'object',
+    callback: function (row) {
+      let entry = [row.id, row.name];
+      section_list.push(entry);
+    }.bind({ counter: 0 })
+  });
+  return section_list;
 }
 
 function getParentId(id) {
@@ -219,12 +233,14 @@ export function buildSection(id) {
       addSectionTile(row.name, row.id, 'assets/section_images/'+row.image);
     }.bind({ counter: 0 })
   });
+   console.log(id);
 
   // Add the part tiles ( if any )
   db.exec({
-    sql: `select * from part p, hierarchy h where p.id = h.part_id AND h.section_id = ${id}`,
+    sql: `SELECT * FROM part INNER JOIN part_section ON part_section.part_id = part.id WHERE part_section.section_id = '${id}'`,
     rowMode: 'object',
     callback: function (row) {
+      console.log(`{row.name} {row.id} {dir} {file}`);
       // Image directories are broken up into groups of 100
       let dir = String(Math.floor(parseInt(row.id) / 100)).padStart(3,'0')
       let file = String(parseInt(row.id) % 100).padStart(3,'0')
@@ -281,6 +297,9 @@ export function buildGallery(_miniViewer, _renderPartFunc) {
         );
         log("** Building Gallery")
         buildSection(0);
+
+        // Setup handler for the add part dialog
+        setupAddPart(getSectionList());
       });
     } catch (e) {
       error("Exception:", e.message);
