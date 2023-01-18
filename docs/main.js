@@ -1,10 +1,9 @@
 import { createWasmMemory, spawnOpenSCAD } from './openscad-runner.js'
-// import OpenScad from "./openscad.js";
 import { registerOpenSCADLanguage } from './openscad-editor-config.js'
 import { writeStateInFragment, readStateFromFragment } from './state.js'
 import { buildFeatureCheckboxes } from './features.js';
-import { parseScad, cleanupControls } from './control-parser.js';
-import { buildGallery, buildSearchResults, buildSection } from './gallery.js';
+import { buildCustomizer } from './control-parser.js';
+import { buildGallery, loadDatabase, buildSearchResults, buildSection, editPart } from './gallery.js';
 import { log, warn, error } from './log.js';
 
 
@@ -20,7 +19,6 @@ const autorotateCheckbox = document.getElementById('autorotate');
 const showExperimentalFeaturesCheckbox = document.getElementById('show-experimental');
 const stlViewerElement = document.getElementById("viewer");
 const showLogsElement = document.getElementById("show-logs");
-const logsElement = document.getElementById("logs");
 const featuresContainer = document.getElementById("features");
 const flipModeButton = document.getElementById("flip-mode");
 const searchBox = document.getElementById("part-search");
@@ -28,17 +26,35 @@ const searchBox = document.getElementById("part-search");
 // const copyLinkButton = document.getElementById("copy-link");
 
 
-var miniViewer;
+const parapart_assets = "https://raw.githubusercontent.com/nbr0wn/parapart/docs/assets";
 
 const darkButton = document.getElementById('darkmode');
 const lightButton = document.getElementById('lightmode');
 
 var modelColor;
 var renderFailed = true;
+var currentPartId = 0;
+var sourceFileName;
+var editor;
 
-/////////////////////////////////////////////////////////////////
-// END
-/////////////////////////////////////////////////////////////////
+const defaultState = {
+  part: {
+    id: 0,
+    configurator: {},
+  },
+  source: {
+    name: 'input.stl',
+    content: `
+  translate([-50, 0, 50])
+  linear_extrude(5)
+  text("PARAPART");
+`},
+  maximumMegabytes: 1024,
+  viewerFocused: false,
+  // maximumMegabytes: 512,
+  features: ['fast-csg', 'fast-csg-trust-corefinement', 'fast-csg-remesh', 'fast-csg-exact-callbacks', 'lazy-union'],
+};
+
 
 const featureCheckboxes = {};
 
@@ -56,9 +72,9 @@ function buildStlViewer() {
 
 function viewStlFile() {
   //console.log(stlViewer.get_camera_state());
-  stlViewer.set_camera_state({position: {x:-100,y:0,z:100}, up:{x:0,y:1,z:0}, target:{x:0,y:0,z:0}})
+  stlViewer.set_camera_state({ position: { x: -100, y: 0, z: 100 }, up: { x: 0, y: 1, z: 0 }, target: { x: 0, y: 0, z: 0 } })
   try { stlViewer.clean(); stlViewer.remove_model(1); } catch (e) { }
-  stlViewer.add_model({ id: 1, local_file: stlFile, color:modelColor });
+  stlViewer.add_model({ id: 1, local_file: stlFile, color: modelColor });
   //console.log(stlViewer);
 }
 
@@ -75,9 +91,11 @@ function addDownloadLink(container, blob, fileName) {
 
 function formatMillis(n) {
   if (n < 1000) {
-    return `${Math.floor(n / 1000)} sec`;
+    return n + 'ms';
   }
-  return `${Math.floor(n / 100) / 10} sec`;
+  let seconds = Math.floor(n / 1000);
+  let ms = Math.floor(n % 1000).toString().padStart(3,'0');
+  return `${seconds}.${ms} s`;
 }
 
 let lastJob;
@@ -108,13 +126,14 @@ function isViewerFocused() {
 }
 
 function setExecuting(isExecuting) {
-  if(isExecuting) {
+  if (isExecuting) {
+    renderStatusElement.innerText = 'rendering...';
+    renderStatusElement.title = null;
     linkContainerElement.classList.add("btn-disabled");
     killButton.classList.remove("btn-disabled");
     runButton.classList.add("btn-disabled");
   } else {
-    if(renderFailed == false )
-    {
+    if (renderFailed == false) {
       linkContainerElement.classList.remove("btn-disabled");
     }
     killButton.classList.add("btn-disabled");
@@ -187,9 +206,6 @@ function processMergedOutputs(editor, mergedOutputs, timestamp) {
   log("** OPENSCAD RENDER OUTPUT");
   log(allLines.join('\n'));
 
-  //logsElement.innerText = allLines.join("\n")
-  // logsElement.innerText = unmatchedLines.join("\n")
-
   monaco.editor.setModelMarkers(editor.getModel(), 'openscad', markers);
 }
 
@@ -208,7 +224,7 @@ const checkSyntax = turnIntoDelayableExecution(syntaxDelay, () => {
     completion: (async () => {
       try {
         const result = await job;
-        console.log(result);
+        //console.log(result);
         processMergedOutputs(editor, result.mergedOutputs, timestamp);
       } catch (e) {
         console.error(e);
@@ -216,9 +232,6 @@ const checkSyntax = turnIntoDelayableExecution(syntaxDelay, () => {
     })()
   };
 });
-
-var sourceFileName;
-var editor;
 
 function turnIntoDelayableExecution(delay, createJob) {
   var pendingId;
@@ -254,11 +267,13 @@ var renderDelay = 1000;
 const render = turnIntoDelayableExecution(renderDelay, () => {
   const source = editor.getValue();
   const timestamp = Date.now();
-  renderStatusElement.innerText = 'rendering...';
-  renderStatusElement.title = null;
-  runButton.classList.add("btn-disabled");
+
   setExecuting(true);
+
   renderFailed = false;
+
+  console.log("SOURCE: " + source);
+  console.log("CUSTOMIZATION: " + JSON.stringify(globalThis.customizations));
 
   const job = spawnOpenSCAD({
     // wasmMemory,
@@ -282,7 +297,7 @@ const render = turnIntoDelayableExecution(renderDelay, () => {
     completion: (async () => {
       try {
         const result = await job;
-        console.log(result);
+        //console.log(result);
         processMergedOutputs(editor, result.mergedOutputs, timestamp);
 
         if (result.error) {
@@ -323,6 +338,10 @@ runButton.onclick = () => render({ now: true });
 function getState() {
   const features = Object.keys(featureCheckboxes).filter(f => featureCheckboxes[f].checked);
   return {
+    part: {
+      id: currentPartId,
+      customizations: globalThis.customizations.first,
+    },
     source: {
       name: sourceFileName,
       content: editor.getValue(),
@@ -357,20 +376,6 @@ function normalizeStateForCompilation(state) {
   }
 }
 
-const defaultState = {
-  source: {
-    name: 'input.stl',
-    content: `
-  translate([-50, 0, 50])
-  linear_extrude(5)
-  text("PARAPART");
-`},
-  maximumMegabytes: 1024,
-  viewerFocused: false,
-  // maximumMegabytes: 512,
-  features: ['fast-csg', 'fast-csg-trust-corefinement', 'fast-csg-remesh', 'fast-csg-exact-callbacks', 'lazy-union'],
-};
-
 // var wasmMemory;
 // var lastMaximumMegabytes;
 // function setMaximumMegabytes(maximumMegabytes) {
@@ -388,6 +393,7 @@ function updateExperimentalCheckbox(temptativeChecked) {
 }
 
 function setState(state) {
+  currentPartId = state.part.id;
   editor.setValue(state.source.content);
   sourceFileName = state.source.name || 'input.scad';
   if (state.camera && persistCameraState) {
@@ -415,7 +421,8 @@ function setState(state) {
 var previousNormalizedState;
 function onStateChanged({ allowRun }) {
   const newState = getState();
-  writeStateInFragment(newState);
+  console.log("NEW STATE: " + JSON.stringify(newState.part));
+  writeStateInFragment(newState.part);
 
   featuresContainer.style.display = showExperimentalFeaturesCheckbox.checked ? null : 'none';
 
@@ -443,40 +450,36 @@ function pollCameraChanges() {
     const ser = JSON.stringify(stlViewer.get_camera_state());
     if (ser != lastCam) {
       lastCam = ser;
-      onStateChanged({ allowRun: false });
+      //onStateChanged({ allowRun: false });
     }
   }, 1000); // TODO only if active tab
 }
 
-////////////////////////////////////////////////////////////////////////////
-// PARAPART STUFF
-////////////////////////////////////////////////////////////////////////////
-
 function setDarkMode(dark) {
   // Set bg to transparent to avoid flicker of old color.  
-  miniViewer.set_bg_color('transparent');
-  if(dark) {
-    darkButton.style.display="none";
-    lightButton.style.display="block";
+  if (dark) {
+    darkButton.style.display = "none";
+    lightButton.style.display = "block";
     document.documentElement.setAttribute("data-theme", "dark");
     render({ now: true });
   } else {
-    darkButton.style.display="block";
-    lightButton.style.display="none";
+    darkButton.style.display = "block";
+    lightButton.style.display = "none";
     document.documentElement.setAttribute("data-theme", "garden");
     render({ now: true });
   }
 }
 
-//////////////////////////////////////////////////////////////////////////
-// End Parapart Stuff
-//////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+// App Initialization
+////////////////////////////////////////////////////////////////////////////
 
 try {
   const workingDir = '/home';
   const fs = await createEditorFS(workingDir);
   await registerOpenSCADLanguage(fs, workingDir, zipArchives);
 
+  // Create the source editor
   editor = monaco.editor.create(editorElement, {
     // value: source,
     lineNumbers: false,
@@ -486,64 +489,74 @@ try {
     tabSize: 2,
     language: 'openscad',
   });
-  editor.addAction({
-    id: "run-openscad",
-    label: "Run OpenSCAD",
-    keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter],
-    run: () => render({ now: true }),
+
+  editor.onDidChangeModelContent(() => {
+    console.log("EDITOR CONTENTS CHANGED");
+    // Rebuild the customization tabs;
+    globalThis.customizations = buildCustomizer(editor.getValue());
+    onStateChanged({ allowRun: true });
   });
 
+  // Create the STL Viewer
   stlViewer = buildStlViewer();
   stlViewer.set_grid(true);
   stlViewerElement.ondblclick = () => {
     console.log("Tap detected!");
     setAutoRotate(!autorotateCheckbox.checked);
-    onStateChanged({ allowRun: false });
+    //onStateChanged({ allowRun: false });
   };
 
   const initialState = readStateFromFragment() || defaultState;
-
-  /////////////////////////////////////////////////////////
-  ///////////////////////// PARAPART
-  /////////////////////////////////////////////////////////
+  setState(initialState);
 
   // Initialize the global customizations object
-  globalThis.customizations = parseScad(initialState.source);
+  //globalThis.customizations = parseScad(initialState.source);
+
+  globalThis.customizations = { "parameterSets": { "first": {} } };
+  globalThis.customizations.parameterSets.first = initialState.customizations;
+
   // Not sure why this doesn't work
   globalThis.customizations.onchange = render;
   // But this does
   globalThis.onchange = render;
 
-  // Setup our mini STL viewer
-  miniViewer = new StlViewer(document.getElementById("miniviewer"), {});
-  miniViewer.set_bg_color('transparent');
-  miniViewer.set_center_models(true);
-  miniViewer.set_auto_rotate(true);
-  miniViewer.model_loaded_callback = id => {
-    //miniViewer.set_edges(1,true);
-    console.log("Model Loaded:" + id)
-  };
-
-  // Build the top level gallery section
-  // Add the logo onclick
-  document.getElementById("mainlogo").onclick = function() { buildSection(0); }
-
   // Set up the part rendering function
-  let renderPartFunc = (scadText) => {
+  let renderPartFunc = (id, scadText) => {
+    console.log("Rendering part " + id);
     var localState = defaultState
+    localState.part.id = id;
+    localState.part.customizations = { "parameterSets": { "first": {} } };
     localState.source.content = scadText;
     setState(localState);
-    onStateChanged({ allowRun: true });
   }
 
-  // Load the database and then build the top level nav elements
-  // on completion
-  buildGallery(miniViewer, renderPartFunc);
-  
+  // This stuff needs DB access 
+  let postDatabaseInitFunc = () => {
+    buildGallery(renderPartFunc);
+
+    let initialState = getState();
+
+    // Did we load the page with a part ID?
+    console.log("*****   HAVE PART ID IN URL: " + initialState.part.id);
+    if (initialState.part.id != 0) {
+      console.log("VALID PART ID FOUND");
+      document.getElementById('nav-overlay').style.width = "0vh";
+      let dir = String(Math.floor(parseInt(initialState.part.id) / 100)).padStart(3, '0');
+      let file = String(parseInt(initialState.part.id) % 100).padStart(3, '0');
+      editPart(initialState.part.id, `assets/local_scad/${dir}/${file}.scad`);
+    }
+  }
+
+  // Load the database and then do initializations that need db access
+  loadDatabase(postDatabaseInitFunc);
+
+  // Add HTML element actions
+  document.getElementById("mainlogo").onclick = function () { buildSection(0); }
   darkButton.onclick = () => { setDarkMode(true); }
   lightButton.onclick = () => { setDarkMode(false); }
+  searchBox.onchange = () => { buildSearchResults(searchBox.value); }
 
-  // Handle logs visibility
+  // Handle log tab visibility
   showLogsElement.checked = false;
   showLogsElement.onchange = () => {
     if (showLogsElement.checked) {
@@ -553,10 +566,8 @@ try {
     }
   }
 
-  searchBox.onchange = () => { buildSearchResults(searchBox.value); }
-
-  // Clipboard handling
-  document.getElementById("get-part-link").onclick = function() {
+  // Clipboard + toast handler for share link
+  document.getElementById("get-part-link").onclick = function () {
     console.log("Get part link clicked " + window.location.hash);
 
     let toast = document.getElementById("toasty");
@@ -576,7 +587,8 @@ try {
     let msg = document.createElement("div");
     let span = document.createElement("span");
 
-    navigator.clipboard.writeText(window.location.hash).then(() => {
+    console.log(JSON.stringify(window.location));
+    navigator.clipboard.writeText(window.location.href).then(() => {
       span.innerText = "Copied!";
     }, (err) => { span.innerText = "Clipboard Copy Failed"; });
 
@@ -585,23 +597,20 @@ try {
     toast.appendChild(alert);
     document.getElementById("main-page").appendChild(toast);
 
-    setTimeout(function() {
+    setTimeout(function () {
       let toast = document.getElementById("toasty");
       if (toast) {
         document.getElementById("main-page").removeChild(toast);
       }
-    }, 1000 );
-   }
+    }, 1000);
+  }
 
-  /////////////////////////////////////////////////////////
-  ///////////////////////// END PARAPART
-  /////////////////////////////////////////////////////////
 
   await buildFeatureCheckboxes(featuresContainer, featureCheckboxes, () => {
     updateExperimentalCheckbox();
-    onStateChanged({ allowRun: true });
+    //onStateChanged({ allowRun: true });
   });
-  setState(initialState);
+
 
   showExperimentalFeaturesCheckbox.onchange = () => onStateChanged({ allowRun: false });
 
@@ -609,10 +618,10 @@ try {
   autoparseCheckbox.onchange = () => onStateChanged({ allowRun: autoparseCheckbox.checked });
   autorotateCheckbox.onchange = () => {
     stlViewer.set_auto_rotate(autorotateCheckbox.checked);
-    onStateChanged({ allowRun: false });
+    //onStateChanged({ allowRun: false });
   };
-  // showedgesCheckbox.onchange = () => onStateChanged({allowRun: false});
 
+  // TODO - this was for mobile displays - layout is currently broken
   flipModeButton.onclick = () => {
     const wasViewerFocused = isViewerFocused();
     setViewerFocused(!wasViewerFocused);
@@ -620,27 +629,12 @@ try {
     if (!wasViewerFocused) {
       setAutoRotate(false);
     }
-    onStateChanged({ allowRun: false });
+    //onStateChanged({ allowRun: false });
   };
-  // maximumMegabytesInput.oninput = () => {
-  //   setMaximumMegabytes(Number(maximumMegabytesInput.value));
-  //   onStateChanged({allowRun: true});
-  // };
-
-  //editor.focus();
 
   pollCameraChanges();
 
-  onStateChanged({ allowRun: true });
-
-  editor.onDidChangeModelContent(() => {
-    // Remove the customizer tabs
-    cleanupControls();
-    // Rebuild the customization tabs;
-    globalThis.customizations = parseScad(editor.getValue());
-    console.log("EDITOR CHANGED");
-    onStateChanged({ allowRun: true });
-  });
+  //onStateChanged({ allowRun: true });
 
 } catch (e) {
   console.trace();

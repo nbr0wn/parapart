@@ -5,11 +5,11 @@ var db;
 var miniViewer;
 var renderPartFunc;
 
-async function fetchRawFromGitHub(owner, repo, branch, path, completedCallback) {
+async function fetchRawFromGitHub(owner, repo, branch, path, id, completedCallback) {
   return fetch(
     `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`
     ).then(response => response.text()
-    ).then(function(response) {completedCallback(response);}
+    ).then(function(response) {completedCallback(id, response);}
     ).catch(function (error) {
       console.log("Fetch Error" + error);
     });
@@ -37,9 +37,9 @@ function base64ToBinary(data) {
 }
 
 // This function is called when a user clicks on a part in the gallery
-function editPart(url) {
-  console.log("EDIT NEW PART:"+ url);
-  fetchRawFromGitHub('nbr0wn','parapart','main', 'docs/'+url, renderPartFunc);
+export function editPart(id, url) {
+  console.log("EDIT NEW PART - ID:" + id + " URL: " + url);
+  fetchRawFromGitHub('nbr0wn','parapart','main', 'docs/'+url, id, renderPartFunc);
 
   //fetchLocal(url, 
     //function (data) {
@@ -49,11 +49,11 @@ function editPart(url) {
 
 var getStyle = function(elementId, property) {
   let element = document.getElementById(elementId);
-  console.log(elementId);
   return window.getComputedStyle ? window.getComputedStyle(element, null).getPropertyValue(property) : element.style[property.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); })];
 };
 
 function fetchSTL(partId) {
+  console.log("FETCHING PART ID:", partId);
   let dir = String(Math.floor(parseInt(partId) / 100)).padStart(3, '0');
   let file = String(parseInt(partId) % 100).padStart(3, '0');
   let url = `assets/local_stl/${dir}/${file}.stl`;
@@ -157,7 +157,7 @@ function addBreadcrumbs(id){
   }
 }
 
-function addTile(destination, name, imgURI, clickFunc, showMiniViewer) {
+function addTile(destination, name, id, imgURI, clickFunc, showMiniViewer) {
   //console.log("ADDING PART:" + name)
   const gallery = document.getElementById(destination);
   let img = document.createElement("img");
@@ -170,7 +170,7 @@ function addTile(destination, name, imgURI, clickFunc, showMiniViewer) {
     img.onmousemove = showViewer;
   }
   img.onclick = clickFunc;
-  img.partId = name.replace('part','');
+  img.partId = id;
 
   let cap = document.createElement("figcaption");
   cap.innerHTML = name;
@@ -186,17 +186,17 @@ function addTile(destination, name, imgURI, clickFunc, showMiniViewer) {
 }
 
 
-function addPartTile(name, url, imgURI) {
-  addTile("gallery", name, imgURI, 
+function addPartTile(name, id, url, imgURI) {
+  addTile("gallery", name, id, imgURI, 
     function() { 
       document.getElementById("nav-overlay").style.width = "0vw"; 
-      editPart(url);
+      editPart(id, url);
     }, 
     true );
 }
 
 function addSectionTile(name, id, imgURI) {
-  addTile("categories", name, imgURI, function() { buildSection(id);}, false);
+  addTile("categories", name, 0, imgURI, function() { buildSection(id);}, false);
 }
 
 export function clearGallery(id) {
@@ -233,18 +233,18 @@ export function buildSection(id) {
       addSectionTile(row.name, row.id, 'assets/section_images/'+row.image);
     }.bind({ counter: 0 })
   });
-   console.log(id);
+   //console.log(id);
 
   // Add the part tiles ( if any )
   db.exec({
     sql: `SELECT * FROM part INNER JOIN part_section ON part_section.part_id = part.id WHERE part_section.section_id = '${id}'`,
     rowMode: 'object',
     callback: function (row) {
-      console.log(`{row.name} {row.id} {dir} {file}`);
+      //console.log(`${row.name} ${row.id} ${dir} ${file}`);
       // Image directories are broken up into groups of 100
       let dir = String(Math.floor(parseInt(row.id) / 100)).padStart(3,'0')
       let file = String(parseInt(row.id) % 100).padStart(3,'0')
-      addPartTile(row.name, `assets/local_scad/${dir}/${file}.scad`, `assets/part_images/${dir}/${file}.png`);
+      addPartTile(row.name, row.id, `assets/local_scad/${dir}/${file}.scad`, `assets/part_images/${dir}/${file}.png`);
     }.bind({ counter: 0 })
   });
 }
@@ -260,7 +260,7 @@ export function buildSearchResults(searchString) {
     .split(' ')
     .map(word => { return '\'%' + word + '%\'' })
     .join(' OR name like ');
-  console.log(likeClause);
+  //console.log(likeClause);
 
   // Add the section tiles ( if any )
   db.exec({
@@ -270,15 +270,33 @@ export function buildSearchResults(searchString) {
       // Image directories are broken up into groups of 100
       let dir = String(Math.floor(parseInt(row.id) / 100)).padStart(3,'0')
       let file = String(parseInt(row.id) % 100).padStart(3,'0')
-      addPartTile(row.name, `assets/local_scad/${dir}/${file}.scad`, `assets/part_images/${dir}/${file}.png`);
+      addPartTile(row.name, row.id, `assets/local_scad/${dir}/${file}.scad`, `assets/part_images/${dir}/${file}.png`);
     }.bind({ counter: c })
   });
 }
 
-export function buildGallery(_miniViewer, _renderPartFunc) {
-  // Stash these as they only exist in main.js
-  miniViewer = _miniViewer;
+function buildMiniViewer() {
+  // Setup our mini STL viewer
+  miniViewer = new StlViewer(document.getElementById("miniviewer"), {});
+  miniViewer.set_bg_color('transparent');
+  miniViewer.set_center_models(true);
+  miniViewer.set_auto_rotate(true);
+  miniViewer.model_loaded_callback = id => {
+    log("Model Loaded - ID:" + id)
+  };
+}
+
+export function buildGallery(_renderPartFunc) {
+  buildMiniViewer();
+  // Stash this for gallery use
   renderPartFunc = _renderPartFunc;
+  console.log("** Building Gallery")
+  buildSection(0);
+  // Setup handler for the add part dialog
+  setupAddPart(getSectionList());
+}
+
+export function loadDatabase(postDatabaseInitFunc) {
   log("** Initializing sqlite database")
   self.sqlite3InitModule({
     print: log,
@@ -295,11 +313,8 @@ export function buildGallery(_miniViewer, _renderPartFunc) {
           db.pointer, 'main', p, dataArray.length, dataArray.length,
           0
         );
-        log("** Building Gallery")
-        buildSection(0);
-
-        // Setup handler for the add part dialog
-        setupAddPart(getSectionList());
+        // Everything was ok.  Call post-init
+        postDatabaseInitFunc();
       });
     } catch (e) {
       error("Exception:", e.message);

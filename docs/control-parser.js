@@ -271,7 +271,7 @@ function addTab(tabName) {
     return randomStr;
 }
 
-export function cleanupControls() {
+function cleanupControls() {
     // Nuke all the removable stuff
     const removeList = document.getElementsByClassName("removable");
     while( removeList.length > 0 ) {
@@ -334,9 +334,11 @@ const sliderRange = /\/\/\s*\[(?<options>[\d: ]+)\]/; // // [1, 2, 3];
 const comboList = /\/\/\s*\[(?<options>.+)\]/; // // [1, 2, 3];
 const customizationEndRegex = /\s*module\s+\w+\s*\(/; // module some_string (...
 
-export function parseScad(data) {
+export function buildCustomizer(data) {
     var haveTabs = false;
     var description;
+
+    cleanupControls();
     
     log("** Parsing Customizer Fields")
     customizations = { "parameterSets" : { "first" : { } } };
