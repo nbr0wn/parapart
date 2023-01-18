@@ -41,6 +41,7 @@ const defaultState = {
   part: {
     id: 0,
     configurator: {},
+    changed: false,
   },
   source: {
     name: 'input.stl',
@@ -90,12 +91,9 @@ function addDownloadLink(container, blob, fileName) {
 }
 
 function formatMillis(n) {
-  if (n < 1000) {
-    return n + 'ms';
-  }
   let seconds = Math.floor(n / 1000);
   let ms = Math.floor(n % 1000).toString().padStart(3,'0');
-  return `${seconds}.${ms} s`;
+  return `${seconds}.${ms} seconds`;
 }
 
 let lastJob;
@@ -272,9 +270,6 @@ const render = turnIntoDelayableExecution(renderDelay, () => {
 
   renderFailed = false;
 
-  console.log("SOURCE: " + source);
-  console.log("CUSTOMIZATION: " + JSON.stringify(globalThis.customizations));
-
   const job = spawnOpenSCAD({
     // wasmMemory,
     inputs: [
@@ -340,7 +335,8 @@ function getState() {
   return {
     part: {
       id: currentPartId,
-      customizations: globalThis.customizations.first,
+      customizations: globalThis.customizations.parameterSets.first,
+      changed: globalThis.customizations.changed
     },
     source: {
       name: sourceFileName,
@@ -491,7 +487,6 @@ try {
   });
 
   editor.onDidChangeModelContent(() => {
-    console.log("EDITOR CONTENTS CHANGED");
     // Rebuild the customization tabs;
     globalThis.customizations = buildCustomizer(editor.getValue());
     onStateChanged({ allowRun: true });
@@ -522,16 +517,22 @@ try {
   globalThis.customizations.parameterSets.first = initialState.customizations;
 
   // Not sure why this doesn't work
-  globalThis.customizations.onchange = render;
+  globalThis.customizations.onchange = () => {
+    globalThis.customizations.changed = true;
+    render({ now: false });
+  }
   // But this does
-  globalThis.onchange = render;
+  globalThis.onchange = () => {
+    globalThis.customizations.changed = true;
+    render({ now: false });
+  }
 
   // Set up the part rendering function
   let renderPartFunc = (id, scadText) => {
-    console.log("Rendering part " + id);
     var localState = defaultState
     localState.part.id = id;
     localState.part.customizations = { "parameterSets": { "first": {} } };
+    localState.part.changed = false;
     localState.source.content = scadText;
     setState(localState);
   }
@@ -543,9 +544,8 @@ try {
     let initialState = getState();
 
     // Did we load the page with a part ID?
-    console.log("*****   HAVE PART ID IN URL: " + initialState.part.id);
     if (initialState.part.id != 0) {
-      console.log("VALID PART ID FOUND");
+      console.log("*****   HAVE PART ID IN URL: " + initialState.part.id);
       document.getElementById('nav-overlay').style.width = "0vh";
       let dir = String(Math.floor(parseInt(initialState.part.id) / 100)).padStart(3, '0');
       let file = String(parseInt(initialState.part.id) % 100).padStart(3, '0');

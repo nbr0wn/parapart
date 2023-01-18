@@ -1,7 +1,7 @@
 
 export function writeStateInFragment(state) {
-  if(typeof state.customizations != "undefined" ) {
-    window.location.hash = encodeURIComponent(JSON.stringify(state.customizations.first));
+  if(typeof state === "object" && state.id > 0 && state.changed == true ) {
+    window.location.hash = encodeURIComponent(JSON.stringify(state));
   }
   else {
     window.location.hash = encodeURIComponent(state.id);
@@ -9,12 +9,10 @@ export function writeStateInFragment(state) {
 }
 export function readStateFromFragment() {
   if (window.location.hash.startsWith('#') && window.location.hash.length > 1) {
-    console.log("HAVE HASH");
     try {
       let state = JSON.parse(decodeURIComponent(window.location.hash.substring(1)));
       if( typeof state != 'object' ) {
         let val = parseInt(state);
-        console.log(val);
         if( isNaN(val) ) {
           val = 0;
         }
@@ -22,6 +20,7 @@ export function readStateFromFragment() {
           part :{
             id: val,
             configurator: { },
+            changed: false,
           },
           source: {
             name: '',
@@ -29,7 +28,7 @@ export function readStateFromFragment() {
           },
         };
       }
-      console.log("STATE: " + JSON.stringify(state));
+      console.log("STATE FROM URI: " + JSON.stringify(state));
       return state;
     } catch (e) {
       console.error(e);
