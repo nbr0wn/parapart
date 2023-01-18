@@ -506,6 +506,12 @@ try {
     //onStateChanged({ allowRun: false });
   };
 
+  await buildFeatureCheckboxes(featuresContainer, featureCheckboxes, () => {
+    updateExperimentalCheckbox();
+    //onStateChanged({ allowRun: true });
+  });
+
+
   const initialState = readStateFromFragment() || defaultState;
   setState(initialState);
 
@@ -605,11 +611,6 @@ try {
     }, 1000);
   }
 
-
-  await buildFeatureCheckboxes(featuresContainer, featureCheckboxes, () => {
-    updateExperimentalCheckbox();
-    //onStateChanged({ allowRun: true });
-  });
 
 
   showExperimentalFeaturesCheckbox.onchange = () => onStateChanged({ allowRun: false });
