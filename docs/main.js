@@ -519,12 +519,12 @@ try {
   // Not sure why this doesn't work
   globalThis.customizations.onchange = () => {
     globalThis.customizations.changed = true;
-    render({ now: false });
+    onStateChanged({ allowRun: true });
   }
   // But this does
   globalThis.onchange = () => {
     globalThis.customizations.changed = true;
-    render({ now: false });
+    onStateChanged({ allowRun: true });
   }
 
   // Set up the part rendering function

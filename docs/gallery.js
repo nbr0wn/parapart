@@ -86,7 +86,7 @@ function showViewer(event) {
 export function getSectionList() {
   let section_list = [];
   db.exec({
-    sql: "SELECT id, name FROM section WHERE id NOT IN (select distinct parent_id from section)",
+    sql: "SELECT id, name FROM section WHERE id NOT IN (select distinct parent_id from section) ORDER BY name ASC",
     rowMode: 'object',
     callback: function (row) {
       let entry = [row.id, row.name];
