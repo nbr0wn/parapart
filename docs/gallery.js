@@ -128,6 +128,7 @@ function pushBreadcrumb(name, imgURI, id, click) {
   let li = document.createElement("li");
   if(click) {
     li.onclick = function() { buildSection(id);}; 
+    li.classList.add("cursor-pointer");
   }
   li.classList.add("flex");
   li.classList.add("items-center");
@@ -142,6 +143,10 @@ function pushBreadcrumb(name, imgURI, id, click) {
 
   let span = document.createElement('span');
   span.innerHTML = name;
+  if(click) {
+    span.onclick = function() { buildSection(id);}; 
+    span.classList.add("cursor-pointer");
+  }
 
   li.appendChild(img);
   li.appendChild(span);
@@ -259,8 +264,8 @@ export function buildSearchResults(searchString) {
   clearGallery();
 
   // Show breadcrumbs
-  addBreadcrumbs(0);
   pushBreadcrumb("Search Results", "assets/section_images/search_results.png", 0, false);
+  addBreadcrumbs(0);
 
   let likeClause = searchString
     .trim()
