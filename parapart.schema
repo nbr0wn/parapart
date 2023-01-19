@@ -1,0 +1,85 @@
+
+CREATE TABLE "part" ( 
+    "id"            INTEGER,
+    "name"          TEXT NOT NULL,
+    "description"   TEXT,
+    "repo_type"     INTEGER DEFAULT 0 NOT NULL,
+    "help_url"      TEXT,
+    "url"           TEXT NOT NULL,
+    "submitter"     TEXT NOT NULL,
+    "add_timestamp" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    PRIMARY KEY("id" AUTOINCREMENT)
+);
+
+CREATE TABLE "part_section" ( "part_id" INTEGER NOT NULL, "section_id" NOT NULL);
+
+CREATE TABLE "section" ( "id" INTEGER, "parent_id" INTEGER, "name" TEXT, "image" TEXT);
+
+CREATE TABLE "tagnames" ( "id" INTEGER, "name" TEXT, PRIMARY KEY("id" AUTOINCREMENT));
+
+CREATE TABLE "part_tag" ( "part_id" INTEGER, "tag_id" INTEGER);
+
+INSERT INTO section (id,parent_id,name,image) VALUES (1000,  0,     "Containers", "containers.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (1100,  1000, "Boxes", "boxes.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (1110,  1100,  "Boxes - Four Sided", "four_sides.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (1120,  1100,  "Boxes - Many Sided", "more_sides.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (1200,  1000,  "Trays", "trays.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (1300,  1000,  "Holders", "holders.png");
+
+INSERT INTO section (id,parent_id,name,image) VALUES (2000,  0,     "Brackets", "brackets.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (2100,  2000,  "Hooks", "hooks.png");
+                                                         
+INSERT INTO section (id,parent_id,name,image) VALUES (3000,  0,     "Fasteners", "fasteners.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (3100,  3000,  "Nuts", "nuts.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (3200,  3000,  "Bolts", "bolts.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (3300,  3000,  "Washers", "washers.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (3400,  3000,  "Screws", "screws.png");
+                                                            
+INSERT INTO section (id,parent_id,name,image) VALUES (4000,  0,     "Standoffs", "standoffs.png");
+
+INSERT INTO section (id,parent_id,name,image) VALUES (5000,  0,     "Hinges", "hinges.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (5100,  5000,  "Hinges - Pin Barrel", "pin_barrel.png");
+                                                            
+INSERT INTO section (id,parent_id,name,image) VALUES (6000,  0,     "Gears", "gears.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (7000,  0,     "Wheels", "wheels.png");
+
+INSERT INTO section (id,parent_id,name,image) VALUES (8000,  0,     "Mechanical", "structural.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (8100,  8000,  "Motion", "structural.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (8110,  8100,  "Linear Slides", "linear_slides.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (8120,  8100,  "Bushings", "bushings.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (8130,  8100,  "Couplers", "couplers.png");
+
+INSERT INTO section (id,parent_id,name,image) VALUES (9000,  0,     "Structural", "structural.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (9100,  9000,  "8020 components", "8020.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (9200,  9000,  "Bar Stock", "8020.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (9300,  9000,  "Blocks", "blocks.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (9400,  9000,  "Wedges", "wedges.png");
+
+INSERT INTO section (id,parent_id,name,image) VALUES (10000, 0,     "Electrical", "electrical.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (10100, 10000, "Fans", "fans.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (10200, 10000, "Motors", "motors.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (10300, 10000, "Displays", "displays.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (10400, 10000, "Power Supplies", "power_supplies.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (10500, 10000, "Switches", "switches.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (10600, 10000, "Potentiometers", "potentiometers.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (10700, 10000, "Connectors", "connectors.png");
+
+INSERT INTO section (id,parent_id,name,image) VALUES (11000, 0,     "Miscellaneous", "miscellaneous.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (12000, 0,     "Tools", "tools.png");
+
+
+
+INSERT INTO tagnames (name) VALUES ("box");
+INSERT INTO tagnames (name) VALUES ("clip");
+INSERT INTO tagnames (name) VALUES ("hanger");
+INSERT INTO tagnames (name) VALUES ("standoff");
+INSERT INTO tagnames (name) VALUES ("fastener");
+INSERT INTO tagnames (name) VALUES ("electrical");
+INSERT INTO tagnames (name) VALUES ("electronics");
+INSERT INTO tagnames (name) VALUES ("structural");
+INSERT INTO tagnames (name) VALUES ("tool");
+INSERT INTO tagnames (name) VALUES ("gear");
+INSERT INTO tagnames (name) VALUES ("wheel");
+INSERT INTO tagnames (name) VALUES ("printable");
+INSERT INTO tagnames (name) VALUES ("supports");
+
