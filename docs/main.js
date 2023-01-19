@@ -3,7 +3,7 @@ import { registerOpenSCADLanguage } from './openscad-editor-config.js'
 import { writeStateInFragment, readStateFromFragment } from './state.js'
 import { buildFeatureCheckboxes } from './features.js';
 import { buildCustomizer } from './control-parser.js';
-import { buildGallery, loadDatabase, buildSearchResults, buildSection, editPart } from './gallery.js';
+import { buildGallery, loadDatabase, buildSearchResults, buildSection, editPart, getStyle } from './gallery.js';
 import { log, warn, error } from './log.js';
 
 
@@ -451,17 +451,35 @@ function pollCameraChanges() {
   }, 1000); // TODO only if active tab
 }
 
+var definedLightTheme = false;
 function setDarkMode(dark) {
   // Set bg to transparent to avoid flicker of old color.  
   if (dark) {
     darkButton.style.display = "none";
     lightButton.style.display = "block";
     document.documentElement.setAttribute("data-theme", "dark");
+    monaco.editor.setTheme('pp-dark');
     render({ now: true });
   } else {
     darkButton.style.display = "block";
     lightButton.style.display = "none";
     document.documentElement.setAttribute("data-theme", "garden");
+
+    // Only need to define this once, but need to be in light-mode 
+    // to fetch the bg color from the CSS theme
+    if (definedLightTheme == false) {
+      let bgcolor = rgba2hex(getStyle('stop-render', 'background'));
+      monaco.editor.defineTheme('pp-light', {
+        base: 'vs',
+        inherit: true,
+        rules: [],
+        colors: {
+          'editor.background': bgcolor,
+        }
+      });
+      definedLightTheme = true;
+    }
+    monaco.editor.setTheme('pp-light');
     render({ now: true });
   }
 }
@@ -470,10 +488,22 @@ function setDarkMode(dark) {
 // App Initialization
 ////////////////////////////////////////////////////////////////////////////
 
+const rgba2hex = (rgba) => `#${rgba.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+\.{0,1}\d*))?\)$/).slice(1).map((n, i) => (i === 3 ? Math.round(parseFloat(n) * 255) : parseFloat(n)).toString(16).padStart(2, '0').replace('NaN', '')).join('')}`
+
 try {
   const workingDir = '/home';
   const fs = await createEditorFS(workingDir);
   await registerOpenSCADLanguage(fs, workingDir, zipArchives);
+
+  let bgcolor = rgba2hex(getStyle('stop-render', 'background'));
+  monaco.editor.defineTheme('pp-dark', {
+    base: 'vs-dark',
+    inherit: true,
+    rules: [  ],
+    colors: {
+      'editor.background': bgcolor,
+    }
+  });
 
   // Create the source editor
   editor = monaco.editor.create(editorElement, {
@@ -481,9 +511,11 @@ try {
     lineNumbers: false,
     automaticLayout: true,
     scrollBeyondLastLine: false,
+    minimap: { enabled: false },
     fontSize: 12,
     tabSize: 2,
     language: 'openscad',
+    theme: 'pp-dark',
   });
 
   editor.onDidChangeModelContent(() => {

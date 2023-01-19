@@ -47,7 +47,7 @@ export function editPart(id, url) {
   //});
 }
 
-var getStyle = function(elementId, property) {
+export var getStyle = function(elementId, property) {
   let element = document.getElementById(elementId);
   return window.getComputedStyle ? window.getComputedStyle(element, null).getPropertyValue(property) : element.style[property.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); })];
 };
