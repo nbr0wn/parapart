@@ -44,16 +44,9 @@ function canSubmit() {
 
     // Are we doing a URL or raw SCAD?
     if (rawCheck.checked) {
-        // Raw SCAD
-        if(scadText.value.trim().length == 0)
-        {
-            // No raw SCAD
-            console.log("RAW SCAD BUT NO TXT");
-        } else {
-            // TODO - check it
-            activateSubmitButton(true);
-            return;
-        }
+        // TODO - check it
+        activateSubmitButton(true);
+        return;
     } else {
         // Raw SCAD
         let url = githubURL.value;
@@ -81,39 +74,6 @@ function canSubmit() {
     activateSubmitButton(false);
 }
 
-// TODO - replace this with a DB query
-var SECTIONS = [
-[ "1110", "Four Sided Containers"],
-[ "1120", "Containers with >4 Sides"],
-[ "1200", "Trays"],
-[ "1300", "Holders"],
-[ "2100", "Hooks"],
-[ "3100", "Nuts"],
-[ "3200", "Bolts"],
-[ "3300", "Washers"],
-[ "3400", "Screws"],
-[ "4000", "Standoffs"],
-[ "5000", "Hinges"],
-[ "5100", "Pin Barrel Hinges"],
-[ "6000", "Gears"],
-[ "7000", "Wheels"],
-[ "8100", "Motion"],
-[ "8110", "Linear Slides"],
-[ "8120", "Bushings"],
-[ "8130", "Couplers"],
-[ "9100", "8020 Extrusion Components"],
-[ "9200", "Bar Stock"],
-[ "9300", "Blocks"],
-[ "9400", "Wedges"],
-[ "10100", "Fans"],
-[ "10200", "Motors"],
-[ "10300", "Displays"],
-[ "10400", "Power Supplies"],
-[ "10500", "Switches"],
-[ "10600", "Potentiometers"],
-[ "10700", "Connectors"],
-[ "12000", "Tools"],
-[ "11000", "Miscellaneous"]];
 
 function add_part_section_option(section_id,name) {
   let opt = document.createElement("option");
@@ -131,9 +91,7 @@ export function setupAddPart(partList) {
         partName.value = "";
         partSection.value = "0";
         githubURL.value = ""; rawCheck.checked = false;
-        scadText.value = "";
         document.getElementById('github-fields').style.display = "block";
-        document.getElementById('non-github-file').style.display = "none";
 
         // Close gallery
         document.getElementById("nav-overlay").style.width = "0vw";
@@ -146,10 +104,8 @@ export function setupAddPart(partList) {
     document.getElementById("add-part-form").onchange = () => { 
         if (rawCheck.checked) {
             document.getElementById('github-fields').style.display = "none";
-            document.getElementById('non-github-file').style.display = "block";
         } else {
             document.getElementById('github-fields').style.display = "block";
-            document.getElementById('non-github-file').style.display = "none";
         }
         canSubmit();
     }
@@ -158,8 +114,6 @@ export function setupAddPart(partList) {
     partSection.onchange = (event) => { canSubmit(); }
     githubURL.oninput = (event) => { canSubmit(); }
     rawCheck.onchange = (event) => { canSubmit(); }
-    // Why do I need all these?
-    scadText.oninput = (event) => { canSubmit(); }
 
 
     document.getElementById("add-part-confirm").onclick = function() { 
@@ -169,7 +123,7 @@ export function setupAddPart(partList) {
         let TEXT = "NAME::" + partName.value + "\n";
         TEXT +="SECTION::" + partSection.value + "\n";
         if(rawCheck.checked ) {
-            TEXT += "SCAD::\n```" + scadText.value + "\n```";
+            TEXT += "SCAD::\n```\n\n\n\n         [PASTE YOUR OPENSCAD SCRIPT HERE]\n\n\n\n```";
         }
         else {
             TEXT += "URL::" + githubURL.value + "\n";

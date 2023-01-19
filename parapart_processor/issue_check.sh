@@ -13,14 +13,12 @@ then
     exit 1
 fi
 
-export GITHUB_TOKEN=$(cat github_token)
-
 set -x
 
 while [ true ];
 do
     cd $SCRIPT_DIR
-    $PROCESSOR
+    $PROCESSOR -t github_token -p .. -o ../../openscad/openscad
     base64 $DB/parapart.sqlite3 > $DOCS/db.base64
 
     cd $DOCS

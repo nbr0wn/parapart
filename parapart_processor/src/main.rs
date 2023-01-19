@@ -1,11 +1,11 @@
-use octocrab::{Octocrab,models,params};
+use chrono::prelude::*;
 use clap::Parser;
+use octocrab::{Octocrab,params,models};
 use regex::Regex;
 use reqwest;
-use rusqlite::{Connection, Result};
+use rusqlite::{Connection, Result, named_params};
 use std::fs;
 use std::io;
-use chrono::prelude::*;
 use std::io::prelude::*;
 use std::process::Command;
 use tempfile::NamedTempFile;
@@ -34,6 +34,10 @@ struct Args {
    /// Path to the openscad executable
    #[arg(short='o', long, required(true))]
    openscad: String,
+
+   /// Leave issues open after processing
+   #[arg(short='l', long, default_value_t =false)]
+   leave_open: bool,
 }
 
 
@@ -47,7 +51,7 @@ fn openscad_check (args: &Args, temp_file: &NamedTempFile) -> bool {
         .arg("--render")
         .arg("--autocenter")
         .arg("--viewall")
-        .arg("--imgsize=512x512")
+        .arg("--imgsize=512,512")
         .arg("-o")
         .arg(TEMP_STL)
         .arg("-o")
@@ -59,6 +63,8 @@ fn openscad_check (args: &Args, temp_file: &NamedTempFile) -> bool {
 
     io::stdout().write_all(&output.stdout).unwrap();
     io::stderr().write_all(&output.stderr).unwrap();
+
+    println!("OpenSCAD OUTPUT CREATED: {}", output.status.success());
 
     // Now replace our ugly bg color with transparency and
     // scale down to our tile size of 128x128
@@ -72,9 +78,11 @@ fn openscad_check (args: &Args, temp_file: &NamedTempFile) -> bool {
         .output()
         .unwrap();
 
-        io::stdout().write_all(&output.stdout).unwrap();
-        io::stderr().write_all(&output.stderr).unwrap();
-    println!("OpenSCAD OUTPUT CREATED: {}", output.status.success());
+    println!("Imagemagick convert status: {}", convert_output.status.success());
+
+        io::stdout().write_all(&convert_output.stdout).unwrap();
+        io::stderr().write_all(&convert_output.stderr).unwrap();
+
     return output.status.success();
 }
 
@@ -127,6 +135,7 @@ fn get_next_seq(db_path: &str) -> u32 {
 
 fn insert_part(db_path: &str, seq: u32, name:&str, section: &str, url: &str, submitter: &str) -> Result<()> {
     let mut conn = Connection::open(format!("{db_path}")).unwrap();
+    // Do this in a transaction so we don't have hanging records
     let tx = conn.transaction()?;
     tx.execute("INSERT INTO part (name, url, submitter) VALUES (?1, ?2, ?3)",
         (&name, &url, &submitter))?;
@@ -135,9 +144,61 @@ fn insert_part(db_path: &str, seq: u32, name:&str, section: &str, url: &str, sub
     tx.commit()
 }
 
+fn check_if_insert(db_path: &str, name: &str, section: &str, url: &str, submitter: &str) -> Result<bool,String> {
+    let conn = Connection::open(format!("{db_path}")).unwrap();
+    // Check to see if URL exists anywhere in the db.  Fetch the section name for the error message
+    let mut stmt = conn.prepare("
+        SELECT 
+        part.name, part.submitter, part_section.section_id, section.name 
+        FROM 
+        part
+        INNER JOIN part_section ON part.id = part_section.part_id
+        INNER JOIN section ON section.id = part_section.section_id
+        WHERE
+        part.url = :url").unwrap();
+    let mut rows = stmt.query(named_params!{":url": url.to_string()}).unwrap();
+    if let Some(row) = rows.next().unwrap() {
+        // URL exists.  Is this an update
+        // Only allow it if the name, section, and submitter match
+        let dbname:String = row.get(0).unwrap();
+        let dbsubmitter:String = row.get(1).unwrap();
+        let dbsection:String = row.get(2).unwrap();
+        let dbsection_name:String = row.get(3).unwrap();
+
+        if name == dbname && section == dbsection
+            && ( submitter == dbsubmitter || submitter == "nbr0wn" ) {
+            // This is an update, not an insert
+            return Ok(false);
+        }
+        else {
+            return Err(format!("OpenSCAD script URL already exists in database as '{}' in section '{}'",
+                dbname, dbsection_name));
+        }
+    }
+    // New URL - Check to see if part name exists in section
+    let mut stmt2 = conn.prepare("
+        SELECT 
+        part.name
+        FROM 
+        part
+        INNER JOIN part_section ON part.id = part_section.part_id
+        WHERE
+        part.name = :part_name
+        AND
+        part_section.section_id =:section_id").unwrap();
+    let mut rows2 = stmt2.query(named_params! {":part_name": name, ":section_id": section}).unwrap();
+    if let Some(_row) = rows2.next().unwrap() {
+        // It exists.  Denied!
+        return Err(format!("Part with this name already exists in section"));
+    }
+
+    // All good - insert new record
+    Ok(true)
+}
+
 fn add_record(args: &Args, name: &str, section: &str, url: &str, submitter: &str, 
-    local_scad: bool, temp_file: NamedTempFile ) -> bool {
-    let db_path = format!("{}/database", args.parapart);
+    local_scad: bool, temp_file: NamedTempFile ) -> Result<(), String> {
+    let db_path = format!("{}/database/parapart.sqlite3", args.parapart);
     let seq = get_next_seq(db_path.as_str());
     let dir = format!("{:03}", seq / 100);
     let file_base = format!("{:03}", seq % 100);
@@ -154,7 +215,6 @@ fn add_record(args: &Args, name: &str, section: &str, url: &str, submitter: &str
 
     let mut insert_url = url.to_string();
 
-
     // If we're dealing with a local SCAD file, we need the parapart URL
     if local_scad {
         // Copy the temp SCAD file over to the assets directory
@@ -167,15 +227,22 @@ fn add_record(args: &Args, name: &str, section: &str, url: &str, submitter: &str
         insert_url = replaced_url;
     }
 
-    // Insert the part record
-    match insert_part(db_path.as_str(), seq, name, section, insert_url.as_str(), submitter) {
-        Ok(_) => {},
-        Err(e) => { println!("Failed to insert part: {:?}", e); return false; }
-    }
-    return true;
+    // Check to see if we need to insert a new record or just update the generated files
+    match check_if_insert(db_path.as_str(),name,section,url,submitter) {
+        Ok(insert) => if insert {
+            // Insert the part record
+            match insert_part(db_path.as_str(), seq, name, section, insert_url.as_str(), submitter) {
+                Ok(_) => {},
+                Err(e) => return Err(format!("Failed to insert part: {:?}", e))
+            }
+        },
+        Err(e) => return Err(format!("Existing Record Check failed; {}", e))
+    };  
+
+    Ok(())
 }
 
-async fn handle_issue<'a>(args: &Args, body: &String, submitter: &str) -> Result<(),&'a str> {
+async fn handle_issue(args: &Args, body: &String, submitter: &str) -> Result<(),String> {
     let mut name = "".to_string();
     let mut section = "".to_string();
     //println!("FULL BODY: {}", body);
@@ -186,7 +253,7 @@ async fn handle_issue<'a>(args: &Args, body: &String, submitter: &str) -> Result
             "SECTION" => { section = tuple[1].to_string(); },
             "URL" => { 
                 if name.is_empty() || section.is_empty()  {
-                    return Err("Not a valid SCAD issue type");
+                    return Err("Not a valid SCAD issue type".to_string());
                 }
                 let tempurl = tuple[1].replace("/blob", "");
                 // Extract URL elements
@@ -202,27 +269,29 @@ async fn handle_issue<'a>(args: &Args, body: &String, submitter: &str) -> Result
                 // Fetch the file locally into a temp file
                 if let Some(scad_file) = fetch_github_file(&user, &repo, &branch, &path).await {
                     if openscad_check(&args, &scad_file) {
-                        if add_record(&args, name.as_str(), section.as_str(), 
-                            url.as_str(), submitter, false,scad_file) {
-                            return Ok(());
-                        } else {
-                            return Err("Failed to add record");
-                        }
+                        return add_record(&args, name.as_str(), section.as_str(), 
+                            url.as_str(), submitter, false,scad_file);
                     }
                     else {
-                        return Err("INVALID OPENSCAD FILE");
+                        return Err("INVALID OPENSCAD FILE".to_string());
                     }
                 } else {
-                    return Err("INVALID OPENSCAD URL");
+                    return Err("INVALID OPENSCAD URL".to_string());
                 }
             },
             "SCAD" => { 
                 if name.is_empty() || section.is_empty()  {
-                    return Err("Not a valid SCAD issue type");
+                    return Err("Not a valid SCAD issue type".to_string());
                 }
-                let re = Regex::new(r".*(?sm)```(.*)```.*").unwrap();
-                let caps = re.captures(body).unwrap();
+                // Just in case someone forgot to delete the auto generated message
+                let re1 = Regex::new(r"\[PASTE YOUR OPENSCAD SCRIPT HERE\]").unwrap();
+                let temp = re1.replace(body,"");
+
+                let re = Regex::new(r".*(?sm)```\s+(.*)\s+```.*").unwrap();
+                let caps = re.captures(&temp).unwrap();
                 let scad = caps.get(1).map_or("", |m| m.as_str().trim());
+
+
                 let date = Utc::now().format("%Y-%m-%d").to_string();
                 let full_scad = format!("// ADDED BY:{submitter}\r\n// ADD DATE:{date}\r\n{scad}");
                 // Extract the scad script
@@ -231,28 +300,25 @@ async fn handle_issue<'a>(args: &Args, body: &String, submitter: &str) -> Result
                 let scad_file:NamedTempFile = write_to_temp_file(full_scad.as_str());
                 if openscad_check(&args, &scad_file) {
                     // Add the record using a real URL with a dummy file name
-                    if add_record(&args, name.as_str(), section.as_str(),
+                    return add_record(&args, name.as_str(), section.as_str(),
                         format!("{PARAPART_BASE}/local_scad/temp.scad").as_str(),
-                        submitter, true, scad_file) {
-                            return Ok(());
-                        } else {
-                            return Err("Failed to add record");
-                        }
+                        submitter, true, scad_file);
                 } else {
-                    return Err("INVALID OPENSCAD SCRIPT");
+                    return Err("INVALID OPENSCAD SCRIPT".to_string());
                 }
             },
             _ => {}
         }
     }
-    Err("Not a valid SCAD issue type")
+    Err("Not a valid SCAD issue type".to_string())
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 
     let args = Args::parse();
-    let token = fs::read_to_string(&args.token_file).unwrap();
+    let token = fs::read_to_string(&args.token_file).unwrap().trim().to_string();
+    
 
     let octocrab = Octocrab::builder()
         .personal_token(token)
@@ -266,31 +332,35 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     .await?;
 
     for issue in issues {
-        if issue.title.trim() == "SCAD" {
-            let title = issue.title.trim().to_string();
-            let user = issue.user.login.trim().to_string();
-            let id = issue.number.to_string().parse::<u64>().unwrap();
-            println!("********************************************");
-            println!("{}", format!("ISSUE ID: {id}\n ISSUE TITLE: {title}\nSUBMITTER: {user}"));
-            match issue.body {
-                Some(body) => {
-                    if let Err(msg) = handle_issue(&args, &body, issue.user.login.as_str()).await {
-                        // Add a comment.
-                        issuebase.create_comment(id,&msg).await?;
-                        println!("** PART ADD FAILED: {msg}")
-                    } else {
-                        // Add a comment.
-                        issuebase.create_comment(id,&"Part Added").await?;
-                        println!("** PART ADDED")
-                    }
-                    // Close the issue
-                    issuebase.update(id)
-                        .state(models::IssueState::Closed)
-                        .send()
-                        .await?;
-                },
-                None => {println!("ISSUE BODY IS NONE")},
-            }
+        match  issue.title.trim() {
+            "SCAD" => {
+                let id = issue.number.to_string().parse::<u64>().unwrap();
+                let user = issue.user.login.trim().to_string();
+                println!("********************************************");
+                println!("{}", format!("ISSUE ID: {id} - NEW SCAD submitted by {user}"));
+                match issue.body {
+                    Some(body) => {
+                        if let Err(msg) = handle_issue(&args, &body, issue.user.login.as_str()).await {
+                            // Add a github issue comment
+                            issuebase.create_comment(id,&msg).await?;
+                            println!("** PART ADD FAILED: {msg}")
+                        } else {
+                            // Add a github issue comment
+                            issuebase.create_comment(id,&"Part Added").await?;
+                            println!("** PART ADDED")
+                        }
+                        if args.leave_open == false {
+                            // Close the issue
+                            issuebase.update(id)
+                                .state(models::IssueState::Closed)
+                                .send()
+                                .await?;
+                        }
+                    },
+                    None => {println!("ISSUE BODY IS NONE")},
+                }
+            },
+            _ => {}
         }
     }
 
