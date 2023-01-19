@@ -303,7 +303,7 @@ export function loadDatabase(postDatabaseInitFunc) {
     printErr: error
   }).then(function (sqlite3) {
     try {
-      fetchLocal('parapart.sqlite3', function (data) {
+      fetchLocal('db.base64', function (data) {
         const dataArray = new Uint8Array(base64ToBinary(atob(data)));
         const p = sqlite3.wasm.allocFromTypedArray(dataArray);
         db = new sqlite3.oo1.DB();
