@@ -137,7 +137,8 @@ fn insert_part(db_path: &str, seq: u32, name:&str, section: &str, url: &str, sub
 
 fn add_record(args: &Args, name: &str, section: &str, url: &str, submitter: &str, 
     local_scad: bool, temp_file: NamedTempFile ) -> bool {
-    let seq = get_next_seq(args.parapart.as_str());
+    let db_path = format!("{}/database", args.parapart);
+    let seq = get_next_seq(db_path.as_str());
     let dir = format!("{:03}", seq / 100);
     let file_base = format!("{:03}", seq % 100);
 
@@ -167,7 +168,7 @@ fn add_record(args: &Args, name: &str, section: &str, url: &str, submitter: &str
     }
 
     // Insert the part record
-    match insert_part(&args.parapart.as_str(), seq, name, section, insert_url.as_str(), submitter) {
+    match insert_part(db_path.as_str(), seq, name, section, insert_url.as_str(), submitter) {
         Ok(_) => {},
         Err(e) => { println!("Failed to insert part: {:?}", e); return false; }
     }
