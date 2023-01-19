@@ -1,22 +1,33 @@
 #!/bin/bash
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+PROCESSOR=$SCRIPT_DIR/target/debug/parapart_processor
+DB=$SCRIPT_DIR/../database
+DOCS=$SCRIPT_DIR/../docs
+
+cd $SCRIPT_DIR
+if [ ! -f "github_token" ]
+then
+    echo "github_token missing from $SCRIPT_DIR"
+    exit 1
+fi
+
+export GITHUB_TOKEN=$(cat github_token)
+
 set -x
-
-BUILD=.
-BASE=../docs
-
-. $BUILD/github_token.txt
 
 while [ true ];
 do
-    cd $BUILD
-    $BUILD/gh_check
-    base64 $BUILD/parapart.sqlite3 > $BASE/parapart.sqlite3
+    cd $SCRIPT_DIR
+    $PROCESSOR
+    base64 $DB/parapart.sqlite3 > $DOCS/db.base64
 
-    cd $BASE
+    cd $DOCS
     git add assets/local_scad
     git add assets/part_images
     git add assets/local_stl
-    git add parapart.sqlite3
+    git add db.base64
     git commit -m "Auto part add"
     git push
 
