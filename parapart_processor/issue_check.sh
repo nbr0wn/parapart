@@ -22,9 +22,7 @@ do
     base64 $DB/parapart.sqlite3 > $DOCS/db.base64
 
     cd $DOCS
-    git add assets/local_scad
-    git add assets/part_images
-    git add assets/local_stl
+    git add --all assets
     git add db.base64
     git commit -m "Auto part add"
     git push

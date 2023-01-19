@@ -108,26 +108,33 @@ function getParentId(id) {
   return parent_id;
 }
 
-function pushBreadcrumb(id) {
+function pushSectionBreadcrumb(id) {
   let name = "Home";
-  let imgURI = "home.png";
+  let imgURI = "assets/section_images/home.png";
   db.exec({
     sql: `select * from section where id = ${id}`,
     rowMode: 'object',
     callback: function (row) {
       name = row.name;
-      imgURI = row.image;
+      imgURI = "assets/section_images/" + row.image;
     }.bind({ counter: 0 })
   });
 
+  pushBreadcrumb(name, imgURI, id, true);
+}
+
+function pushBreadcrumb(name, imgURI, id, click) {
+
   let li = document.createElement("li");
-  li.onclick = function() { buildSection(id);};
+  if(click) {
+    li.onclick = function() { buildSection(id);}; 
+  }
   li.classList.add("flex");
   li.classList.add("items-center");
   li.classList.add("space-x-2");
 
   let img = document.createElement("img");
-  img.src = "assets/section_images/" + imgURI;
+  img.src = imgURI;
   img.alt = name;
   img.classList.add("w-8");
   img.classList.add("h-8");
@@ -146,14 +153,14 @@ function pushBreadcrumb(id) {
 }
 
 function addBreadcrumbs(id){
-  pushBreadcrumb(id);
+  pushSectionBreadcrumb(id);
   let parent_id = getParentId(id);
   while (parent_id > 0) {
-    pushBreadcrumb(parent_id);
+    pushSectionBreadcrumb(parent_id);
     parent_id = getParentId(parent_id);
   }
   if( id > 0) {
-    pushBreadcrumb(0);
+    pushSectionBreadcrumb(0);
   }
 }
 
@@ -253,6 +260,7 @@ export function buildSearchResults(searchString) {
 
   // Show breadcrumbs
   addBreadcrumbs(0);
+  pushBreadcrumb("Search Results", "assets/section_images/search_results.png", 0, false);
 
   let likeClause = searchString
     .trim()
@@ -271,7 +279,7 @@ export function buildSearchResults(searchString) {
       let dir = String(Math.floor(parseInt(row.id) / 100)).padStart(3,'0')
       let file = String(parseInt(row.id) % 100).padStart(3,'0')
       addPartTile(row.name, row.id, `assets/local_scad/${dir}/${file}.scad`, `assets/part_images/${dir}/${file}.png`);
-    }.bind({ counter: c })
+    }.bind({ counter: 0 })
   });
 }
 
