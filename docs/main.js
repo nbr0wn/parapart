@@ -1,6 +1,6 @@
 import { createWasmMemory, spawnOpenSCAD } from './openscad-runner.js'
 import { registerOpenSCADLanguage } from './openscad-editor-config.js'
-import { writeStateInFragment, readStateFromFragment } from './state.js'
+import { writeStateInFragment, readStateFromFragment, copyURIToClipboard } from './state.js'
 import { buildFeatureCheckboxes } from './features.js';
 import { buildCustomizer } from './control-parser.js';
 import { buildGallery, loadDatabase, buildSearchResults, buildSection, editPart, getStyle } from './gallery.js';
@@ -37,26 +37,6 @@ var renderFailed = true;
 var currentPartId = 0;
 var sourceFileName;
 var editor;
-
-const defaultState = {
-  part: {
-    id: 0,
-    configurator: {},
-    changed: false,
-  },
-  source: {
-    name: 'input.stl',
-    content: `
-  translate([-50, 0, 50])
-  linear_extrude(5)
-  text("PARAPART");
-`},
-  maximumMegabytes: 1024,
-  viewerFocused: false,
-  // maximumMegabytes: 512,
-  features: ['fast-csg', 'fast-csg-trust-corefinement', 'fast-csg-remesh', 'fast-csg-exact-callbacks', 'lazy-union'],
-};
-
 
 const featureCheckboxes = {};
 
@@ -390,7 +370,10 @@ function updateExperimentalCheckbox(temptativeChecked) {
 }
 
 function setState(state) {
+
   currentPartId = state.part.id;
+
+  globalThis.customizations.parameterSets.first = state.part.customizations;
   editor.setValue(state.source.content);
   sourceFileName = state.source.name || 'input.scad';
   if (state.camera && persistCameraState) {
@@ -540,15 +523,26 @@ try {
   });
 
 
-  const initialState = readStateFromFragment() || defaultState;
-  setState(initialState);
-
-  // Initialize the global customizations object
-  //globalThis.customizations = parseScad(initialState.source);
+const defaultState = {
+  part: {
+    id: 0,
+    configurator: {},
+    changed: false,
+  },
+  source: {
+    name: 'input.stl',
+    content: `
+  translate([-50, 0, 50])
+  linear_extrude(5)
+  text("PARAPART");
+`},
+  maximumMegabytes: 1024,
+  viewerFocused: false,
+  // maximumMegabytes: 512,
+  features: ['fast-csg', 'fast-csg-trust-corefinement', 'fast-csg-remesh', 'fast-csg-exact-callbacks', 'lazy-union'],
+};
 
   globalThis.customizations = { "parameterSets": { "first": {} } };
-  globalThis.customizations.parameterSets.first = initialState.customizations;
-
   // Not sure why this doesn't work
   globalThis.customizations.onchange = () => {
     globalThis.customizations.changed = true;
@@ -560,36 +554,59 @@ try {
     onStateChanged({ allowRun: true });
   }
 
-  // Set up the part rendering function
+  // Read any state from the URL
+  const initialState = readStateFromFragment() || defaultState;
+
+  setState(initialState);
+
+  // Set up the part rendering function that we will apply
+  // to the parts in the gallery
   let renderPartFunc = (id, scadText) => {
-    var localState = defaultState
-    localState.part.id = id;
-    localState.part.customizations = { "parameterSets": { "first": {} } };
-    localState.part.changed = false;
-    localState.source.content = scadText;
-    setState(localState);
+
+    // Get the current state
+    var newState = getState();
+
+    // Modify it
+    newState.part.id = id;
+    // No customizations if we just loaded the part
+    newState.part.customizations = { "parameterSets": { "first": {} } };
+    newState.part.changed = false;
+
+    // Save the scad text
+    newState.source.content = scadText;
+
+    // Apply it to the currently running state vars
+    setState(newState);
   }
 
-  // This stuff needs DB access 
+  // This stuff needs DB access and should just be done after db init
   let postDatabaseInitFunc = () => {
+
+    // Build the parts gallery
     buildGallery(renderPartFunc);
 
-    let initialState = getState();
+    // Get the current state
+    let currentState = getState();
 
     // Did we load the page with a part ID?
-    if (initialState.part.id != 0) {
-      console.log("*****   HAVE PART ID IN URL: " + initialState.part.id);
+    if (currentState.part.id != 0) {
+      console.log("*****   HAVE PART ID IN URL: " + currentState.part.id);
+      // Close the gallery
       document.getElementById('nav-overlay').style.width = "0vh";
-      let dir = String(Math.floor(parseInt(initialState.part.id) / 100)).padStart(3, '0');
-      let file = String(parseInt(initialState.part.id) % 100).padStart(3, '0');
-      editPart(initialState.part.id, `assets/local_scad/${dir}/${file}.scad`);
+
+      // Edit the part as though we chose it from the gallery
+      let dir = String(Math.floor(parseInt(currentState.part.id) / 100)).padStart(3, '0');
+      let file = String(parseInt(currentState.part.id) % 100).padStart(3, '0');
+      editPart(currentState.part.id, `assets/local_scad/${dir}/${file}.scad`);
     }
   }
 
   // Load the database and then do initializations that need db access
   loadDatabase(postDatabaseInitFunc);
 
+  //////////////////////////////////////////////////////////////////
   // Add HTML element actions
+  //////////////////////////////////////////////////////////////////
   document.getElementById("mainlogo").onclick = function () { buildSection(0); }
   darkButton.onclick = () => { setDarkMode(true); }
   lightButton.onclick = () => { setDarkMode(false); }
@@ -616,44 +633,7 @@ try {
   }
 
   // Clipboard + toast handler for share link
-  document.getElementById("get-part-link").onclick = function () {
-    console.log("Get part link clicked " + window.location.hash);
-
-    let toast = document.getElementById("toasty");
-    if (toast) {
-      document.getElementById("main-page").removeChild(toast);
-    }
-
-    toast = document.createElement("div");
-    toast.id = "toasty";
-    toast.classList.add("toast");
-    toast.classList.add("toast-bottom");
-    toast.classList.add("transition-opacity");
-    let alert = document.createElement("div");
-    alert.classList.add("alert");
-    alert.classList.add("alert-info");
-
-    let msg = document.createElement("div");
-    let span = document.createElement("span");
-
-    console.log(JSON.stringify(window.location));
-    navigator.clipboard.writeText(window.location.href).then(() => {
-      span.innerText = "Copied!";
-    }, (err) => { span.innerText = "Clipboard Copy Failed"; });
-
-    msg.appendChild(span);
-    alert.appendChild(msg);
-    toast.appendChild(alert);
-    document.getElementById("main-page").appendChild(toast);
-
-    setTimeout(function () {
-      let toast = document.getElementById("toasty");
-      if (toast) {
-        document.getElementById("main-page").removeChild(toast);
-      }
-    }, 1000);
-  }
-
+  document.getElementById("get-part-link").onclick = copyURIToClipboard;
 
 
   showExperimentalFeaturesCheckbox.onchange = () => onStateChanged({ allowRun: false });
@@ -677,8 +657,6 @@ try {
   };
 
   pollCameraChanges();
-
-  //onStateChanged({ allowRun: true });
 
 } catch (e) {
   console.trace();

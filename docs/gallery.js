@@ -51,6 +51,7 @@ function base64ToBinary(data) {
 // This function is called when a user clicks on a part in the gallery
 export function editPart(id, url) {
   console.log("EDIT NEW PART - ID:" + id + " URL: " + url);
+  //fetchSTL(id);
   fetchRawFromGitHub('nbr0wn','parapart','main', 'docs/'+url, id, renderPartFunc);
   //fetchLocalSCAD(url, id, renderPartFunc);
 }
