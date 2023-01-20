@@ -209,8 +209,9 @@ function addComboBox(controlDiv,description,varname,defaultValue,optionList) {
         let option = document.createElement("option");
         if(entry.includes(":") )
         {
+            console.log(entry);
             // Yes - Value:Label
-            labelval = entry.split(":");
+            let labelval = entry.split(":");
             option.value = labelval[0];
             option.innerHTML = labelval[1];
         } else {
@@ -263,7 +264,7 @@ function addTab(tabName) {
     newDiv.id = tabId + '-div';
 
     // Append this div to the control area
-    let editor = document.getElementById("tabedit");
+    let editor = document.getElementById("tabsettings");
     document.getElementById("tab-head").insertBefore(anchor,editor);
     document.getElementById("control-area").appendChild(newDiv);
     
@@ -325,7 +326,7 @@ function cleanupControls() {
 // Vector4=[12,34,46,24]; //[0:2:50]
 
 const tabRegex = /^\/\*\s*\[\s*(?<tab>.+)\s*\*\//; // /* [Tab name:] */
-const descriptionRegex = /^\s*\/\/\s*(?<description>[\w ]+)/; // // Control Description
+const descriptionRegex = /^\s*\/\/\s*(?<description>[\w ]+.*)\s*$/; // // Control Description
 const vectorRegex = /^\s*(?<varname>[\w]+)\s*=\s*\[\s*(?<elements>[\d,\.\- ]+)\s*\]\s*;/; // // Variable = 10;
 const numberRegex = /^\s*(?<varname>[\w]+)\s*=\s*(?<value>[\d.+-]+)\s*;/; // // Variable = 10;
 const boolRegex = /^\s*(?<varname>[\w]+)\s*=\s*(?<value>true|false)\s*;/; // // Variable = "foo";
@@ -390,7 +391,7 @@ export function buildCustomizer(data) {
                 haveTabs = true;
             } else {
                 // Create a new tab
-                controlDiv = 'tab-' + addTab(tabName);
+                controlDiv = 'tab-' + addTab(tabName) + '-div';
             }
         }
 

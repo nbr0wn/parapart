@@ -19,6 +19,7 @@ const autorotateCheckbox = document.getElementById('autorotate');
 const showExperimentalFeaturesCheckbox = document.getElementById('show-experimental');
 const stlViewerElement = document.getElementById("viewer");
 const showLogsElement = document.getElementById("show-logs");
+const showEditorElement = document.getElementById("show-editor");
 const featuresContainer = document.getElementById("features");
 const flipModeButton = document.getElementById("flip-mode");
 const searchBox = document.getElementById("part-search");
@@ -601,6 +602,16 @@ try {
       document.getElementById('tablogs').style.display = "block";
     } else {
       document.getElementById('tablogs').style.display = "none";
+    }
+  }
+
+  // Handle log tab visibility
+  showEditorElement.checked = false;
+  showEditorElement.onchange = () => {
+    if (showEditorElement.checked) {
+      document.getElementById('tabedit').style.display = "block";
+    } else {
+      document.getElementById('tabedit').style.display = "none";
     }
   }
 

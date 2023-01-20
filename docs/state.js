@@ -1,5 +1,6 @@
 
 export function writeStateInFragment(state) {
+  console.log('WRITING STATE IN FRAGMENT' + JSON.stringify(state));
   if(typeof state === "object" && state.id > 0 && state.changed == true ) {
     window.location.hash = encodeURIComponent(JSON.stringify(state));
   }
@@ -35,4 +36,5 @@ export function readStateFromFragment() {
       return null;
     }
   }
+  return null;
 }

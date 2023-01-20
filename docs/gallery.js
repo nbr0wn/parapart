@@ -15,11 +15,23 @@ async function fetchRawFromGitHub(owner, repo, branch, path, id, completedCallba
     });
 }
 
+// Fetch from local web tree
 async function fetchLocal(fileName, completedCallback) {
-  //console.log("FETCHING LOCAL " + fileName);
+  console.log("FETCHING LOCAL " + fileName);
   return fetch(fileName
   ).then(response => response.text()
   ).then(function(response) { completedCallback(response); }
+  ).catch(function (error) {
+    console.log("Fetch Error:" + error );
+  });
+}
+
+// Test func for local server
+async function fetchLocalSCAD(fileName, id, completedCallback) {
+  console.log("FETCHING LOCAL " + fileName);
+  return fetch(fileName
+  ).then(response => response.text()
+  ).then(function(response) { completedCallback(id, response); }
   ).catch(function (error) {
     console.log("Fetch Error:" + error );
   });
@@ -40,11 +52,7 @@ function base64ToBinary(data) {
 export function editPart(id, url) {
   console.log("EDIT NEW PART - ID:" + id + " URL: " + url);
   fetchRawFromGitHub('nbr0wn','parapart','main', 'docs/'+url, id, renderPartFunc);
-
-  //fetchLocal(url, 
-    //function (data) {
-      //renderPart(data);
-  //});
+  //fetchLocalSCAD(url, id, renderPartFunc);
 }
 
 export var getStyle = function(elementId, property) {
