@@ -1,9 +1,5 @@
 import { log, warn, error } from './log.js';
 
-
-// Placeholder for our customizations object
-let customizations;
-
 // Generate a random string for our unique identifiers
 function randomString() { 
     var d = new Date().getTime();
@@ -26,8 +22,8 @@ function randomString() {
 // Build up the customization array for the scad controls
 async function updateCustomizations(varname, value) {
     //log(`Setting ${varname} to ${value}`);
-    customizations["parameterSets"]
-    customizations.parameterSets.first[varname] = value;
+    globalThis.parapart.part.customization[varname] = value;
+    globalThis.parapart.part.changed = true;
 }
 
 // Add a control label
@@ -342,7 +338,7 @@ export function buildCustomizer(data) {
     cleanupControls();
     
     log("** Parsing Customizer Fields")
-    customizations = { "parameterSets" : { "first" : { } } };
+    globalThis.parapart.part.customization = { };
 
     // Activate the static tabs
     document.getElementById('tabedit').onclick = function () { makeTabActive('tabedit'); }
@@ -480,5 +476,4 @@ export function buildCustomizer(data) {
         // Process next line
         return true;
     });
-    return customizations;
 }

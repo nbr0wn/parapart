@@ -1,42 +1,48 @@
 
-export function writeStateInFragment(state) {
-  console.log('WRITING STATE IN FRAGMENT' + JSON.stringify(state));
-  if(typeof state === "object" && state.id > 0 && state.changed == true ) {
-    window.location.hash = encodeURIComponent(JSON.stringify(state));
-  }
-  else {
-    window.location.hash = encodeURIComponent(state.id);
+function isEmpty(obj) {
+  return Object.keys(obj).length === 0;
+}
+
+export function writePartToURL(changed,part) {
+  console.log('WRITING PART TO URL:' + JSON.stringify(part));
+  // Save any customizations
+  if(changed && ! isEmpty(part.customization) ) {
+    window.location.hash = encodeURIComponent(JSON.stringify(part));
+  } else {
+    // Otherwise just save the part ID
+    window.location.hash = part.id;
   }
 }
-export function readStateFromFragment() {
+
+const defaultPart = {
+  id: 0,
+  customization: { },
+};
+
+export function readPartFromURL() {
+  let newPart = defaultPart;
+  let changed = false;
   if (window.location.hash.startsWith('#') && window.location.hash.length > 1) {
     try {
-      let state = JSON.parse(decodeURIComponent(window.location.hash.substring(1)));
-      if( typeof state != 'object' ) {
-        let val = parseInt(state);
-        if( isNaN(val) ) {
-          val = 0;
+      let URLPart = JSON.parse(decodeURIComponent(window.location.hash.substring(1)));
+      // If it's not an object, it may just be a part ID
+      if( typeof URLPart != 'object' ) {
+        let val = parseInt(URLPart);
+        if( ! isNaN(val) ) {
+          newPart.id = val;
         }
-        state = {
-          part :{
-            id: val,
-            configurator: { },
-            changed: false,
-          },
-          source: {
-            name: '',
-            content: '',
-          },
-        };
+      } else {
+        // Save the ID and the customization settings
+        newPart.id = URLPart.id;
+        newPart.customization = URLPart.customization;
+        changed = true;
       }
-      console.log("STATE FROM URI: " + JSON.stringify(state));
-      return state;
     } catch (e) {
       console.error(e);
-      return null;
     }
-  }
-  return null;
+  } 
+  writePartToURL(changed,newPart);
+  return newPart;
 }
 
 export function copyURIToClipboard() {

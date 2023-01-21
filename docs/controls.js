@@ -1,9 +1,8 @@
 
-// Update the customizations object
+// Update the customization object
 function updateCustomizations(varname, value) {
     //console.log(`Setting ${varname} to ${value}`);
-    globalThis.customizations["parameterSets"]
-    globalThis.customizations.parameterSets.first[varname] = value;
+    globalThis.parapart.part.customization[varname] = value;
 }
 
 // Update the slider thumb position based on the textbox input

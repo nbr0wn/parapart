@@ -1,6 +1,6 @@
 import { createWasmMemory, spawnOpenSCAD } from './openscad-runner.js'
 import { registerOpenSCADLanguage } from './openscad-editor-config.js'
-import { writeStateInFragment, readStateFromFragment, copyURIToClipboard } from './state.js'
+import { readPartFromURL, writePartToURL, copyURIToClipboard } from './state.js'
 import { buildFeatureCheckboxes } from './features.js';
 import { buildCustomizer } from './control-parser.js';
 import { buildGallery, loadDatabase, buildSearchResults, buildSection, editPart, getStyle } from './gallery.js';
@@ -38,11 +38,20 @@ var currentPartId = 0;
 var sourceFileName;
 var editor;
 
+// Flag for the first time after loading a page
+var initialLoad = true;
+
 const featureCheckboxes = {};
 
 var persistCameraState = false; // If one gets too far, it's really hard to auto reset and can be confusing to users. Just restart.
 var stlViewer;
 var stlFile;
+
+function isEmpty(obj) {
+  return Object.keys(obj).length === 0;
+}
+
+const rgba2hex = (rgba) => `#${rgba.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+\.{0,1}\d*))?\)$/).slice(1).map((n, i) => (i === 3 ? Math.round(parseFloat(n) * 255) : parseFloat(n)).toString(16).padStart(2, '0').replace('NaN', '')).join('')}`
 
 function buildStlViewer() {
   const stlViewer = new StlViewer(stlViewerElement, {});
@@ -100,6 +109,7 @@ function setViewerFocused(value) {
     stlViewerElement.classList.remove('focused');
   }
 }
+
 function isViewerFocused() {
   return stlViewerElement.classList.contains('focused');
 }
@@ -251,11 +261,21 @@ const render = turnIntoDelayableExecution(renderDelay, () => {
 
   renderFailed = false;
 
+  // Rejigger the customization parameters into the format that openscad wants
+  let customization = { 
+    "fileFormatVersion" : "1", 
+    "parameterSets" : { 
+      "first": globalThis.parapart.part.customization 
+    } 
+  };
+
+  console.log("CUSTOMIZATION: " + JSON.stringify(customization));
+
   const job = spawnOpenSCAD({
     // wasmMemory,
     inputs: [
       ['input.scad', source],
-      ['customizations.json', JSON.stringify(globalThis.customizations)]
+      ['customizations.json', JSON.stringify(customization)]
     ],
     args: [
       "input.scad",
@@ -316,8 +336,8 @@ function getState() {
   return {
     part: {
       id: currentPartId,
-      customizations: globalThis.customizations.parameterSets.first,
-      changed: globalThis.customizations.changed
+      customization: globalThis.parapart.part.customization,
+      changed: globalThis.parapart.changed,
     },
     source: {
       name: sourceFileName,
@@ -327,7 +347,6 @@ function getState() {
     autoparse: autoparseCheckbox.checked,
     autorotate: autorotateCheckbox.checked,
     // showedges: showedgesCheckbox.checked,
-    // maximumMegabytes: Number(maximumMegabytesInput.value),
     features,
     viewerFocused: isViewerFocused(),
     // showExp: features.length > 0 || showExperimentalFeaturesCheckbox.checked,
@@ -353,15 +372,6 @@ function normalizeStateForCompilation(state) {
   }
 }
 
-// var wasmMemory;
-// var lastMaximumMegabytes;
-// function setMaximumMegabytes(maximumMegabytes) {
-//   if (!wasmMemory || (lastMaximumMegabytes != maximumMegabytes)) {
-//     wasmMemory = createWasmMemory({maximumMegabytes});
-//     lastMaximumMegabytes = maximumMegabytes;
-//   }
-// }
-
 function updateExperimentalCheckbox(temptativeChecked) {
   const features = Object.keys(featureCheckboxes).filter(f => featureCheckboxes[f].checked);
   const hasFeatures = features.length > 0;
@@ -369,13 +379,8 @@ function updateExperimentalCheckbox(temptativeChecked) {
   // showExperimentalFeaturesCheckbox.disabled = hasFeatures;
 }
 
-function setState(state) {
-
-  currentPartId = state.part.id;
-
-  globalThis.customizations.parameterSets.first = state.part.customizations;
-  editor.setValue(state.source.content);
-  sourceFileName = state.source.name || 'input.scad';
+function setFeatures() {
+  let state = globalThis.parapart;
   if (state.camera && persistCameraState) {
     //stlViewer.set_camera_state(state.camera);
   }
@@ -387,26 +392,22 @@ function setState(state) {
   autorenderCheckbox.checked = state.autorender ?? true;
   autoparseCheckbox.checked = state.autoparse ?? true;
 
-  // stlViewer.set_edges(1, showedgesCheckbox.checked = state.showedges ?? false);
-
   setAutoRotate(state.autorotate ?? true)
   setViewerFocused(state.viewerFocused ?? false);
   updateExperimentalCheckbox(state.showExp ?? false);
-
-  // const maximumMegabytes = state.maximumMegabytes ?? defaultState.maximumMegabytes;
-  // setMaximumMegabytes(maximumMegabytes);
-  // maximumMegabytesInput.value = maximumMegabytes;
 }
 
+// Handle changes to state.
 var previousNormalizedState;
 function onStateChanged({ allowRun }) {
-  const newState = getState();
-  console.log("NEW STATE: " + JSON.stringify(newState.part));
-  writeStateInFragment(newState.part);
+  console.log("STATE CHANGED: " + JSON.stringify(globalThis.parapart.part));
+
+  // Save new part state in URL
+  writePartToURL(globalThis.parapart.changed, globalThis.parapart.part);
 
   featuresContainer.style.display = showExperimentalFeaturesCheckbox.checked ? null : 'none';
 
-  const normalizedState = normalizeStateForCompilation(newState);
+  const normalizedState = normalizeStateForCompilation(globalThis.parapart);
   if (JSON.stringify(previousNormalizedState) != JSON.stringify(normalizedState)) {
     previousNormalizedState = normalizedState;
 
@@ -472,7 +473,6 @@ function setDarkMode(dark) {
 // App Initialization
 ////////////////////////////////////////////////////////////////////////////
 
-const rgba2hex = (rgba) => `#${rgba.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+\.{0,1}\d*))?\)$/).slice(1).map((n, i) => (i === 3 ? Math.round(parseFloat(n) * 255) : parseFloat(n)).toString(16).padStart(2, '0').replace('NaN', '')).join('')}`
 
 try {
   const workingDir = '/home';
@@ -503,9 +503,33 @@ try {
   });
 
   editor.onDidChangeModelContent(() => {
-    // Rebuild the customization tabs;
-    globalThis.customizations = buildCustomizer(editor.getValue());
-    onStateChanged({ allowRun: true });
+    let savedCustomization = globalThis.parapart.part.customization;
+    // Rebuild the customization tabs and reset the fields
+    buildCustomizer(editor.getValue());
+
+    // If this is the first time through and we had some
+    // customizations from the URL, overwrite the generated
+    // ones 
+    if (initialLoad) {
+      if (! isEmpty(savedCustomization)) {
+        console.log("HAVE CUSTOMIZATIONS FROM URL");
+        // Merge in the saved customizations
+        let merged = {
+          ...globalThis.parapart.part.customization,
+          ...savedCustomization
+        };
+        globalThis.parapart.part.customization = merged;
+        // Set changed flag to true to force a rerender
+        globalThis.parapart.changed = true;
+      }
+      initialLoad = false;
+    } else {
+      // Not the first time through, so something changed
+      globalThis.parapart.changed = true;
+    }
+    // Process the stat change
+    console.log("EDITOR CONTENTS CHANGED");
+    onStateChanged({ allowRun: true }); 
   });
 
   // Create the STL Viewer
@@ -526,7 +550,7 @@ try {
 const defaultState = {
   part: {
     id: 0,
-    configurator: {},
+    customization: { },
     changed: false,
   },
   source: {
@@ -536,47 +560,69 @@ const defaultState = {
   linear_extrude(5)
   text("PARAPART");
 `},
-  maximumMegabytes: 1024,
   viewerFocused: false,
-  // maximumMegabytes: 512,
   features: ['fast-csg', 'fast-csg-trust-corefinement', 'fast-csg-remesh', 'fast-csg-exact-callbacks', 'lazy-union'],
 };
 
-  globalThis.customizations = { "parameterSets": { "first": {} } };
+  // Set up our global state
+  globalThis.parapart = defaultState;
+
   // Not sure why this doesn't work
-  globalThis.customizations.onchange = () => {
-    globalThis.customizations.changed = true;
+  globalThis.parapart.onchange = () => {
+    globalThis.parapart.changed = true;
+    console.log("OnChange");
     onStateChanged({ allowRun: true });
   }
   // But this does
   globalThis.onchange = () => {
-    globalThis.customizations.changed = true;
+    globalThis.parapart.changed = true;
+    console.log("OnChange");
     onStateChanged({ allowRun: true });
   }
 
-  // Read any state from the URL
-  const initialState = readStateFromFragment() || defaultState;
+  globalThis.parapart.part = readPartFromURL();
 
-  setState(initialState);
+  // Save the default source to the editor
+  //editor.setValue(globalThis.parapart.source.content);
+
+  setFeatures();
 
   // Set up the part rendering function that we will apply
   // to the parts in the gallery
-  let renderPartFunc = (id, scadText) => {
+  let renderPartFunc = (id, scadText, stlText) => {
+    
+    // Build new local file for STL Viewer
+    const blob = new Blob([stlText], { type: "application/octet-stream" });
+    stlFile = new File([blob], "temp.stl");
 
-    // Get the current state
-    var newState = getState();
+    // Did we get here by reading the part from the URL?
+    if( id != globalThis.parapart.part.id ) {
+      // No - we picked this from the gallery. No
+      // customizations yet.
+      globalThis.parapart.part.id = id;
+      globalThis.parapart.part.customization = { },
+      globalThis.parapart.changed = false;
+      viewStlFile();
+    } else {
+      // We have an ID.  Do we have any customizations?
+      if( globalThis.parapart.changed ){
+        // Yes.  The base STL we have won't represent
+        // the linked part, so re-render
+        globalThis.parapart.changed = true;
+      } else {
+        // No changes - URL contained just a part ID
+        viewStlFile();
+      }
+    }
 
-    // Modify it
-    newState.part.id = id;
-    // No customizations if we just loaded the part
-    newState.part.customizations = { "parameterSets": { "first": {} } };
-    newState.part.changed = false;
+    // Save the SCAD source.  
+    // TODO - we can probably just use the editor for this
+    globalThis.parapart.source.content = scadText;
+    //console.log("SCAD: " + scadText);
 
-    // Save the scad text
-    newState.source.content = scadText;
+    editor.setValue(globalThis.parapart.source.content);
 
-    // Apply it to the currently running state vars
-    setState(newState);
+    console.log("RENDERING PART: "+ id);
   }
 
   // This stuff needs DB access and should just be done after db init
@@ -585,19 +631,17 @@ const defaultState = {
     // Build the parts gallery
     buildGallery(renderPartFunc);
 
-    // Get the current state
-    let currentState = getState();
-
+    let part = globalThis.parapart.part;
     // Did we load the page with a part ID?
-    if (currentState.part.id != 0) {
-      console.log("*****   HAVE PART ID IN URL: " + currentState.part.id);
+    if (part.id != 0) {
+      console.log("*****   HAVE PART ID IN URL: " + part.id);
       // Close the gallery
       document.getElementById('nav-overlay').style.width = "0vh";
 
       // Edit the part as though we chose it from the gallery
-      let dir = String(Math.floor(parseInt(currentState.part.id) / 100)).padStart(3, '0');
-      let file = String(parseInt(currentState.part.id) % 100).padStart(3, '0');
-      editPart(currentState.part.id, `assets/local_scad/${dir}/${file}.scad`);
+      let dir = String(Math.floor(parseInt(part.id) / 100)).padStart(3, '0');
+      let file = String(parseInt(part.id) % 100).padStart(3, '0');
+      editPart(part.id, `assets/local_scad/${dir}/${file}.scad`);
     }
   }
 

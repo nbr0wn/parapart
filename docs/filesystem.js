@@ -106,6 +106,7 @@ async function createEditorFS(workingDir='/home') {
       writable: {
         fs: "InMemory"
       },
+      "/download": { fs: "InMemory" }
     },
   });
 

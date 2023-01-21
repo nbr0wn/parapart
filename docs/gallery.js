@@ -5,7 +5,23 @@ var db;
 var miniViewer;
 var renderPartFunc;
 
+function base64ToBinary(data) {
+  var rawLength = data.length;
+  //var array = new Uint8Array(new ArrayBuffer(rawLength));
+  var array = new Uint8Array(rawLength);
+
+  for (let i = 0; i < rawLength; i++) {
+    array[i] = data.charCodeAt(i);
+  }
+  return array.buffer;
+}
+export var getStyle = function(elementId, property) {
+  let element = document.getElementById(elementId);
+  return window.getComputedStyle ? window.getComputedStyle(element, null).getPropertyValue(property) : element.style[property.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); })];
+};
+
 async function fetchRawFromGitHub(owner, repo, branch, path, id, completedCallback) {
+  console.log(`FETCHING GITHUB: https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`);
   return fetch(
     `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`
     ).then(response => response.text()
@@ -26,9 +42,9 @@ async function fetchLocal(fileName, completedCallback) {
   });
 }
 
-// Test func for local server
+// Test func for serving from local server
 async function fetchLocalSCAD(fileName, id, completedCallback) {
-  console.log("FETCHING LOCAL " + fileName);
+  console.log("FETCHING LOCAL SCAD" + fileName);
   return fetch(fileName
   ).then(response => response.text()
   ).then(function(response) { completedCallback(id, response); }
@@ -37,47 +53,43 @@ async function fetchLocalSCAD(fileName, id, completedCallback) {
   });
 }
 
-function base64ToBinary(data) {
-  var rawLength = data.length;
-  //var array = new Uint8Array(new ArrayBuffer(rawLength));
-  var array = new Uint8Array(rawLength);
-
-  for (let i = 0; i < rawLength; i++) {
-    array[i] = data.charCodeAt(i);
-  }
-  return array.buffer;
-}
-
-// This function is called when a user clicks on a part in the gallery
-export function editPart(id, url) {
+// We've either clicked on a part in the gallary, or we loaded the
+// main page with a partID in the URL.  Fetch the scad and fetch the
+// STL file.
+var stashedSTL = null;
+var stashedSCAD = null;
+export async function editPart(id, url) {
   console.log("EDIT NEW PART - ID:" + id + " URL: " + url);
-  //fetchSTL(id);
-  fetchRawFromGitHub('nbr0wn','parapart','main', 'docs/'+url, id, renderPartFunc);
-  //fetchLocalSCAD(url, id, renderPartFunc);
+  // Fetch the STL and then fetch the SCAD.  These both return promises
+  // so wait for them to finish here. 
+  await fetchSTL(id, function (data) { stashedSTL = data;}); // Cheezy.  Should use browserFS
+  await fetchRawFromGitHub('nbr0wn','parapart','main', 'docs/'+url, id, function(id,data) { stashedSCAD = data;});
+
+  // Swap for above when serving from local server
+  //await fetchLocalSCAD(url, id, function(data) { stashedSCAD = data;});
+
+  renderPartFunc(id, stashedSCAD, stashedSTL);
 }
 
-export var getStyle = function(elementId, property) {
-  let element = document.getElementById(elementId);
-  return window.getComputedStyle ? window.getComputedStyle(element, null).getPropertyValue(property) : element.style[property.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); })];
-};
-
-function fetchSTL(partId) {
-  console.log("FETCHING PART ID:", partId);
+function fetchSTL(partId, processFunc) {
+  console.log("FETCHING STL FOR PART ID:", partId);
   let dir = String(Math.floor(parseInt(partId) / 100)).padStart(3, '0');
   let file = String(parseInt(partId) % 100).padStart(3, '0');
   let url = `assets/local_stl/${dir}/${file}.stl`;
-  fetchLocal(url, function (data) {
-    const fileName = 'foo.stl';
-    const blob = new Blob([data], { type: "application/octet-stream" });
-    const stlFile = new File([blob], fileName);
-    // Set the miniViewer color to match the current style
-    const style = getComputedStyle(document.getElementById("nav-overlay"));
-    miniViewer.set_bg_color(style.backgroundColor);
-    let modelColor = getStyle("lightmode", "backgroundColor");
-    try { miniViewer.clean(); } catch (e) { console.log("STLVIEW ERROR: " + e + e.stack); }
-    try { miniViewer.add_model({ id: 1, local_file: stlFile, color:modelColor }) } catch (e) { console.log("STLVIEW ERROR: " + e); }
-    //console.log(miniViewer);
-  });
+  fetchLocal(url, function (data) { processFunc(data); });
+}
+
+function miniViewSTL(data) {
+  const fileName = 'foo.stl';
+  const blob = new Blob([data], { type: "application/octet-stream" });
+  const stlFile = new File([blob], fileName);
+  // Set the miniViewer color to match the current style
+  const style = getComputedStyle(document.getElementById("nav-overlay"));
+  miniViewer.set_bg_color(style.backgroundColor);
+  let modelColor = getStyle("lightmode", "backgroundColor");
+  try { miniViewer.clean(); } catch (e) { console.log("STLVIEW ERROR: " + e + e.stack); }
+  try { miniViewer.add_model({ id: 1, local_file: stlFile, color: modelColor }) } catch (e) { console.log("STLVIEW ERROR: " + e); }
+  //console.log(miniViewer);
 }
 
 function showViewer(event) {
@@ -89,7 +101,7 @@ function showViewer(event) {
   viewer.style.display = "block";
   viewer.onclick = function () { viewer.style.display = "none" ; event.target.onclick(); }
   viewer.onmouseleave = function () { viewer.style.display = "none"; }
-  fetchSTL(event.target.partId);
+  fetchSTL(event.target.partId, miniViewSTL);
 }
 
 export function getSectionList() {
@@ -312,7 +324,7 @@ export function buildGallery(_renderPartFunc) {
   buildMiniViewer();
   // Stash this for gallery use
   renderPartFunc = _renderPartFunc;
-  console.log("** Building Gallery")
+  log("** Building Gallery")
   buildSection(0);
   // Setup handler for the add part dialog
   setupAddPart(getSectionList());
