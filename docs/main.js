@@ -51,7 +51,23 @@ function isEmpty(obj) {
   return Object.keys(obj).length === 0;
 }
 
-const rgba2hex = (rgba) => `#${rgba.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+\.{0,1}\d*))?\)$/).slice(1).map((n, i) => (i === 3 ? Math.round(parseFloat(n) * 255) : parseFloat(n)).toString(16).padStart(2, '0').replace('NaN', '')).join('')}`
+function rgba2hex(orig) {
+  var a, isPercent,
+  rgb = orig.replace(/\s/g, '').match(/^rgba?\((\d+),(\d+),(\d+),?([^,\s)]+)?/i),
+  alpha = (rgb && rgb[4] || "").trim(),
+  hex = rgb ?
+  (rgb[1] | 1 << 8).toString(16).slice(1) +
+  (rgb[2] | 1 << 8).toString(16).slice(1) +
+  (rgb[3] | 1 << 8).toString(16).slice(1) : orig;
+
+  if (alpha !== "") { a = alpha; }
+  else { a = ''; } // No alpha channel
+  hex = hex + a;
+
+  return hex;
+}
+
+//const rgba2hex = (rgba) => `#${rgba.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+\.{0,1}\d*))?\)$/).slice(1).map((n, i) => (i === 3 ? Math.round(parseFloat(n) * 255) : parseFloat(n)).toString(16).padStart(2, '0').replace('NaN', '')).join('')}`
 
 function buildStlViewer() {
   const stlViewer = new StlViewer(stlViewerElement, {});
@@ -479,6 +495,7 @@ try {
   const fs = await createEditorFS(workingDir);
   await registerOpenSCADLanguage(fs, workingDir, zipArchives);
 
+  console.log(getStyle('stop-render', 'background'));
   let bgcolor = rgba2hex(getStyle('stop-render', 'background'));
   monaco.editor.defineTheme('pp-dark', {
     base: 'vs-dark',
