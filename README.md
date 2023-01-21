@@ -19,6 +19,9 @@ never seen the Thingiverse customizer actually work, so...here we are.
 
 This site is intended to be a fast, free repository of customizable OpenSCAD models with STL export. No logins or signups to download models, no ads.  Everything is statically hosted on GitHub, and processing work is done in the browser using WASM versions of Sqlite and OpenSCAD.
 
+## What is it not?
+Parapart is not intended to be a replacement for thingiverse, thangs, or any of the other excellent model repositories out there.  Parapart is intended to be a repository of components for makers to use while building their fabulous projects, or for anyone with a 3D printer to quickly download and print that one type of hook that nobody makes.
+
 Parapart uses OpenSCAD's built-in customization handling as described in the wiki:
 
 https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Customizer
