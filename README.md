@@ -2,6 +2,7 @@
 
 Parametric OpenSCAD part library
 - Free
+- Fast
 - Open source
 - No signups/logins/ads to download parts
 - 100% static - Hosted by GitHub and runs in the browser
@@ -34,7 +35,7 @@ customizer.
 
 ## I have SCAD files - how do I get them in here?
 
-https://github.com/nbr0wn/parapart/wiki
+Instructions are here: https://github.com/nbr0wn/parapart/wiki
 
 ## Shout outs to those who laid the foundation for this project
 
