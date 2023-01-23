@@ -3,7 +3,6 @@
 include <BOSL/constants.scad>
 use <BOSL/metric_screws.scad>
 
-$fn=50;
 /* [Parameters] */
 
 // Bolt size

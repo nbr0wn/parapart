@@ -60,9 +60,9 @@ function rgba2hex(orig) {
   (rgb[2] | 1 << 8).toString(16).slice(1) +
   (rgb[3] | 1 << 8).toString(16).slice(1) : orig;
 
-  if (alpha !== "") { a = alpha; }
-  else { a = ''; } // No alpha channel
-  hex = hex + a;
+  //if (alpha !== "") { a = alpha; }
+  //else { a = ''; } // No alpha channel
+  //hex = hex + a;
 
   return hex;
 }
@@ -71,6 +71,10 @@ function rgba2hex(orig) {
 
 function buildStlViewer() {
   const stlViewer = new StlViewer(stlViewerElement, {});
+  stlViewer.set_auto_resize(true);
+  stlViewer.set_drag_and_drop(false);
+  stlViewer.set_edges(false);
+  stlViewer.set_grid(false);
   stlViewer.set_bg_color('transparent');
   stlViewer.model_loaded_callback = id => {
   };
@@ -101,6 +105,53 @@ function formatMillis(n) {
   let ms = Math.floor(n % 1000).toString().padStart(3,'0');
   return `${seconds}.${ms} seconds`;
 }
+
+//////////////////////////////////////////////////////////////////////
+// Handle draggable width DIV
+//////////////////////////////////////////////////////////////////////
+let lastXPos = 0;
+let leftWidth = 0;
+
+const resizer = document.getElementById('resizer');
+const leftSide = document.getElementById('control-area');
+const rightSide = document.getElementById('view-panel');
+
+const mouseMoveHandler = function(e) {
+   // How far the mouse has been moved
+   const dx = e.clientX - lastXPos;
+
+   const newLeftWidth = ((leftWidth + dx) * 100) / resizer.parentNode.getBoundingClientRect().width;
+   // Account for the divider
+   const newRightWidth = 98 - newLeftWidth;
+   leftSide.style.width = `${newLeftWidth}%`;
+   rightSide.style.width = `${newRightWidth}%`;
+};
+
+const mouseUpHandler = function () {
+  // Remove the handlers of `mousemove` and `mouseup`
+  document.removeEventListener('mousemove', mouseMoveHandler);
+  document.removeEventListener('mouseup', mouseUpHandler);
+  console.log('mouseup');
+};
+// Handle the mousedown event
+// that's triggered when user drags the resizer
+const mouseDownHandler = function (e) {
+    // Get the current mouse position
+    lastXPos = e.clientX;
+    leftWidth = leftSide.getBoundingClientRect().width;
+
+    // Attach the listeners to `document`
+    document.addEventListener('mousemove', mouseMoveHandler);
+    document.addEventListener('mouseup', mouseUpHandler);
+    console.log('mousedown');
+};
+
+// Attach the handler to the draggable div
+resizer.onmousedown = mouseDownHandler;
+
+//////////////////////////////////////////////////////////////////////
+// Handle OpenSCAD tasks
+//////////////////////////////////////////////////////////////////////
 
 let lastJob;
 
@@ -279,10 +330,9 @@ const render = turnIntoDelayableExecution(renderDelay, () => {
 
   // Rejigger the customization parameters into the format that openscad wants
   let customization = { 
-    "fileFormatVersion" : "1", 
     "parameterSets" : { 
       "first": globalThis.parapart.part.customization 
-    } 
+    }
   };
 
   console.log("CUSTOMIZATION: " + JSON.stringify(customization));
@@ -344,6 +394,10 @@ const render = turnIntoDelayableExecution(renderDelay, () => {
     })()
   }
 });
+
+//////////////////////////////////////////////////////////////////////
+// Utility functions
+//////////////////////////////////////////////////////////////////////
 
 runButton.onclick = () => render({ now: true });
 
@@ -414,7 +468,7 @@ function setFeatures() {
 }
 
 // Handle changes to state.
-var previousNormalizedState;
+var previousNormalizedState = "";
 function onStateChanged({ allowRun }) {
   console.log("STATE CHANGED: " + JSON.stringify(globalThis.parapart.part));
 
@@ -423,11 +477,16 @@ function onStateChanged({ allowRun }) {
 
   featuresContainer.style.display = showExperimentalFeaturesCheckbox.checked ? null : 'none';
 
-  const normalizedState = normalizeStateForCompilation(globalThis.parapart);
-  if (JSON.stringify(previousNormalizedState) != JSON.stringify(normalizedState)) {
+  globalThis.parapart.source.content = editor.getValue();
+
+  const normalizedState = JSON.stringify(normalizeStateForCompilation(globalThis.parapart));
+  //console.log("PREV: " + JSON.stringify(previousNormalizedState));
+  //console.log("CURR: " +JSON.stringify(normalizedState));
+  if (previousNormalizedState != normalizedState) {
     previousNormalizedState = normalizedState;
 
     if (allowRun) {
+      console.log("RUNNING");
       if (autoparseCheckbox.checked) {
         checkSyntax({ now: false });
       }
@@ -475,7 +534,7 @@ function setDarkMode(dark) {
         inherit: true,
         rules: [],
         colors: {
-          'editor.background': bgcolor,
+          'editor.background': '#' + bgcolor,
         }
       });
       definedLightTheme = true;
@@ -497,12 +556,13 @@ try {
 
   console.log(getStyle('stop-render', 'background'));
   let bgcolor = rgba2hex(getStyle('stop-render', 'background'));
+  console.log(bgcolor);
   monaco.editor.defineTheme('pp-dark', {
     base: 'vs-dark',
     inherit: true,
     rules: [  ],
     colors: {
-      'editor.background': bgcolor,
+      'editor.background': '#'+bgcolor,
     }
   });
 
@@ -551,7 +611,7 @@ try {
 
   // Create the STL Viewer
   stlViewer = buildStlViewer();
-  stlViewer.set_grid(true);
+  //stlViewer.set_grid(true);
   stlViewerElement.ondblclick = () => {
     console.log("Tap detected!");
     setAutoRotate(!autorotateCheckbox.checked);
@@ -587,13 +647,11 @@ const defaultState = {
   // Not sure why this doesn't work
   globalThis.parapart.onchange = () => {
     globalThis.parapart.changed = true;
-    console.log("OnChange");
     onStateChanged({ allowRun: true });
   }
   // But this does
   globalThis.onchange = () => {
     globalThis.parapart.changed = true;
-    console.log("OnChange");
     onStateChanged({ allowRun: true });
   }
 
