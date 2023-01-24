@@ -3,6 +3,7 @@ import { setupAddPart } from './add-part.js';
 
 var db;
 var miniViewer;
+var miniViewerDiv;
 var renderPartFunc;
 
 function base64ToBinary(data) {
@@ -89,18 +90,15 @@ function miniViewSTL(data) {
   let modelColor = getStyle("lightmode", "backgroundColor");
   try { miniViewer.clean(); } catch (e) { console.log("STLVIEW ERROR: " + e + e.stack); }
   try { miniViewer.add_model({ id: 1, local_file: stlFile, color: modelColor }) } catch (e) { console.log("STLVIEW ERROR: " + e); }
-  //console.log(miniViewer);
 }
 
 function showViewer(event) {
-  const viewer = document.getElementById("miniviewer");
-
   // Move the miniViewer to the current target 
-  viewer.style.left = event.target.offsetLeft + "px";
-  viewer.style.top = event.target.offsetTop + "px";
-  viewer.style.display = "block";
-  viewer.onclick = function () { viewer.style.display = "none" ; event.target.onclick(); }
-  viewer.onmouseleave = function () { viewer.style.display = "none"; }
+  miniViewerDiv.style.left = event.target.offsetLeft + "px";
+  miniViewerDiv.style.top = event.target.offsetTop + "px";
+  miniViewerDiv.style.zIndex = 50;
+  miniViewerDiv.onclick = function () { miniViewerDiv.style.zIndex = -50; miniViewer.clean(); event.target.onclick(); }
+  miniViewerDiv.onmouseleave = function () { miniViewerDiv.style.zIndex = -50; miniViewer.clean(); }
   fetchSTL(event.target.partId, miniViewSTL);
 }
 
@@ -310,6 +308,7 @@ export function buildSearchResults(searchString) {
 }
 
 function buildMiniViewer() {
+  miniViewerDiv = document.getElementById("miniviewer");
   // Setup our mini STL viewer
   miniViewer = new StlViewer(document.getElementById("miniviewer"), {});
   miniViewer.set_bg_color('transparent');
@@ -317,6 +316,9 @@ function buildMiniViewer() {
   miniViewer.set_auto_rotate(true);
   miniViewer.model_loaded_callback = id => {
     log("Model Loaded - ID:" + id)
+    //miniViewer.style.display = "block";
+    //log(getStyle("miniviewer","x"));
+    //log(getStyle("miniviewer","y"));
   };
 }
 

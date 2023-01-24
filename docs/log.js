@@ -15,7 +15,7 @@ let logHtml = function (cssClass, ...args) {
     //ln.appendChild(pre);
     //document.getElementById('logs').append(pre);
 
-    //console.log(args.join(' '));
+    console.log(args.join(' '));
 };
 
 export const log = (...args) => logHtml('', ...args);

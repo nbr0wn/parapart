@@ -131,7 +131,6 @@ const mouseUpHandler = function () {
   // Remove the handlers of `mousemove` and `mouseup`
   document.removeEventListener('mousemove', mouseMoveHandler);
   document.removeEventListener('mouseup', mouseUpHandler);
-  console.log('mouseup');
 };
 // Handle the mousedown event
 // that's triggered when user drags the resizer
@@ -143,7 +142,6 @@ const mouseDownHandler = function (e) {
     // Attach the listeners to `document`
     document.addEventListener('mousemove', mouseMoveHandler);
     document.addEventListener('mouseup', mouseUpHandler);
-    console.log('mousedown');
 };
 
 // Attach the handler to the draggable div
@@ -528,13 +526,12 @@ function setDarkMode(dark) {
     // Only need to define this once, but need to be in light-mode 
     // to fetch the bg color from the CSS theme
     if (definedLightTheme == false) {
-      let bgcolor = rgba2hex(getStyle('stop-render', 'background'));
       monaco.editor.defineTheme('pp-light', {
         base: 'vs',
         inherit: true,
         rules: [],
         colors: {
-          'editor.background': '#' + bgcolor,
+          'editor.background': '#bdbcbc',
         }
       });
       definedLightTheme = true;
