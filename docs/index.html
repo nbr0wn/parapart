@@ -141,6 +141,7 @@
       <div id="control-area" class="w-100 card">
         <div id="tab-head" class="tabs">
           <a id="tabedit" class="tab tab-lifted" style="display:none">Editor</a>
+          <a id="tabhelp" class="tab tab-lifted">Part Help</a>
           <a id="tabsettings" class="tab tab-lifted">Settings</a>
           <a id="tablogs" class="tab tab-lifted" style="display:none">Logs</a>
         </div>
@@ -149,7 +150,11 @@
           <div id="monacoEditor" style="height:80vh"></div>
           <button id="flip-mode">Flip 🔀</button>
         </div>
-
+        <div id="tabhelp-div" class="tab-content"> 
+          <div class="text-xs overflow-auto x-" id="tabhelp-container" style="height:80vh">
+            <pre id="tabhelp-contents"></pre>
+          </div>
+        </div>
         <div id="tabsettings-div" class="tab-content">
           <div>
             <input type="checkbox" id="autorender" checked>
@@ -178,7 +183,6 @@
           <div id="features" class="features">
           </div>
         </div>
-
         <div id="tablogs-div" class="tab-content">
           <div class="text-xs overflow-auto x-" id="logs" style="height:80vh">
             <pre id="logpre"></pre>

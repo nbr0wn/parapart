@@ -96,6 +96,7 @@ function showViewer(event) {
   // Move the miniViewer to the current target 
   miniViewerDiv.style.left = event.target.offsetLeft + "px";
   miniViewerDiv.style.top = event.target.offsetTop + "px";
+  // Goddamned webdev - this should have been possible with just a display block/none but OoHhhhhHhh nOoOOo.
   miniViewerDiv.style.zIndex = 50;
   miniViewerDiv.onclick = function () { miniViewerDiv.style.zIndex = -50; miniViewer.clean(); event.target.onclick(); }
   miniViewerDiv.onmouseleave = function () { miniViewerDiv.style.zIndex = -50; miniViewer.clean(); }

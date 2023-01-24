@@ -260,7 +260,7 @@ function addTab(tabName) {
     newDiv.id = tabId + '-div';
 
     // Append this div to the control area
-    let editor = document.getElementById("tabsettings");
+    let editor = document.getElementById("tabhelp");
     document.getElementById("tab-head").insertBefore(anchor,editor);
     document.getElementById("control-area").appendChild(newDiv);
     
@@ -275,6 +275,13 @@ function cleanupControls() {
         removeList[0].parentNode.removeChild(removeList[0]);
     }
 }
+
+function addHelpLine(line){
+    const help = document.getElementById('tabhelp-contents');
+    const tn = document.createTextNode(line + "\n");
+    help.appendChild(tn);
+}
+
 
 // /* [Drop down box:] */
 // // combo box for number
@@ -330,6 +337,10 @@ const stringRegex = /^\s*(?<varname>[\w]+)\s*=\s*"(?<value>[^"]+)"\s*;/; // // V
 const sliderRange = /\/\/\s*\[(?<options>[\d: ]+)\]/; // // [1, 2, 3];
 const comboList = /\/\/\s*\[(?<options>.+)\]/; // // [1, 2, 3];
 const customizationEndRegex = /\s*module\s+\w+\s*\(/; // module some_string (...
+const header1Regex = /^\s*\/\/\s*ADDED BY/; // Autogen header
+const header2Regex = /^\s*\/\/\s*ADD DATE/; // Autogen header
+const header3Regex = /^\s*include\s*</; // Autogen header
+const header4Regex = /^\s*use\s*</; // Autogen header
 
 export function buildCustomizer(data) {
     var haveTabs = false;
@@ -344,6 +355,7 @@ export function buildCustomizer(data) {
     document.getElementById('tabedit').onclick = function () { makeTabActive('tabedit'); }
     document.getElementById('tabsettings').onclick = function () { makeTabActive('tabsettings'); }
     document.getElementById('tablogs').onclick = function () { makeTabActive('tablogs'); }
+    document.getElementById('tabhelp').onclick = function () { makeTabActive('tabhelp'); }
 
     // Add the first tab
     let tabId = addTab('Customization')
@@ -356,7 +368,7 @@ export function buildCustomizer(data) {
 
     data.toString().split("\n").every( function(line, index, arr) {
 
-        //log(index + " " + line);
+        log(index + " " + line);
 
         // END OF CUSTOMIZATION MARKER
         if(line.match(customizationEndRegex)) {
@@ -365,6 +377,17 @@ export function buildCustomizer(data) {
             return false;
         }
 
+        // Early stuff to just skip
+        if(line.match(header1Regex)
+            || line.match(header2Regex)
+            || line.match(header3Regex)
+            || line.match(header4Regex)) {
+            // Skip these
+            return true;
+        }
+
+        addHelpLine(line);
+
         // DESCRIPTIONS
         // We want this first so that we can break early to avoid
         // resetting the description at the end of the loop
@@ -372,6 +395,7 @@ export function buildCustomizer(data) {
         if( matches = line.match(descriptionRegex)) {
             description = matches.groups.description;
             log("DESCRIPTION: " + description );
+            //addHelpLine(`** ${description}`);
             return true;
         }
 
@@ -379,6 +403,7 @@ export function buildCustomizer(data) {
         if( matches = line.match(tabRegex)) {
             let tabName = matches.groups.tab.replaceAll("[","").replaceAll("]","");
             log(`TAB: ${tabName}`);
+            //addHelpLine(`\n-- SECTION ${tabName} --\n`);
             // If this is the first tab, rename our default placeholder 
             // rather than creating a new one
             if( haveTabs == false ){

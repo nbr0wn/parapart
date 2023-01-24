@@ -667,6 +667,9 @@ const defaultState = {
     const blob = new Blob([stlText], { type: "application/octet-stream" });
     stlFile = new File([blob], "temp.stl");
 
+    // We just loaded this from the gallery
+    initialLoad = true;
+
     // Did we get here by reading the part from the URL?
     if( id != globalThis.parapart.part.id ) {
       // No - we picked this from the gallery. No
