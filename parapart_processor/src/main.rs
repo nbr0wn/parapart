@@ -4,6 +4,7 @@ use octocrab::{Octocrab,params,models};
 use regex::Regex;
 use reqwest;
 use rusqlite::{Connection, Result, named_params};
+//use std::arch::x86_64::_MM_PERM_AAAA;
 use std::fs;
 use std::io;
 use std::io::prelude::*;
@@ -23,21 +24,41 @@ static PARAPART_BASE: &'static str = "https://raw.githubusercontent.com/nbr0wn/p
 #[derive(Parser, Default, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
-   /// Name of the file containing the GitHub token
-   #[arg(short='t', long, required(true))]
-   token_file: String,
-
    /// Path to the parapart git repository
-   #[arg(short='p', long, required(true))]
+   #[arg(short,long)]
    parapart: String,
 
-   /// Path to the openscad executable
-   #[arg(short='o', long, required(true))]
-   openscad: String,
+   /// List parts
+   #[arg(short,long)]
+   list_parts: bool,
 
-   /// Leave issues open after processing
-   #[arg(short='l', long, default_value_t =false)]
-   leave_open: bool,
+   /// List sections
+   #[arg(short='s',long)]
+   list_sections: bool,
+
+   /// Remove a part from the database
+   #[arg(short,long,required(false))]
+   remove_part: Option<String>,
+
+   /// Name of file containing an issue in the correct format
+   #[arg(short,long,required(false))]
+   issue_file: Option<String>,
+
+   /// Move a part to a new category partid=newcategory
+   #[arg(short,long,required(false))]
+   move_part: Option<String>,
+
+   /// Name of the file containing the GitHub token
+   #[arg(short,long,required(false))]
+   token_file: Option<String>,
+
+   /// Path to the openscad executable
+   #[arg(short,long,required(false))]
+   openscad: Option<String>,
+
+   /// Close issues after processing
+   #[arg(short, long, default_value_t =true)]
+   close_issue: bool,
 }
 
 
@@ -45,45 +66,49 @@ struct Args {
 fn openscad_check (args: &Args, temp_file: &NamedTempFile) -> bool {
     // Run OpenSCAD on the scad file
     println!("Running OpenSCAD on {}", temp_file.path().to_str().unwrap());
-    let output = Command::new(args.openscad.as_str())
-        .arg("--colorscheme")
-        .arg("Parapart")
-        .arg("--render")
-        .arg("--autocenter")
-        .arg("--viewall")
-        .arg("--imgsize=512,512")
-        .arg("-o")
-        .arg(TEMP_STL)
-        .arg("-o")
-        .arg(TEMP_PNG)
-        .arg("-q")
-        .arg(temp_file.path().to_str().unwrap())
-        .output()
-        .unwrap();
+    if let Some(openscad) = args.openscad.as_deref() {
+        let output = Command::new(openscad)
+            .arg("--colorscheme")
+            .arg("Parapart")
+            .arg("--render")
+            .arg("--autocenter")
+            .arg("--viewall")
+            .arg("--imgsize=512,512")
+            .arg("-o")
+            .arg(TEMP_STL)
+            .arg("-o")
+            .arg(TEMP_PNG)
+            .arg("-q")
+            .arg(temp_file.path().to_str().unwrap())
+            .output()
+            .unwrap();
 
-    io::stdout().write_all(&output.stdout).unwrap();
-    io::stderr().write_all(&output.stderr).unwrap();
+        io::stdout().write_all(&output.stdout).unwrap();
+        io::stderr().write_all(&output.stderr).unwrap();
 
-    println!("OpenSCAD OUTPUT CREATED: {}", output.status.success());
+        println!("OpenSCAD OUTPUT CREATED: {}", output.status.success());
 
-    // Now replace our ugly bg color with transparency and
-    // scale down to our tile size of 128x128
-    let convert_output = Command::new("convert")
-        .arg(TEMP_PNG)
-        .arg("-transparent")
-        .arg("#cc00cc")
-        .arg("-geometry")
-        .arg("128x128")
-        .arg(TEMP_PNG)
-        .output()
-        .unwrap();
+        // Now replace our ugly bg color with transparency and
+        // scale down to our tile size of 128x128
+        let convert_output = Command::new("convert")
+            .arg(TEMP_PNG)
+            .arg("-transparent")
+            .arg("#cc00cc")
+            .arg("-geometry")
+            .arg("128x128")
+            .arg(TEMP_PNG)
+            .output()
+            .unwrap();
 
-    println!("Imagemagick convert status: {}", convert_output.status.success());
+        println!("Imagemagick convert status: {}", convert_output.status.success());
 
-        io::stdout().write_all(&convert_output.stdout).unwrap();
-        io::stderr().write_all(&convert_output.stderr).unwrap();
+            io::stdout().write_all(&convert_output.stdout).unwrap();
+            io::stderr().write_all(&convert_output.stderr).unwrap();
 
-    return output.status.success();
+        return output.status.success();
+    }
+
+    return false;
 }
 
 // Fetch raw file text from GitHub
@@ -132,6 +157,72 @@ fn get_next_seq(db_path: &str) -> u32 {
     }
     return 1;
 }
+
+fn list_parts(args: &Args) {
+    let db_path = format!("{}/database/parapart.sqlite3", args.parapart);
+    let conn = Connection::open(format!("{db_path}")).unwrap();
+    let mut stmt = conn.prepare("
+        SELECT 
+        part.id, part.name, section.name, section.id 
+        FROM 
+        part
+        INNER JOIN part_section ON part.id = part_section.part_id
+        INNER JOIN section ON section.id = part_section.section_id").unwrap();
+    let mut rows = stmt.query({}).unwrap();
+    while let Some(row) = rows.next().unwrap() {
+        // URL exists.  Is this an update
+        // Only allow it if the name, section, and submitter match
+        let part_id:u64 = row.get(0).unwrap();
+        let part_name:String = row.get(1).unwrap();
+        let section_name:String = row.get(2).unwrap();
+        let section_id:u64 = row.get(3).unwrap();
+        println!("{}", format!("{part_id:5} - {part_name}  | {section_name} ( {section_id:5} )"));
+    }
+}
+
+fn list_sections(args: &Args) {
+    let db_path = format!("{}/database/parapart.sqlite3", args.parapart);
+    let conn = Connection::open(format!("{db_path}")).unwrap();
+    let mut stmt = conn.prepare("
+        SELECT 
+        id, parent_id, name 
+        FROM 
+        section").unwrap();
+    let mut rows = stmt.query({}).unwrap();
+    while let Some(row) = rows.next().unwrap() {
+        // URL exists.  Is this an update
+        // Only allow it if the name, section, and submitter match
+        let section_id:u64 = row.get(0).unwrap();
+        let parent_id:u64 = row.get(1).unwrap();
+        let name:String = row.get(2).unwrap();
+        println!("{}", format!("ID:{section_id:5} PARENT:{parent_id:5} {name}"));
+    }
+}
+
+fn remove_part(args: &Args, id: &str) {
+    let db_path = format!("{}/database/parapart.sqlite3", args.parapart);
+    let seq = id.parse::<u64>().unwrap();
+    let dir = format!("{:03}", seq / 100);
+    let file_base = format!("{:03}", seq % 100);
+    let base = args.parapart.as_str();
+    fs::remove_file(format!("{base}/{PNG_PATH}/{dir}/{file_base}.png")).unwrap();
+    fs::remove_file(format!("{base}/{STL_PATH}/{dir}/{file_base}.stl")).unwrap();
+    let conn = Connection::open(format!("{db_path}")).unwrap();
+    conn.execute("DELETE FROM part WHERE id = :id", named_params!{":id": id}).unwrap();
+}
+
+fn move_part(args: &Args, movestr: &str, ) {
+    let db_path = format!("{}/database/parapart.sqlite3", args.parapart);
+    let conn = Connection::open(format!("{db_path}")).unwrap();
+    // Do this in a transaction so we don't have hanging records
+    let fields : Vec<&str> = movestr.split("=").collect();
+    if fields.len() != 2 {
+        return
+    }
+    conn.execute("UPDATE part_section set section_id = :section_id WHERE part_id = :part_id", 
+    named_params!{":section_id":&fields[1], ":part_id":&fields[0]}).unwrap();
+}
+                    //let id = issue.number.to_string().parse::<u64>().unwrap();
 
 fn insert_part(db_path: &str, seq: u32, name:&str, section: &str, url: &str, submitter: &str) -> Result<()> {
     let mut conn = Connection::open(format!("{db_path}")).unwrap();
@@ -317,51 +408,96 @@ async fn handle_issue(args: &Args, body: &String, submitter: &str) -> Result<(),
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 
     let args = Args::parse();
-    let token = fs::read_to_string(&args.token_file).unwrap().trim().to_string();
-    
 
-    let octocrab = Octocrab::builder()
-        .personal_token(token)
-        .build()?;
-
-    let issuebase = octocrab.issues("nbr0wn", "parapart");
-    let issues = issuebase
-    .list()
-    .state(params::State::Open)
-    .send()
-    .await?;
-
-    for issue in issues {
-        match  issue.title.trim() {
-            "SCAD" => {
-                let id = issue.number.to_string().parse::<u64>().unwrap();
-                let user = issue.user.login.trim().to_string();
-                println!("********************************************");
-                println!("{}", format!("ISSUE ID: {id} - NEW SCAD submitted by {user}"));
-                match issue.body {
-                    Some(body) => {
-                        if let Err(msg) = handle_issue(&args, &body, issue.user.login.as_str()).await {
-                            // Add a github issue comment
-                            issuebase.create_comment(id,&msg).await?;
-                            println!("** PART ADD FAILED: {msg}")
-                        } else {
-                            // Add a github issue comment
-                            issuebase.create_comment(id,&"Part Added").await?;
-                            println!("** PART ADDED")
-                        }
-                        if args.leave_open == false {
-                            // Close the issue
-                            issuebase.update(id)
-                                .state(models::IssueState::Closed)
-                                .send()
-                                .await?;
-                        }
-                    },
-                    None => {println!("ISSUE BODY IS NONE")},
-                }
-            },
-            _ => {}
+    // Add a part from a local file
+    if let Some(issue_file) = args.issue_file.as_deref() {
+        let body = fs::read_to_string(issue_file).unwrap().trim().to_string();
+        if let Err(msg) = handle_issue(&args, &body, r"test_user").await {
+            println!("** PART ADD FAILED: {msg}");
+        } else {
+            println!("** PART ADDED");
         }
+        return Ok(());
+    }
+
+    // List parts
+    if args.list_parts {
+        list_parts(&args);
+        return Ok(());
+    }
+
+    // List parts
+    if args.list_sections {
+        list_sections(&args);
+        return Ok(());
+    }
+
+    // Remove a part
+    if let Some(part) = args.remove_part.as_deref() {
+        remove_part(&args, part);
+        return Ok(());
+    }
+
+    // Move a part
+    if let Some(move_str) = args.move_part.as_deref() {
+        move_part(&args, move_str);
+        return Ok(());
+    }
+
+    // If we got to this point, we need the path to openscad
+    if args.openscad.as_deref() == None {
+        println!("Need path to openscad");
+        return Ok(());
+    }
+
+    if let Some(token_str) = args.token_file.as_deref() {
+        let token = fs::read_to_string(token_str).unwrap().trim().to_string();
+        let octocrab = Octocrab::builder()
+            .personal_token(token)
+            .build()?;
+
+        let issuebase = octocrab.issues("nbr0wn", "parapart");
+        let issues = issuebase
+        .list()
+        .state(params::State::Open)
+        .send()
+        .await?;
+
+        for issue in issues {
+            match  issue.title.trim() {
+                "SCAD" => {
+                    let id = issue.number.to_string().parse::<u64>().unwrap();
+                    let user = issue.user.login.trim().to_string();
+                    println!("********************************************");
+                    println!("{}", format!("ISSUE ID: {id} - NEW SCAD submitted by {user}"));
+                    match issue.body {
+                        Some(body) => {
+                            if let Err(msg) = handle_issue(&args, &body, issue.user.login.as_str()).await {
+                                // Add a github issue comment
+                                issuebase.create_comment(id,&msg).await?;
+                                println!("** PART ADD FAILED: {msg}")
+                            } else {
+                                // Add a github issue comment
+                                issuebase.create_comment(id,&"Part Added").await?;
+                                println!("** PART ADDED")
+                            }
+                            if args.close_issue {
+                                // Close the issue
+                                issuebase.update(id)
+                                    .state(models::IssueState::Closed)
+                                    .send()
+                                    .await?;
+                            }
+                        },
+                        None => {println!("ISSUE BODY IS NONE")},
+                    }
+                },
+                _ => {}
+            }
+        }
+    } else {
+        println!("Need a token file");
+        return Ok(());
     }
 
     Ok(())
