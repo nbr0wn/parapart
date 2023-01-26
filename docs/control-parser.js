@@ -276,6 +276,13 @@ function cleanupControls() {
     }
 }
 
+function cleanupHelp() {
+    const help = document.getElementsById("tabhelp-contents");
+    while(help.firstChild) {
+        help.removeChild(help.firstChild);
+      }
+}
+
 function addHelpLine(line){
     const help = document.getElementById('tabhelp-contents');
     const tn = document.createTextNode(line + "\n");
@@ -347,6 +354,7 @@ export function buildCustomizer(data) {
     var description;
 
     cleanupControls();
+    cleanupHelp();
     
     log("** Parsing Customizer Fields")
     globalThis.parapart.part.customization = { };
