@@ -24,7 +24,7 @@ export function spawnOpenSCAD({inputs, args, outputPaths}) {
   }
     
   const promise = new Promise((resolve, reject) => {
-    worker = new Worker('./openscad-worker-inlined.js');
+    worker = new Worker('./openscad-worker-expanded.js');
     // if (navigator.userAgent.indexOf(' Chrome/') < 0) {
     //   worker = new Worker('./openscad-worker-firefox.js'); // {'type': 'module'}
     // } else {

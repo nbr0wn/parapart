@@ -4,7 +4,7 @@ function isEmpty(obj) {
 }
 
 export function writePartToURL(changed,part) {
-  console.log('WRITING PART TO URL:' + JSON.stringify(part));
+  //console.log('WRITING PART TO URL:' + JSON.stringify(part));
   // Save any customizations
   if(changed && ! isEmpty(part.customization) ) {
     window.location.hash = encodeURIComponent(JSON.stringify(part));

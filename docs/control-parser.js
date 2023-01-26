@@ -23,7 +23,7 @@ function randomString() {
 async function updateCustomizations(varname, value) {
     //log(`Setting ${varname} to ${value}`);
     globalThis.parapart.part.customization[varname] = value;
-    globalThis.parapart.part.changed = true;
+    globalThis.parapart.changed = true;
 }
 
 // Add a control label

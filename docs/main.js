@@ -333,7 +333,7 @@ const render = turnIntoDelayableExecution(renderDelay, () => {
     }
   };
 
-  console.log("CUSTOMIZATION: " + JSON.stringify(customization));
+  console.log("CUSTOMIZER JSON: " + JSON.stringify(customization));
 
   const job = spawnOpenSCAD({
     // wasmMemory,
@@ -342,11 +342,12 @@ const render = turnIntoDelayableExecution(renderDelay, () => {
       ['customizations.json', JSON.stringify(customization)]
     ],
     args: [
-      "input.scad",
-      "-o", "out.stl",
+      //"--debug", "all",
       "--summary", "all",
       "-p", "customizations.json",
       "-P", "first",
+      "-o", "out.stl",
+      "input.scad",
       ...Object.keys(featureCheckboxes).filter(f => featureCheckboxes[f].checked).map(f => `--enable=${f}`),
     ],
     outputPaths: ['out.stl']
@@ -483,8 +484,7 @@ function onStateChanged({ allowRun }) {
   if (previousNormalizedState != normalizedState) {
     previousNormalizedState = normalizedState;
 
-    if (allowRun) {
-      console.log("RUNNING");
+    if (allowRun && globalThis.parapart.changed) {
       if (autoparseCheckbox.checked) {
         checkSyntax({ now: false });
       }
@@ -581,12 +581,16 @@ try {
     // Rebuild the customization tabs and reset the fields
     buildCustomizer(editor.getValue());
 
+    globalThis.parapart.changed = false;
+
     // If this is the first time through and we had some
     // customizations from the URL, overwrite the generated
     // ones 
     if (initialLoad) {
+      console.log("* INITIAL LOAD");
+
       if (! isEmpty(savedCustomization)) {
-        console.log("HAVE CUSTOMIZATIONS FROM URL");
+        console.log("** HAVE CUSTOMIZATIONS FROM URL");
         // Merge in the saved customizations
         let merged = {
           ...globalThis.parapart.part.customization,
@@ -597,12 +601,8 @@ try {
         globalThis.parapart.changed = true;
       }
       initialLoad = false;
-    } else {
-      // Not the first time through, so something changed
-      globalThis.parapart.changed = true;
     }
     // Process the stat change
-    console.log("EDITOR CONTENTS CHANGED");
     onStateChanged({ allowRun: true }); 
   });
 
@@ -644,11 +644,13 @@ const defaultState = {
   // Not sure why this doesn't work
   globalThis.parapart.onchange = () => {
     globalThis.parapart.changed = true;
+    //console.log("GLOBALTHIS CHANGED");
     onStateChanged({ allowRun: true });
   }
   // But this does
   globalThis.onchange = () => {
     globalThis.parapart.changed = true;
+    //console.log("GLOBALTHIS CHANGED");
     onStateChanged({ allowRun: true });
   }
 
@@ -662,16 +664,15 @@ const defaultState = {
   // Set up the part rendering function that we will apply
   // to the parts in the gallery
   let renderPartFunc = (id, scadText, stlText) => {
+    console.log("RENDERING PART: " + id);
     
     // Build new local file for STL Viewer
     const blob = new Blob([stlText], { type: "application/octet-stream" });
     stlFile = new File([blob], "temp.stl");
 
-    // We just loaded this from the gallery
-    initialLoad = true;
-
     // Did we get here by reading the part from the URL?
     if( id != globalThis.parapart.part.id ) {
+      console.log("NO GLOBAL PART ID.  Initial load");
       // No - we picked this from the gallery. No
       // customizations yet.
       globalThis.parapart.part.id = id;
@@ -679,6 +680,7 @@ const defaultState = {
       globalThis.parapart.changed = false;
       viewStlFile();
     } else {
+      console.log("New Part ID");
       // We have an ID.  Do we have any customizations?
       if( globalThis.parapart.changed ){
         // Yes.  The base STL we have won't represent
@@ -696,8 +698,6 @@ const defaultState = {
     //console.log("SCAD: " + scadText);
 
     editor.setValue(globalThis.parapart.source.content);
-
-    console.log("RENDERING PART: "+ id);
   }
 
   // This stuff needs DB access and should just be done after db init

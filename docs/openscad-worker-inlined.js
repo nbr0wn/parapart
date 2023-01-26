@@ -1,5 +1,6 @@
 // AUTO GENERATED FILE - DO NOT EDIT
-var import_meta_url = 'https://ochafik.com/openscad/openscad-worker-firefox.js';
+//var import_meta_url = 'https://ochafik.com/openscad/openscad-worker-firefox.js';
+var import_meta_url = 'https://raw.githubusercontent.com/nbr0wn/parapart/main/docs/openscad/openscad-worker-inlined.js';
 
 
 var OpenSCAD = (() => {
