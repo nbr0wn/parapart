@@ -39,22 +39,22 @@ For the part database, Parapart loads a static database file and uses the WASM v
 
 Instructions are here: https://github.com/nbr0wn/parapart/wiki
 
-## Shout outs to those who laid the foundation for this project
+## Shout outs to those upon whose shoulders I stood
 
-Whoo...I did some serious shoulder climbing for this one.  Many thanks to Olivier Chafik, whose opencad-wasm editor project was the foundation of this effort:
+Many thanks to Olivier Chafik, whose opencad-wasm editor project served as the foundation for Parapart.  I did a lot of modification to the presentation layer and file management, but the true work of loading, spawning, and managing OpenSCAD WASM is largely still Olivier's work.
 
 https://github.com/ochafik/openscad-wasm/tree/editor-ochafik.com
 
-Olivier's openscad-wasm build is a fork of Dominick Schroer's openscad-wasm project, which I'm using in place of Olivier's since it was updated a little more recently:
+Olivier's openscad-wasm build is a fork of Dominick Schroer's openscad-wasm project:
 
 https://github.com/DSchroer/openscad-wasm
 
-Olivier's project also made use of the most excellent viewstl:
+Olivier's project also made use of the most excellent viewstl, which Parapart also still uses:
 
 https://www.viewstl.com
 https://github.com/omrips/viewstl
 
-...and the monaco editor:
+...and the monaco editor as well:
 https://github.com/microsoft/monaco-editor
 
 Because I wanted this site to be served from GitHub and hosted statically, I needed a way 
@@ -63,7 +63,7 @@ database in the distribution and using sqlite WASM to query it:
 
 https://sqlite.org/wasm/doc/trunk/index.md
 
-...and of course the OpenSCAD project itself
+...and of course where would any of this be without the OpenSCAD project itself
 https://openscad.org
 
 
@@ -92,5 +92,5 @@ See https://openscad.org/libraries.html for license details
 - General code cleanup
 
 ## Wish List
-- Help files per part
+- External help files per part
 - Having the ability to link related parts and possibly use the same customizations
