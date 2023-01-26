@@ -205,8 +205,16 @@ fn remove_part(args: &Args, id: &str) {
     let dir = format!("{:03}", seq / 100);
     let file_base = format!("{:03}", seq % 100);
     let base = args.parapart.as_str();
-    fs::remove_file(format!("{base}/{PNG_PATH}/{dir}/{file_base}.png")).unwrap();
-    fs::remove_file(format!("{base}/{STL_PATH}/{dir}/{file_base}.stl")).unwrap();
+    Command::new("git")
+        .arg("rm")
+        .arg(format!("{base}/{PNG_PATH}/{dir}/{file_base}.png"))
+        .output()
+        .unwrap();
+    Command::new("git")
+        .arg("rm")
+        .arg(format!("{base}/{STL_PATH}/{dir}/{file_base}.stl"))
+        .output()
+        .unwrap();
     let conn = Connection::open(format!("{db_path}")).unwrap();
     conn.execute("DELETE FROM part WHERE id = :id", named_params!{":id": id}).unwrap();
 }
