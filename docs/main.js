@@ -82,11 +82,13 @@ function buildStlViewer() {
 }
 
 function viewStlFile() {
+  try {
   //console.log(stlViewer.get_camera_state());
   stlViewer.set_camera_state({ position: { x: -100, y: 0, z: 100 }, up: { x: 0, y: 1, z: 0 }, target: { x: 0, y: 0, z: 0 } })
-  try { stlViewer.clean(); stlViewer.remove_model(1); } catch (e) { }
-  stlViewer.add_model({ id: 1, local_file: stlFile, color: modelColor });
-  //console.log(stlViewer);
+    stlViewer.clean(); stlViewer.remove_model(1);
+    stlViewer.add_model({ id: 1, local_file: stlFile, color: modelColor });
+    //console.log(stlViewer);
+  } catch (e) { console.log("STLVIEW ERROR: " + e); }
 }
 
 function addDownloadLink(container, blob, fileName) {
@@ -667,6 +669,7 @@ const defaultState = {
     console.log("RENDERING PART: " + id);
     
     // Build new local file for STL Viewer
+    //console.log("STL FILE: " + stlText);
     const blob = new Blob([stlText], { type: "application/octet-stream" });
     stlFile = new File([blob], "temp.stl");
 

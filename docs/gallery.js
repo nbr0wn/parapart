@@ -22,7 +22,7 @@ export var getStyle = function(elementId, property) {
 };
 
 async function fetchRawFromGitHub(owner, repo, branch, path, id, completedCallback) {
-  console.log(`FETCHING GITHUB: https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`);
+  console.log(`FETCHING RAW GITHUB: https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`);
   return fetch(
     `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`
     ).then(response => response.text()
@@ -34,7 +34,7 @@ async function fetchRawFromGitHub(owner, repo, branch, path, id, completedCallba
 
 // Fetch from local web tree
 async function fetchLocal(fileName, completedCallback) {
-  console.log("FETCHING LOCAL " + fileName);
+  console.log("FETCHING RELATIVE: " + fileName);
   return fetch(fileName
   ).then(response => response.text()
   ).then(function(response) { completedCallback(response); }
@@ -43,9 +43,9 @@ async function fetchLocal(fileName, completedCallback) {
   });
 }
 
-// Test func for serving from local server
+// Test func for serving from non-github server
 async function fetchLocalSCAD(fileName, id, completedCallback) {
-  console.log("FETCHING LOCAL SCAD" + fileName);
+  console.log("FETCHING RELATIVE SCAD: " + fileName);
   return fetch(fileName
   ).then(response => response.text()
   ).then(function(response) { completedCallback(id, response); }
@@ -63,21 +63,21 @@ export async function editPart(id, url) {
   console.log("EDIT NEW PART - ID:" + id + " URL: " + url);
   // Fetch the STL and then fetch the SCAD.  These both return promises
   // so wait for them to finish here. 
-  await fetchSTL(id, function (data) { stashedSTL = data;}); // Cheezy.  Should use browserFS
+  await fetchSTL(id, function (data) { stashedSTL = data; }); // Cheezy.  Should use browserFS
   await fetchRawFromGitHub('nbr0wn','parapart','main', 'docs/'+url, id, function(id,data) { stashedSCAD = data;});
 
-  // Swap for above when serving from local server
+  // Swap for above when serving from non-github server
   //await fetchLocalSCAD(url, id, function(data) { stashedSCAD = data;});
 
   renderPartFunc(id, stashedSCAD, stashedSTL);
 }
 
 function fetchSTL(partId, processFunc) {
-  console.log("FETCHING STL FOR PART ID:", partId);
+  //console.log("FETCHING STL FOR PART ID:", partId);
   let dir = String(Math.floor(parseInt(partId) / 100)).padStart(3, '0');
   let file = String(parseInt(partId) % 100).padStart(3, '0');
   let url = `assets/local_stl/${dir}/${file}.stl`;
-  fetchLocal(url, function (data) { processFunc(data); });
+  return fetchLocal(url, function (data) { processFunc(data); });
 }
 
 function miniViewSTL(data) {

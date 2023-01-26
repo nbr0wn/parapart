@@ -402,7 +402,7 @@ export function buildCustomizer(data) {
         let matches;
         if( matches = line.match(descriptionRegex)) {
             description = matches.groups.description;
-            log("DESCRIPTION: " + description );
+            log("PARAMETER: " + description );
             //addHelpLine(`** ${description}`);
             return true;
         }
@@ -410,7 +410,7 @@ export function buildCustomizer(data) {
         // TABS
         if( matches = line.match(tabRegex)) {
             let tabName = matches.groups.tab.replaceAll("[","").replaceAll("]","");
-            log(`TAB: ${tabName}`);
+            log(`CONTROL TAB: ${tabName}`);
             //addHelpLine(`\n-- SECTION ${tabName} --\n`);
             // If this is the first tab, rename our default placeholder 
             // rather than creating a new one
