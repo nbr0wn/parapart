@@ -376,7 +376,7 @@ export function buildCustomizer(data) {
 
     data.toString().split("\n").every( function(line, index, arr) {
 
-        log(index + " " + line);
+        //log(index + " " + line);
 
         // END OF CUSTOMIZATION MARKER
         if(line.match(customizationEndRegex)) {
