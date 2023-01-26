@@ -277,7 +277,7 @@ function cleanupControls() {
 }
 
 function cleanupHelp() {
-    const help = document.getElementsById("tabhelp-contents");
+    const help = document.getElementById("tabhelp-contents");
     while(help.firstChild) {
         help.removeChild(help.firstChild);
       }
