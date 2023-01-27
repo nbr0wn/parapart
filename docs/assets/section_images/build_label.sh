@@ -8,12 +8,13 @@ do
     scadfile="scad/$t.scad"
     if [ -f $scadfile ]
     then
+        echo "HAVE SCAD FOR $label"
         $1/openscad $args $scadfile -o temp.png
         convert temp.png -transparent "#cc00cc" -geometry 128x128 $t.png
         rm temp.png
     else
         label=`echo $t | tr 'a-z' 'A-Z'`
-        echo $label
+        echo "NO SCAD FOR $label"
         convert -size 128x128 -background grey -fill black -gravity center label:"$label" "$t".png
     fi
 done
