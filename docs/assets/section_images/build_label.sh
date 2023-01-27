@@ -10,7 +10,7 @@ process_file () {
     if [ -f $scadfile ]
     then
         echo "HAVE SCAD FOR $label"
-        $1/openscad $args $scadfile -o temp.png
+        $OSCDIR/openscad $args $scadfile -o temp.png
         convert temp.png -transparent "#cc00cc" -geometry 128x128 $1.png
         rm temp.png
     else
