@@ -43,15 +43,16 @@ INSERT INTO section (id,parent_id,name,image) VALUES (5100,  5000,  "Hinges - Pi
 INSERT INTO section (id,parent_id,name,image) VALUES (6000,  0,     "Gears", "gears.png");
 INSERT INTO section (id,parent_id,name,image) VALUES (7000,  0,     "Wheels", "wheels.png");
 
-INSERT INTO section (id,parent_id,name,image) VALUES (8000,  0,     "Mechanical", "structural.png");
-INSERT INTO section (id,parent_id,name,image) VALUES (8100,  8000,  "Motion", "structural.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (8000,  0,     "Mechanical", "mechanical.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (8100,  8000,  "Motion", "motion.png");
 INSERT INTO section (id,parent_id,name,image) VALUES (8110,  8100,  "Linear Slides", "linear_slides.png");
 INSERT INTO section (id,parent_id,name,image) VALUES (8120,  8100,  "Bushings", "bushings.png");
 INSERT INTO section (id,parent_id,name,image) VALUES (8130,  8100,  "Couplers", "couplers.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (8140,  8100,  "Pulleys", "pulleys.png");
 
 INSERT INTO section (id,parent_id,name,image) VALUES (9000,  0,     "Structural", "structural.png");
 INSERT INTO section (id,parent_id,name,image) VALUES (9100,  9000,  "8020 components", "8020.png");
-INSERT INTO section (id,parent_id,name,image) VALUES (9200,  9000,  "Bar Stock", "8020.png");
+INSERT INTO section (id,parent_id,name,image) VALUES (9200,  9000,  "Bar Stock", "bar_stock.png");
 INSERT INTO section (id,parent_id,name,image) VALUES (9300,  9000,  "Blocks", "blocks.png");
 INSERT INTO section (id,parent_id,name,image) VALUES (9400,  9000,  "Wedges", "wedges.png");
 
