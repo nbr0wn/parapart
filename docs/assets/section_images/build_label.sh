@@ -28,7 +28,7 @@ then
 fi
 
 # Generate the whole works
-for t in 8020 bar_stock blocks bolts boxes brackets bushings components connectors containers couplers displays electrical fans fasteners four_sides gears hinges holders home hooks linear_slides mechanical miscellaneous more_sides motion motion motors nuts pin_barrel potentiometers pulleys screws search_results standoffs structural switches tools trays washers wedges wheels
+for t in 8020 bar_stock blocks bolts boxes brackets bushings components connectors containers couplers displays electrical fans fasteners four_sides gears hinges holders home hooks linear_slides mechanical miscellaneous more_sides motion motion motors nuts pin_barrel potentiometers power_supplies pulleys screws search_results standoffs structural switches tools trays washers wedges wheels
 do
     process_file $t
 done
