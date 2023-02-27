@@ -22,7 +22,7 @@ export var getStyle = function(elementId, property) {
 };
 
 async function fetchRawFromGitHub(owner, repo, branch, path, id, completedCallback) {
-  console.log(`FETCHING RAW GITHUB: https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`);
+  //console.log(`FETCHING RAW GITHUB: https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`);
   return fetch(
     `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`
     ).then(response => response.text()
@@ -34,7 +34,7 @@ async function fetchRawFromGitHub(owner, repo, branch, path, id, completedCallba
 
 // Fetch from local web tree
 async function fetchLocal(fileName, completedCallback) {
-  console.log("FETCHING RELATIVE: " + fileName);
+  //console.log("FETCHING RELATIVE: " + fileName);
   return fetch(fileName
   ).then(response => response.text()
   ).then(function(response) { completedCallback(response); }
@@ -60,7 +60,7 @@ async function fetchLocalSCAD(fileName, id, completedCallback) {
 var stashedSTL = null;
 var stashedSCAD = null;
 export async function editPart(id, url) {
-  console.log("EDIT NEW PART - ID:" + id + " URL: " + url);
+  //console.log("EDIT NEW PART - ID:" + id + " URL: " + url);
   // Fetch the STL and then fetch the SCAD.  These both return promises
   // so wait for them to finish here. 
   await fetchSTL(id, function (data) { stashedSTL = data; }); // Cheezy.  Should use browserFS

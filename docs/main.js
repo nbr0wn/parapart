@@ -74,8 +74,8 @@ function buildStlViewer() {
   stlViewer.set_center_models(true);
   stlViewer.set_auto_resize(true);
   stlViewer.set_auto_zoom(true);
+  stlViewer.set_zoom(-1);
   stlViewer.set_drag_and_drop(false);
-  stlViewer.set_edges(false);
   stlViewer.set_grid(false);
   stlViewer.set_bg_color('transparent');
   stlViewer.model_loaded_callback = id => {
@@ -87,7 +87,7 @@ function viewStlFile() {
   try {
   //console.log(stlViewer.get_camera_state());
   stlViewer.set_camera_state({ position: { x: -100, y: 0, z: 100 }, up: { x: 0, y: 1, z: 0 }, target: { x: 0, y: 0, z: 0 } })
-    stlViewer.clean(); stlViewer.remove_model(1);
+    stlViewer.clean();
     stlViewer.add_model({ id: 1, local_file: stlFile, color: modelColor });
     //console.log(stlViewer);
   } catch (e) { console.log("STLVIEW ERROR: " + e); }
@@ -185,12 +185,13 @@ function isViewerFocused() {
 
 function setExecuting(isExecuting) {
   if (isExecuting) {
-    renderStatusElement.innerText = 'rendering...';
+    renderStatusElement.innerText = 'rendering...1%';
     renderStatusElement.title = null;
     linkContainerElement.classList.add("btn-disabled");
     killButton.classList.remove("btn-disabled");
     runButton.classList.add("btn-disabled");
   } else {
+    renderStatusElement.innerText = '';
     if (renderFailed == false) {
       linkContainerElement.classList.remove("btn-disabled");
     }
@@ -473,7 +474,7 @@ function setFeatures() {
 // Handle changes to state.
 var previousNormalizedState = "";
 function onStateChanged({ allowRun }) {
-  console.log("STATE CHANGED: " + JSON.stringify(globalThis.parapart.part));
+  //console.log("STATE CHANGED: " + JSON.stringify(globalThis.parapart.part));
 
   // Save new part state in URL
   writePartToURL(globalThis.parapart.changed, globalThis.parapart.part);
@@ -555,9 +556,8 @@ try {
   const fs = await createEditorFS(workingDir);
   await registerOpenSCADLanguage(fs, workingDir, zipArchives);
 
-  console.log(getStyle('stop-render', 'background'));
+  //console.log(getStyle('stop-render', 'background'));
   let bgcolor = rgba2hex(getStyle('stop-render', 'background'));
-  console.log(bgcolor);
   monaco.editor.defineTheme('pp-dark', {
     base: 'vs-dark',
     inherit: true,
@@ -591,10 +591,10 @@ try {
     // customizations from the URL, overwrite the generated
     // ones 
     if (initialLoad) {
-      console.log("* INITIAL LOAD");
+      //console.log("* INITIAL LOAD");
 
       if (! isEmpty(savedCustomization)) {
-        console.log("** HAVE CUSTOMIZATIONS FROM URL");
+        console.log("HAVE CUSTOMIZATIONS FROM URL");
         // Merge in the saved customizations
         let merged = {
           ...globalThis.parapart.part.customization,
@@ -668,16 +668,18 @@ const defaultState = {
   // Set up the part rendering function that we will apply
   // to the parts in the gallery
   let renderPartFunc = (id, scadText, stlText) => {
-    console.log("RENDERING PART: " + id);
-    
+    var fname = "parapart" + id + ".stl";
+
     // Build new local file for STL Viewer
-    //console.log("STL FILE: " + stlText);
     const blob = new Blob([stlText], { type: "application/octet-stream" });
-    stlFile = new File([blob], "temp.stl");
+    stlFile = new File([blob], fname);
+
+    // Update the STL download link
+    addDownloadLink(linkContainerElement, blob, fname);
 
     // Did we get here by reading the part from the URL?
     if( id != globalThis.parapart.part.id ) {
-      console.log("NO GLOBAL PART ID.  Initial load");
+      console.log("No Part ID in URL - Gallery pick");
       // No - we picked this from the gallery. No
       // customizations yet.
       globalThis.parapart.part.id = id;
@@ -685,15 +687,18 @@ const defaultState = {
       globalThis.parapart.changed = false;
       viewStlFile();
     } else {
-      console.log("New Part ID");
-      // We have an ID.  Do we have any customizations?
+      console.log("Part ID obtained from URL");
+      // There was We have an ID.  Do we have any customizations?
       if( globalThis.parapart.changed ){
+        console.log("customizations obtained from URL");
         // Yes.  The base STL we have won't represent
         // the linked part, so re-render
         globalThis.parapart.changed = true;
       } else {
         // No changes - URL contained just a part ID
         viewStlFile();
+        // Force 
+        setExecuting(false);
       }
     }
 
@@ -714,7 +719,6 @@ const defaultState = {
     let part = globalThis.parapart.part;
     // Did we load the page with a part ID?
     if (part.id != 0) {
-      console.log("*****   HAVE PART ID IN URL: " + part.id);
       // Close the gallery
       document.getElementById('nav-overlay').style.width = "0vh";
 

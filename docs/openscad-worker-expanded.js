@@ -337,14 +337,14 @@ function isDataURI(filename) {
     return filename.startsWith(dataURIPrefix)
 }
 var wasmBinaryFile;
-    if (Module["locateFile"]) {
-        wasmBinaryFile = "openscad.wasm";
-        if (!isDataURI(wasmBinaryFile)) {
-            wasmBinaryFile = locateFile(wasmBinaryFile)
-        }
-    } else {
-        wasmBinaryFile = new URL("openscad.wasm", import_meta_url).toString()
-        console.log(wasmBinaryFile);
+if (Module["locateFile"]) {
+    wasmBinaryFile = "openscad.wasm";
+    if (!isDataURI(wasmBinaryFile)) {
+        wasmBinaryFile = locateFile(wasmBinaryFile)
+    }
+} else {
+    wasmBinaryFile = new URL("openscad.wasm", import_meta_url).toString()
+    //console.log(wasmBinaryFile);
 }
 
 function getBinary(file) {
@@ -5459,7 +5459,7 @@ addEventListener('message', async (e) => {
             elapsedMillis: end - start
         }
 
-        console.debug(result);
+        //console.debug(result);
 
         postMessage(result);
     } catch (e) {

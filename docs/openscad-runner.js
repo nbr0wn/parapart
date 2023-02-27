@@ -34,8 +34,10 @@ export function spawnOpenSCAD({inputs, args, outputPaths}) {
     // }
     rejection = reject;
     worker.onmessage = e => {
+        // Handle special exit code for render progress updates
         if (e.data.exitcode == -2) {
             document.getElementById('render-status').innerText = 'Rendering...' + e.data.progress + '%';
+            // "I'm not done yet!"" --nearly-dead peasant
             return false;
         } else {
           resolve(e.data);
