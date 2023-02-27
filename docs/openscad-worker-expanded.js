@@ -1,7 +1,7 @@
 // AUTO GENERATED FILE - DO NOT EDIT
 //var import_meta_url = 'https://ochafik.com/openscad/openscad-worker-firefox.js';
-//var import_meta_url = 'https://raw.githubusercontent.com/nbr0wn/parapart/main/docs/openscad/openscad-worker-expanded.js';
-var import_meta_url = 'http://localhost:8001/openscad/openscad.wasm';
+var import_meta_url = 'https://raw.githubusercontent.com/nbr0wn/parapart/main/docs/openscad/openscad-worker-expanded.js';
+//var import_meta_url = 'http://localhost:8001/openscad/openscad.wasm';
 
 
 var OpenSCAD = (() => {
