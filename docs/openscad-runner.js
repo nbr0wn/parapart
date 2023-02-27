@@ -15,6 +15,8 @@ export function spawnOpenSCAD({inputs, args, outputPaths}) {
   var worker;
   var rejection;
 
+  console.log("OPENSCAD ARGS", args);
+
   function terminate() {
     if (!worker) {
       return;
@@ -32,8 +34,13 @@ export function spawnOpenSCAD({inputs, args, outputPaths}) {
     // }
     rejection = reject;
     worker.onmessage = e => {
-      resolve(e.data);
-      terminate();
+        if (e.data.exitcode == -2) {
+            document.getElementById('render-status').innerText = 'Rendering...' + e.data.progress + '%';
+            return false;
+        } else {
+          resolve(e.data);
+          terminate();
+        }
     }
     worker.postMessage({inputs, args, outputPaths})
   });

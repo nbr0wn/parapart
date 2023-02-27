@@ -71,7 +71,9 @@ function rgba2hex(orig) {
 
 function buildStlViewer() {
   const stlViewer = new StlViewer(stlViewerElement, {});
+  stlViewer.set_center_model(true);
   stlViewer.set_auto_resize(true);
+  stlViewer.set_auto_zoom(true);
   stlViewer.set_drag_and_drop(false);
   stlViewer.set_edges(false);
   stlViewer.set_grid(false);
