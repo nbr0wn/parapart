@@ -43,7 +43,9 @@ var initialLoad = true;
 
 const featureCheckboxes = {};
 
-var persistCameraState = false; // If one gets too far, it's really hard to auto reset and can be confusing to users. Just restart.
+//var defaultCamState = { position: { x: -100, y: 0, z: 100 }, up: { x: 0, y: 1, z: 0 }, target: { x: 0, y: 0, z: 0 } };
+var savedCamState = null;
+
 var stlViewer;
 var stlFile;
 
@@ -72,13 +74,16 @@ function rgba2hex(orig) {
 function buildStlViewer() {
   const stlViewer = new StlViewer(stlViewerElement, {});
   stlViewer.set_center_models(true);
-  stlViewer.set_auto_resize(true);
+  //stlViewer.set_auto_resize(true);
   stlViewer.set_auto_zoom(true);
-  stlViewer.set_zoom(-1);
+  //stlViewer.set_zoom(-1);
   stlViewer.set_drag_and_drop(false);
   stlViewer.set_grid(false);
   stlViewer.set_bg_color('transparent');
   stlViewer.model_loaded_callback = id => {
+    if ( savedCamState != null ) {
+      stlViewer.set_camera_state(savedCamState);
+    }
   };
   return stlViewer;
 }
@@ -86,8 +91,9 @@ function buildStlViewer() {
 function viewStlFile() {
   try {
   //console.log(stlViewer.get_camera_state());
-  stlViewer.set_camera_state({ position: { x: -100, y: 0, z: 100 }, up: { x: 0, y: 1, z: 0 }, target: { x: 0, y: 0, z: 0 } })
+  //stlViewer.set_camera_state({ position: { x: -100, y: 0, z: 100 }, up: { x: 0, y: 1, z: 0 }, target: { x: 0, y: 0, z: 0 } })
     stlViewer.clean();
+    stlViewer.zoom_done = false;
     stlViewer.add_model({ id: 1, local_file: stlFile, color: modelColor });
     //console.log(stlViewer);
   } catch (e) { console.log("STLVIEW ERROR: " + e); }
@@ -191,7 +197,6 @@ function setExecuting(isExecuting) {
     killButton.classList.remove("btn-disabled");
     runButton.classList.add("btn-disabled");
   } else {
-    renderStatusElement.innerText = '';
     if (renderFailed == false) {
       linkContainerElement.classList.remove("btn-disabled");
     }
@@ -363,7 +368,7 @@ const render = turnIntoDelayableExecution(renderDelay, () => {
     completion: (async () => {
       try {
         const result = await job;
-        //console.log(result);
+        console.log(result);
         processMergedOutputs(editor, result.mergedOutputs, timestamp);
 
         if (result.error) {
@@ -383,6 +388,8 @@ const render = turnIntoDelayableExecution(renderDelay, () => {
         // console.log(new TextDecoder().decode(content));
         stlFile = new File([blob], fileName);
 
+        savedCamState = stlViewer.get_camera_state();
+
         viewStlFile(stlFile);
 
         addDownloadLink(linkContainerElement, blob, fileName);
@@ -391,7 +398,7 @@ const render = turnIntoDelayableExecution(renderDelay, () => {
         renderStatusElement.innerText = '[Render Failed]';
         renderFailed = true;
         linkContainerElement.classList.add("btn-disabled");
-        renderStatusElement.title = e.toString();
+        //renderStatusElement.title = e.toString();
       } finally {
         setExecuting(false);
       }
@@ -404,30 +411,6 @@ const render = turnIntoDelayableExecution(renderDelay, () => {
 //////////////////////////////////////////////////////////////////////
 
 runButton.onclick = () => render({ now: true });
-
-function getState() {
-  const features = Object.keys(featureCheckboxes).filter(f => featureCheckboxes[f].checked);
-  return {
-    part: {
-      id: currentPartId,
-      customization: globalThis.parapart.part.customization,
-      changed: globalThis.parapart.changed,
-    },
-    source: {
-      name: sourceFileName,
-      content: editor.getValue(),
-    },
-    autorender: autorenderCheckbox.checked,
-    autoparse: autoparseCheckbox.checked,
-    autorotate: autorotateCheckbox.checked,
-    // showedges: showedgesCheckbox.checked,
-    features,
-    viewerFocused: isViewerFocused(),
-    // showExp: features.length > 0 || showExperimentalFeaturesCheckbox.checked,
-    showExp: showExperimentalFeaturesCheckbox.checked,
-    camera: persistCameraState ? stlViewer.get_camera_state() : null,
-  };
-}
 
 function normalizeSource(src) {
   return src.replaceAll(/\/\*.*?\*\/|\/\/.*?$/gm, '')
@@ -455,9 +438,6 @@ function updateExperimentalCheckbox(temptativeChecked) {
 
 function setFeatures() {
   let state = globalThis.parapart;
-  if (state.camera && persistCameraState) {
-    //stlViewer.set_camera_state(state.camera);
-  }
   let features = new Set();
   if (state.features) {
     features = new Set(state.features);
@@ -500,19 +480,6 @@ function onStateChanged({ allowRun }) {
   }
 }
 
-function pollCameraChanges() {
-  if (!persistCameraState) {
-    return;
-  }
-  let lastCam;
-  setInterval(function () {
-    const ser = JSON.stringify(stlViewer.get_camera_state());
-    if (ser != lastCam) {
-      lastCam = ser;
-      //onStateChanged({ allowRun: false });
-    }
-  }, 1000); // TODO only if active tab
-}
 
 var definedLightTheme = false;
 function setDarkMode(dark) {
@@ -783,8 +750,6 @@ const defaultState = {
     }
     //onStateChanged({ allowRun: false });
   };
-
-  pollCameraChanges();
 
 } catch (e) {
   console.trace();
