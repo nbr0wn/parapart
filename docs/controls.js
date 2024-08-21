@@ -1,4 +1,6 @@
 
+// Helper functions for handling input changes in the customizer UI
+
 // Update the customization object
 function updateCustomizations(varname, value) {
     //console.log(`Setting ${varname} to ${value}`);

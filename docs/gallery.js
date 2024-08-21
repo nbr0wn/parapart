@@ -1,3 +1,7 @@
+
+// This code is used to build and navigate the gallery before selecting a particular part.
+
+
 import { log, warn, error } from './log.js';
 import { setupAddPart } from './add-part.js';
 
@@ -87,6 +91,7 @@ function miniViewSTL(data) {
   // Set the miniViewer color to match the current style
   const style = getComputedStyle(document.getElementById("nav-overlay"));
   miniViewer.set_bg_color(style.backgroundColor);
+  miniViewer.zoom_done=false;
   let modelColor = getStyle("lightmode", "backgroundColor");
   try { miniViewer.clean(); } catch (e) { console.log("STLVIEW ERROR: " + e + e.stack); }
   try { miniViewer.add_model({ id: 1, local_file: stlFile, color: modelColor }) } catch (e) { console.log("STLVIEW ERROR: " + e); }
@@ -98,7 +103,7 @@ function showViewer(event) {
   miniViewerDiv.style.top = event.target.offsetTop + "px";
   // Goddamned webdev - this should have been possible with just a display block/none but OoHhhhhHhh nOoOOo.
   miniViewerDiv.style.zIndex = 50;
-  miniViewerDiv.onclick = function () { miniViewerDiv.style.zIndex = -50; miniViewer.clean(); event.target.onclick(); }
+  miniViewerDiv.onclick = function () { miniViewerDiv.style.zIndex = -50; miniViewerDiv.style.left = -9999; miniViewerDiv.style.top = -9999; miniViewer.clean(); event.target.onclick(); }
   miniViewerDiv.onmouseleave = function () { miniViewerDiv.style.zIndex = -50; miniViewer.clean(); }
   fetchSTL(event.target.partId, miniViewSTL);
 }

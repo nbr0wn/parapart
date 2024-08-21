@@ -1,3 +1,8 @@
+
+
+// This file contains code to build the customizer UI by parsing the openSCAD 
+// code and inserting HTML elements to match the customization config found there
+
 import { log, warn, error } from './log.js';
 
 // Generate a random string for our unique identifiers

@@ -1,3 +1,7 @@
+
+// Code for managing the uploading of built-in libraries used by SCAD code
+
+
 const zipArchives = {
   'fonts': {},
   // @openscad
@@ -64,6 +68,7 @@ async function symlinkLibraries(archiveNames, FS, prefix='/libraries', cwd='/tmp
   };
 
   await Promise.all(archiveNames.map(n => (async () => {
+    console.log("Loading LIBS");
     if (!(n in zipArchives)) throw `Archive named ${n} invalid (valid ones: ${Object.keys(zipArchives).join(', ')})`;
     const {symlinks} = (zipArchives)[n];
     if (symlinks) {

@@ -82,7 +82,7 @@ function buildStlViewer() {
   stlViewer.set_bg_color('transparent');
   stlViewer.model_loaded_callback = id => {
     if ( savedCamState != null ) {
-      stlViewer.set_camera_state(savedCamState);
+      //stlViewer.set_camera_state(savedCamState);
     }
   };
   return stlViewer;
@@ -93,6 +93,8 @@ function viewStlFile() {
   //console.log(stlViewer.get_camera_state());
   //stlViewer.set_camera_state({ position: { x: -100, y: 0, z: 100 }, up: { x: 0, y: 1, z: 0 }, target: { x: 0, y: 0, z: 0 } })
     stlViewer.clean();
+    stlViewer.set_auto_zoom(true);
+    stlViewer.set_zoom(-1);
     stlViewer.zoom_done = false;
     stlViewer.add_model({ id: 1, local_file: stlFile, color: modelColor });
     //console.log(stlViewer);
