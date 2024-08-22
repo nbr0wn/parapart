@@ -8,7 +8,7 @@ Parametric OpenSCAD part library
 - 100% static - Hosted by GitHub and runs in the browser
 
 
-GitHub Pages site:
+### Take a look:
 https://parapart.com
 
 
