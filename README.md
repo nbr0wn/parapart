@@ -100,3 +100,4 @@ See https://openscad.org/libraries.html for license details
 - External help files per part
 - Local include files for a part 
 - Having the ability to link related parts and possibly use the same customizations
+- Expose $fn to tune model smoothness
