@@ -1,4 +1,4 @@
-# parapart
+# Parapart
 
 3D part library for printing or incorporating into other projects.
 
