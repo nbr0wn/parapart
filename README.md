@@ -6,9 +6,10 @@
 - Free
 - Fast
 - Open source
-- No signups/logins/ads to download parts
+- No account needed to download parts
+- Ad free
 - 100% static - Hosted by GitHub and runs in the browser
-- No coding needed to customize parts
+- No code editing needed to customize parts
 
 
 ### Take a look:
