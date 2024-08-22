@@ -87,9 +87,10 @@ Olivier kindly included the following OpenSCAD libraries in his distribution, wh
 
 See https://openscad.org/libraries.html for license details 
 
-
 ## Known Issues
 - General code cleanup
+- Layout for mobile needs serious help
+- OpenSCAD wasm performance for complicated models can be painful
 
 ## Wish List
 - External help files per part
