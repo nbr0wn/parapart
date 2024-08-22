@@ -8,6 +8,7 @@
 - Open source
 - No signups/logins/ads to download parts
 - 100% static - Hosted by GitHub and runs in the browser
+- No coding needed to customize parts
 
 
 ### Take a look:
