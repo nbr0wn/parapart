@@ -88,8 +88,12 @@ Olivier kindly included the following OpenSCAD libraries in his distribution, wh
 - UB.scad
 - YAPP_Box
 
-
 See https://openscad.org/libraries.html for license details 
+
+I also included the following libraries myself:
+
+- dotscad (https://github.com/JustinSDK/dotSCAD/tree/master)
+
 
 ## Known Issues
 - General code messiness

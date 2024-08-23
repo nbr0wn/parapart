@@ -6,6 +6,7 @@ const zipArchives = {
   'fonts': {},
   // @openscad
   'MCAD': {},
+  'dotscad': {},
   // @revarbat
   'BOSL': {},
   'BOSL2': {
@@ -92,10 +93,12 @@ function configureAndInstallFS(windowOrSelf, options) {
 }
 
 async function createEditorFS(workingDir='/home') {
+  console.log('Creating FS');
   const archiveNames = Object.keys(zipArchives);
   const librariesMounts = await getBrowserFSLibrariesMounts(archiveNames);
   const allMounts = {};
   for (const n in librariesMounts) {
+    console.log('Mounting', n);
     allMounts[`${workingDir}/${n}`] = librariesMounts[n];
   }
 
