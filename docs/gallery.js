@@ -64,7 +64,7 @@ async function fetchLocalSCAD(fileName, id, completedCallback) {
 var stashedSTL = null;
 var stashedSCAD = null;
 export async function editPart(id, url) {
-  //console.log("EDIT NEW PART - ID:" + id + " URL: " + url);
+  console.log("EDIT NEW PART - ID:" + id + " URL: " + url);
   // Fetch the STL and then fetch the SCAD.  These both return promises
   // so wait for them to finish here. 
   await fetchSTL(id, function (data) { stashedSTL = data; }); // Cheezy.  Should use browserFS

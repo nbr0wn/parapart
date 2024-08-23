@@ -1,4 +1,5 @@
 
+-- Details for each part in the database
 CREATE TABLE "part" ( 
     "id"            INTEGER,
     "name"          TEXT NOT NULL,
@@ -11,14 +12,20 @@ CREATE TABLE "part" (
     PRIMARY KEY("id" AUTOINCREMENT)
 );
 
+-- Mapping from a part to a section when displaying in the gallery
 CREATE TABLE "part_section" ( "part_id" INTEGER NOT NULL, "section_id" NOT NULL);
 
+-- Gallery section description
 CREATE TABLE "section" ( "id" INTEGER, "parent_id" INTEGER, "name" TEXT, "image" TEXT);
 
+-- Available tag list for parts
 CREATE TABLE "tagnames" ( "id" INTEGER, "name" TEXT, PRIMARY KEY("id" AUTOINCREMENT));
 
+-- Mapping of tags to parts
 CREATE TABLE "part_tag" ( "part_id" INTEGER, "tag_id" INTEGER);
 
+
+-- Current default sections 
 INSERT INTO section (id,parent_id,name,image) VALUES (1000,  0,     "Containers", "containers.png");
 INSERT INTO section (id,parent_id,name,image) VALUES (1100,  1000, "Boxes", "boxes.png");
 INSERT INTO section (id,parent_id,name,image) VALUES (1110,  1100,  "Boxes - Four Sided", "four_sides.png");
@@ -69,7 +76,7 @@ INSERT INTO section (id,parent_id,name,image) VALUES (11000, 0,     "Miscellaneo
 INSERT INTO section (id,parent_id,name,image) VALUES (12000, 0,     "Tools", "tools.png");
 
 
-
+-- Current default tags
 INSERT INTO tagnames (name) VALUES ("box");
 INSERT INTO tagnames (name) VALUES ("clip");
 INSERT INTO tagnames (name) VALUES ("hanger");
