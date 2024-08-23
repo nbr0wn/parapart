@@ -1,14 +1,18 @@
-# parapart
+# Parapart
 
-Parametric OpenSCAD part library
+3D part library for printing or incorporating into other projects.
+
+## Project Goals
 - Free
 - Fast
 - Open source
-- No signups/logins/ads to download parts
+- No account needed to download parts
+- Ad free
 - 100% static - Hosted by GitHub and runs in the browser
+- No code editing needed to customize parts
 
 
-GitHub Pages site:
+### Take a look:
 https://parapart.com
 
 
@@ -87,10 +91,13 @@ Olivier kindly included the following OpenSCAD libraries in his distribution, wh
 
 See https://openscad.org/libraries.html for license details 
 
-
 ## Known Issues
-- General code cleanup
+- General code messiness
+- Layout (especially mobile) needs serious help
+- OpenSCAD wasm performance for complicated models can be painful
 
 ## Wish List
 - External help files per part
+- Local include files for a part 
 - Having the ability to link related parts and possibly use the same customizations
+- Expose $fn to tune model smoothness
