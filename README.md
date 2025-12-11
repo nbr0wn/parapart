@@ -1,3 +1,6 @@
+
+## This project is currently in limbo and is not being maintained.
+
 # Parapart
 
 3D part library for printing or incorporating into other projects.
@@ -13,7 +16,7 @@
 
 
 ### Take a look:
-https://parapart.com
+https://nbr0wn.github.io/parapart
 
 
 ## What is this thing?
